@@ -1,0 +1,306 @@
+TBASE
+
+http://tbase.co.kr  -> LOGIN -> report
+http://cts.tbase.co.kr
+
+TBASE STAGE
+
+http://tradingdesk.co.kr  -> LOGIN (miyoung.park1 : Password3#) -> report
+http://cts.tradingdesk.co.kr  <- elasticsearch
+
+
+Gitlab (gitlab.com)
+https://gitlab.com/dbasen/report
+-> clone (stage branch)
+  -> new branch
+
+
+# vi /etc/hosts
+127.0.0.1	cts.tradingdesk.co.kr
+
+
+* Report 구조
+    예제 - 매체별 기여 분석
+        http://cts.tradingdesk.co.kr/cts_conv_v2/2137
+        CJMall, 2020-03-01 ~ 2020-03-12
+
+    <설명>
+    front JSP       /cts_conv_v2/2137           <- options 를 mysql에서 가져와서 데이터를 질의할 수 있는 화면에 출력
+    ajax JSP        /cts_conv_v2_ajax/2148      <- 조건에 맞는 데이터를 질의, 회신(JSON)  => eclise console 에 query 출력 참고 => index 참고하여 KIBANA에 질의하면 됨
+    sub_ajax JSP
+
+
+* elasticsearch KIBANA
+    http://122.99.192.172:5601/  => Dev Tool
+
+---------------------------------------------
+GET /summary2-*/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "pfno": [
+              "1037",
+              "1040"
+            ],
+            "boost": 1
+          }
+        },
+        {
+          "range": {
+            "statdate": {
+              "from": "2020-02-29T15:00:00Z",
+              "to": "2020-03-12T14:59:59Z",
+              "include_lower": true,
+              "include_upper": true,
+              "boost": 1
+            }
+          }
+        },
+        {
+          "terms": {
+            "promotion": [
+              "CJmall"
+            ],
+            "boost": 1
+          }
+        },
+        {
+          "match_all": {
+            "boost": 1
+          }
+        },
+        {
+          "wildcard": {
+            "camp": {
+              "wildcard": "**",
+              "boost": 1
+            }
+          }
+        }
+      ],
+      "adjust_pure_negative": true,
+      "boost": 1
+    }
+  },
+  "aggregations": {
+    "media": {
+      "terms": {
+        "field": "camp_group_no",
+        "size": 10000,
+        "min_doc_count": 1,
+        "shard_min_doc_count": 0,
+        "show_term_doc_count_error": false,
+        "order": [
+          {
+            "revenueSum": "desc"
+          },
+          {
+            "_key": "asc"
+          }
+        ]
+      },
+      "aggregations": {
+        "conversionSum": {
+          "sum": {
+            "field": "l_odr_last",
+            "missing": 0
+          }
+        },
+        "revenueSum": {
+          "sum": {
+            "field": "l_rvn_last",
+            "missing": 0
+          }
+        },
+        "registerSum": {
+          "sum": {
+            "field": "l_rgr_last",
+            "missing": 0
+          }
+        },
+        "inboundSum": {
+          "sum": {
+            "field": "land",
+            "missing": 0
+          }
+        },
+        "impressionSum": {
+          "sum": {
+            "field": "impr",
+            "missing": 0
+          }
+        },
+        "g1Sum": {
+          "sum": {
+            "field": "l_g1_last",
+            "missing": 0
+          }
+        },
+        "g2Sum": {
+          "sum": {
+            "field": "l_g2_last",
+            "missing": 0
+          }
+        },
+        "g3Sum": {
+          "sum": {
+            "field": "l_g3_last",
+            "missing": 0
+          }
+        },
+        "g4Sum": {
+          "sum": {
+            "field": "l_g4_last",
+            "missing": 0
+          }
+        },
+        "g5Sum": {
+          "sum": {
+            "field": "l_g5_last",
+            "missing": 0
+          }
+        },
+        "g6Sum": {
+          "sum": {
+            "field": "l_g6_last",
+            "missing": 0
+          }
+        },
+        "g7Sum": {
+          "sum": {
+            "field": "l_g7_last",
+            "missing": 0
+          }
+        },
+        "g8Sum": {
+          "sum": {
+            "field": "l_g8_last",
+            "missing": 0
+          }
+        },
+        "g9Sum": {
+          "sum": {
+            "field": "l_g9_last",
+            "missing": 0
+          }
+        },
+        "g10Sum": {
+          "sum": {
+            "field": "l_g10_last",
+            "missing": 0
+          }
+        },
+        "by_day": {
+          "date_histogram": {
+            "field": "statdate",
+            "format": "yyyy-MM-dd",
+            "time_zone": "Asia/Seoul",
+            "interval": "1d",
+            "offset": 0,
+            "order": {
+              "_key": "asc"
+            },
+            "keyed": false,
+            "min_doc_count": 0
+          },
+          "aggregations": {
+            "conversion": {
+              "sum": {
+                "field": "l_odr_last",
+                "missing": 0
+              }
+            },
+            "revenue": {
+              "sum": {
+                "field": "l_rvn_last",
+                "missing": 0
+              }
+            },
+            "register": {
+              "sum": {
+                "field": "l_rgr_last",
+                "missing": 0
+              }
+            },
+            "inbound": {
+              "sum": {
+                "field": "land",
+                "missing": 0
+              }
+            },
+            "impression": {
+              "sum": {
+                "field": "impr",
+                "missing": 0
+              }
+            },
+            "g1": {
+              "sum": {
+                "field": "l_g1_last",
+                "missing": 0
+              }
+            },
+            "g2": {
+              "sum": {
+                "field": "l_g2_last",
+                "missing": 0
+              }
+            },
+            "g3": {
+              "sum": {
+                "field": "l_g3_last",
+                "missing": 0
+              }
+            },
+            "g4": {
+              "sum": {
+                "field": "l_g4_last",
+                "missing": 0
+              }
+            },
+            "g5": {
+              "sum": {
+                "field": "l_g5_last",
+                "missing": 0
+              }
+            },
+            "g6": {
+              "sum": {
+                "field": "l_g6_last",
+                "missing": 0
+              }
+            },
+            "g7": {
+              "sum": {
+                "field": "l_g7_last",
+                "missing": 0
+              }
+            },
+            "g8": {
+              "sum": {
+                "field": "l_g8_last",
+                "missing": 0
+              }
+            },
+            "g9": {
+              "sum": {
+                "field": "l_g9_last",
+                "missing": 0
+              }
+            },
+            "g10": {
+              "sum": {
+                "field": "l_g10_last",
+                "missing": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+---------------------------------------------

@@ -1,0 +1,5 @@
+print(5)
+print(-10)
+print(3.14)
+print(abs(-5))
+print(pow(4,2))

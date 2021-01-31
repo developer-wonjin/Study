@@ -1,0 +1,151 @@
+* 웹사이트
+logger-dev.tradingdesk.co.kr
+122.99.192.250 - bizspring : qnfrma!@!@
+
+* 소스 디렉토리
+/home/bizspring/html/elastic.logger.co.kr
+
+
+* elasticsearch KIBANA
+    http://172.16.100.70:5601/  => Dev Tool
+
+---------------------------------------------
+
+GET /pageview-*/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "terms": {
+          "pfno": [
+            "12845",
+            "23884"
+          ]
+        }
+      },
+      "must_not": {
+        "term": {
+          "du_dp.full": ""
+        }
+      },
+      "filter": {
+        "range": {
+          "vt": {
+            "gte": "2020-03-01T00:00:00+0900",
+            "lte": "2020-04-28T23:59:59+0900"
+          }
+        }
+      }
+    }
+  },
+  "aggregations": {
+    "by_dimension": {
+      "terms": {
+        "field": "du_dp.full",
+        "size": 200,
+        "order": {
+          "pageviews": "desc"
+        }
+      },
+      "aggs": {
+        "pageviews": {
+          "value_count": {
+            "field": "_id"
+          }
+        },
+        "visits": {
+          "cardinality": {
+            "field": "sid"
+          }
+        },
+        "visitors": {
+          "cardinality": {
+            "field": "uid"
+          }
+        },
+        "duration": {
+          "sum": {
+            "field": "duration",
+            "missing": 0
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+* REST query
+
+
+curl -XGET '172.16.100.71:9200/pageview-*/_search' -H 'Content-Type: application/json' -d '{
+  "query": {
+    "bool": {
+      "must": {
+        "terms": {
+          "pfno": [
+            "12845",
+            "23884"
+          ]
+        }
+      },
+      "must_not": {
+        "term": {
+          "du_dp.full": ""
+        }
+      },
+      "filter": {
+        "range": {
+          "vt": {
+            "gte": "2020-03-01T00:00:00+0900",
+            "lte": "2020-04-28T23:59:59+0900"
+          }
+        }
+      }
+    }
+  },
+  "aggregations": {
+    "by_dimension": {
+      "terms": {
+        "field": "du_dp.full",
+        "size": 200,
+        "order": {
+          "pageviews": "desc"
+        }
+      },
+      "aggs": {
+        "pageviews": {
+          "value_count": {
+            "field": "_id"
+          }
+        },
+        "visits": {
+          "cardinality": {
+            "field": "sid"
+          }
+        },
+        "visitors": {
+          "cardinality": {
+            "field": "uid"
+          }
+        },
+        "duration": {
+          "sum": {
+            "field": "duration",
+            "missing": 0
+          }
+        }
+      }
+    }
+  }
+}'
+
+
+
+=>
+
+
+
+
+{"took":26,"timed_out":false,"_shards":{"total":42,"successful":42,"skipped":0,"failed":0},"hits":{"total":{"value":375,"relation":"eq"},"max_score":1.0,"hits":[{"_index":"pageview-2020-03-19","_type":"_doc","_id":"Sv6j8nAB212ZgcqwfYvx","_score":1.0,"_source":{"du_dq":[{"value":"A","param":"bigCat"},{"value":"G","param":"midCat"},{"value":"K","param":"smallCat"}],"dpuid":"rRExHwYxyoXobzeBHVf3GlE0jfmnfuXGmBe37cAG","trex":5,"vt":"2020-03-19T11:52:44.000Z","pfno":"12845","du":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=G&smallCat=K","du_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/list.php","d2":"list.php"},"dr_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/view.php","d2":"view.php"},"cp":["상품 A 카테고리 > 제조사_G > 브랜드_K"],"pi":"PLV","dr_dq":[{"value":"AFK001","param":"itemCode"}],"sid":"01bcd15f0f96e5e1c0d865e2f1119ab5","uid":"8a207da187810e03118b833c83fb45c6","dr":"http://demo.logger.co.kr/item/view.php?itemCode=AFK001","@timestamp":"2020-03-19T11:52:44.722Z","locations":{"ip":"122.99.192.187"},"@version":"1","environments":{"os":"Macintosh","ce":true,"js":true,"cd":24,"ss":[1920,1080],"tz":-540,"user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","lg":"ko","an":"Chrome 80.","je":false}}},{"_index":"pageview-2020-03-19","_type":"_doc","_id":"mJej8nABxX_lJrFHjRej","_score":1.0,"_source":{"du_dq":[{"value":"A","param":"bigCat"},{"value":"F","param":"midCat"},{"value":"L","param":"smallCat"}],"dpuid":"rRExHwYxyoXobzeBHVf3GlE0jfmnfuXGmBe37cAG","trex":7,"vt":"2020-03-19T11:52:47.000Z","pfno":"12845","du":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=F&smallCat=L","du_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/list.php","d2":"list.php"},"dr_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/view.php","d2":"view.php"},"cp":["상품 A 카테고리 > 제조사_F > 브랜드_L"],"pi":"PLV","dr_dq":[{"value":"AGK000","param":"itemCode"}],"sid":"01bcd15f0f96e5e1c0d865e2f1119ab5","uid":"8a207da187810e03118b833c83fb45c6","dr":"http://demo.logger.co.kr/item/view.php?itemCode=AGK000","@timestamp":"2020-03-19T11:52:48.723Z","locations":{"ip":"122.99.192.187"},"@version":"1","environments":{"os":"Macintosh","ce":true,"js":true,"cd":24,"ss":[1920,1080],"tz":-540,"user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","lg":"ko","an":"Chrome 80.","je":false}}},{"_index":"pageview-2020-03-19","_type":"_doc","_id":"30aj8nABD0MJ2paXqQ0A","_score":1.0,"_source":{"du_dq":[{"value":"AGM004","param":"itemCode"}],"dpuid":"rRExHwYxyoXobzeBHVf3GlE0jfmnfuXGmBe37cAG","trex":10,"vt":"2020-03-19T11:52:54.000Z","items":{"pn":"환불상품_AGM004","pnc":"AGM004","mf":"제조사_G"},"pfno":"12845","du":"http://demo.logger.co.kr/item/view.php?itemCode=AGM004","du_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/view.php","d2":"view.php"},"dr_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/list.php","d2":"list.php"},"cp":["상품보기",""],"pi":"PDV","dr_dq":[{"value":"A","param":"bigCat"},{"value":"G","param":"midCat"},{"value":"M","param":"smallCat"}],"sid":"01bcd15f0f96e5e1c0d865e2f1119ab5","uid":"8a207da187810e03118b833c83fb45c6","dr":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=G&smallCat=M","@timestamp":"2020-03-19T11:52:55.726Z","locations":{"ip":"122.99.192.187"},"@version":"1","environments":{"os":"Macintosh","ce":true,"js":true,"cd":24,"ss":[1920,1080],"tz":-540,"user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","lg":"ko","an":"Chrome 80.","je":false}}},{"_index":"pageview-2020-03-19","_type":"_doc","_id":"T_6j8nAB212ZgcqwuIuE","_score":1.0,"_source":{"du_dq":[{"value":"AFL003","param":"itemCode"}],"dpuid":"rRExHwYxyoXobzeBHVf3GlE0jfmnfuXGmBe37cAG","trex":12,"vt":"2020-03-19T11:52:58.000Z","items":{"pn":"상품_AFL003","pnc":"AFL003","mf":"제조사_F"},"pfno":"12845","du":"http://demo.logger.co.kr/item/view.php?itemCode=AFL003","du_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/view.php","d2":"view.php"},"dr_dp":{"d1":"item","d0":"http://demo.logger.co.kr","full":"http://demo.logger.co.kr/item/list.php","d2":"list.php"},"cp":["상품보기",""],"pi":"PDV","dr_dq":[{"value":"A","param":"bigCat"},{"value":"F","param":"midCat"},{"value":"L","param":"smallCat"}],"sid":"01bcd15f0f96e5e1c0d865e2f1119ab5","uid":"8a207da187810e03118b833c83fb45c6","dr":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=F&smallCat=L","@timestamp":"2020-03-19T11:52:59.726Z","locations":{"ip":"122.99.192.187"},"@version":"1","environments":{"os":"Macintosh","ce":true,"js":true,"cd":24,"ss":[1920,1080],"tz":-540,"user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","lg":"ko","an":"Chrome 80.","je":false}}},{"_index":"pageview-2020-03-23","_type":"_doc","_id":"12845_64ae9a206f355430295a79d09120b090_22","_score":1.0,"_source":{"logtype":"pageview","dr":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=H&smallCat=M","vt":"2020-03-23T07:04:08.000Z","du":"http://demo.logger.co.kr/item/view.php?itemCode=AHM000","dr_dq":[{"param":"bigCat","value":"A"},{"param":"midCat","value":"H"},{"param":"smallCat","value":"M"}],"pi":"PDV","dpuid":"iY1P99v3AfWrX4FpxGIJWxu9YfNGHUd0TfP2ok6Y","items":{"pnc":"AHM000","mf":"제조사_H","pn":"상품_AHM000"},"uid":"f98ed6200aa7c9c5fcc0406614211e60","sid":"64ae9a206f355430295a79d09120b090","@version":"1","cp":["상품보기",""],"du_dp":{"d0":"http://demo.logger.co.kr","d1":"item","d2":"view.php","full":"http://demo.logger.co.kr/item/view.php"},"environments":{"lg":"ko","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","an":"Chrome 80.","os":"Macintosh","ce":true,"js":true,"cd":24,"je":false,"ss":[1920,1080],"tz":-540},"locations":{"ip":"122.99.192.187"},"trex":22,"dr_dp":{"d0":"http://demo.logger.co.kr","d1":"item","d2":"list.php","full":"http://demo.logger.co.kr/item/list.php"},"pfno":"12845","du_dq":[{"param":"itemCode","value":"AHM000"}],"@timestamp":"2020-03-23T07:04:08.991Z"}},{"_index":"pageview-2020-03-23","_type":"_doc","_id":"12845_64ae9a206f355430295a79d09120b090_21","_score":1.0,"_source":{"logtype":"pageview","dr":"http://demo.logger.co.kr/item/view.php?itemCode=AFM001","vt":"2020-03-23T07:04:05.000Z","du":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=H&smallCat=M","dr_dq":[{"param":"itemCode","value":"AFM001"}],"pi":"PLV","dpuid":"iY1P99v3AfWrX4FpxGIJWxu9YfNGHUd0TfP2ok6Y","uid":"f98ed6200aa7c9c5fcc0406614211e60","sid":"64ae9a206f355430295a79d09120b090","@version":"1","cp":["상품 A 카테고리 > 제조사_H > 브랜드_M"],"du_dp":{"d0":"http://demo.logger.co.kr","d1":"item","d2":"list.php","full":"http://demo.logger.co.kr/item/list.php"},"environments":{"lg":"ko","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","an":"Chrome 80.","os":"Macintosh","ce":true,"js":true,"cd":24,"je":false,"ss":[1920,1080],"tz":-540},"locations":{"ip":"122.99.192.187"},"trex":21,"dr_dp":{"d0":"http://demo.logger.co.kr","d1":"item","d2":"view.php","full":"http://demo.logger.co.kr/item/view.php"},"pfno":"12845","du_dq":[{"param":"bigCat","value":"A"},{"param":"midCat","value":"H"},{"param":"smallCat","value":"M"}],"@timestamp":"2020-03-23T07:04:05.991Z","left":"2020-03-23T07:04:08.000Z","duration":3}},{"_index":"pageview-2020-03-23","_type":"_doc","_id":"12845_42367cba463ac168e3f6804b0f3fb0c0_2","_score":1.0,"_source":{"dr_dq":[{"param":"bigCat","value":"A"}],"@timestamp":"2020-03-23T08:12:25.090Z","items":{"pn":"상품_AFK000","mf":"제조사_F","pnc":"AFK000"},"dr_dp":{"d2":"list.php","full":"http://demo.logger.co.kr/item/list.php","d1":"item","d0":"http://demo.logger.co.kr"},"@version":"1","sid":"42367cba463ac168e3f6804b0f3fb0c0","du_dp":{"d2":"view.php","full":"http://demo.logger.co.kr/item/view.php","d1":"item","d0":"http://demo.logger.co.kr"},"locations":{"ip":"122.99.192.187"},"environments":{"js":true,"user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","tz":-540,"je":false,"lg":"ko","an":"Chrome 80.","ss":[1920,1080],"os":"Macintosh","ce":true,"cd":24},"du":"http://demo.logger.co.kr/item/view.php?itemCode=AFK000&TSPSESSIONID=98d6a43116bac5619246a855729e947a","logtype":"pageview","trex":2,"pfno":"12845","vt":"2020-03-23T08:12:21.000Z","du_dq":[{"param":"itemCode","value":"AFK000"},{"param":"TSPSESSIONID","value":"98d6a43116bac5619246a855729e947a"}],"pi":"PDV","dpuid":"iY1P99v3AfWrX4FpxGIJWxu9YfNGHUd0TfP2ok6Y","dr":"http://demo.logger.co.kr/item/list.php?bigCat=A","uid":"59fd9f393092fa30de06a7791a000179","cp":["상품보기",""],"left":"2020-03-23T08:12:41.000Z","duration":20}},{"_index":"pageview-2020-03-23","_type":"_doc","_id":"12845_64ae9a206f355430295a79d09120b090_17","_score":1.0,"_source":{"logtype":"pageview","dr":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=H&smallCat=L","vt":"2020-03-23T06:56:28.000Z","du":"http://demo.logger.co.kr/item/view.php?itemCode=AHL000","dr_dq":[{"param":"bigCat","value":"A"},{"param":"midCat","value":"H"},{"param":"smallCat","value":"L"}],"pi":"PDV","dpuid":"iY1P99v3AfWrX4FpxGIJWxu9YfNGHUd0TfP2ok6Y","items":{"pnc":"AHL000","mf":"제조사_H","pn":"상품_AHL000"},"uid":"f98ed6200aa7c9c5fcc0406614211e60","sid":"64ae9a206f355430295a79d09120b090","@version":"1","cp":["상품보기",""],"du_dp":{"d0":"http://demo.logger.co.kr","d1":"item","d2":"view.php","full":"http://demo.logger.co.kr/item/view.php"},"environments":{"lg":"ko","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","an":"Chrome 80.","os":"Macintosh","ce":true,"js":true,"cd":24,"je":false,"ss":[1920,1080],"tz":-540},"locations":{"ip":"122.99.192.187"},"trex":17,"dr_dp":{"d0":"http://demo.logger.co.kr","d1":"item","d2":"list.php","full":"http://demo.logger.co.kr/item/list.php"},"pfno":"12845","du_dq":[{"param":"itemCode","value":"AHL000"}],"@timestamp":"2020-03-23T06:56:31.981Z","left":"2020-03-23T06:56:53.000Z","duration":25}},{"_index":"pageview-2020-03-23","_type":"_doc","_id":"12845_42367cba463ac168e3f6804b0f3fb0c0_8","_score":1.0,"_source":{"dr_dq":[{"param":"bigCat","value":"A"},{"param":"midCat","value":"F"},{"param":"smallCat","value":"M"}],"@timestamp":"2020-03-23T08:13:57.094Z","items":{"pn":"상품_AFM001","mf":"제조사_F","pnc":"AFM001"},"dr_dp":{"d2":"list.php","full":"http://demo.logger.co.kr/item/list.php","d1":"item","d0":"http://demo.logger.co.kr"},"@version":"1","sid":"42367cba463ac168e3f6804b0f3fb0c0","du_dp":{"d2":"view.php","full":"http://demo.logger.co.kr/item/view.php","d1":"item","d0":"http://demo.logger.co.kr"},"locations":{"ip":"122.99.192.187"},"environments":{"js":true,"user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","tz":-540,"je":false,"lg":"ko","an":"Chrome 80.","ss":[1920,1080],"os":"Macintosh","ce":true,"cd":24},"du":"http://demo.logger.co.kr/item/view.php?itemCode=AFM001","logtype":"pageview","trex":8,"pfno":"12845","vt":"2020-03-23T08:13:56.000Z","du_dq":[{"param":"itemCode","value":"AFM001"}],"pi":"PDV","dpuid":"iY1P99v3AfWrX4FpxGIJWxu9YfNGHUd0TfP2ok6Y","dr":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=F&smallCat=M","uid":"59fd9f393092fa30de06a7791a000179","cp":["상품보기",""]}},{"_index":"pageview-2020-03-23","_type":"_doc","_id":"12845_41710b8fb0be84a8b09166ee0592e9fb_29","_score":1.0,"_source":{"pi":"PLV","dr_dq":[{"param":"itemCode","value":"AGK001"}],"logtype":"duration","@timestamp":"2020-03-23T05:29:29.873Z","@version":"1","dpuid":"CaN1PvK3RaWv5IbTiJ6ma10ITuaM3yKFJyHz3rCV","uid":"0c899a52f240e953d350f0b051b64700","dr_dp":{"d1":"item","full":"http://demo.logger.co.kr/item/view.php","d2":"view.php","d0":"http://demo.logger.co.kr"},"sid":"41710b8fb0be84a8b09166ee0592e9fb","du_dq":[{"param":"bigCat","value":"A"},{"param":"midCat","value":"F"},{"param":"smallCat","value":"K"}],"cp":["상품 A 카테고리 > 제조사_F > 브랜드_K"],"pfno":"12845","trex":29,"du":"http://demo.logger.co.kr/item/list.php?bigCat=A&midCat=F&smallCat=K","du_dp":{"d1":"item","full":"http://demo.logger.co.kr/item/list.php","d2":"list.php","d0":"http://demo.logger.co.kr"},"vt":"2020-03-23T05:29:22.000Z","dr":"http://demo.logger.co.kr/item/view.php?itemCode=AGK001","locations":{"ip":"122.99.192.187"},"environments":{"ce":true,"lg":"ko","tz":-540,"ss":[1920,1080],"je":false,"user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36","an":"Chrome 80.","cd":24,"js":true,"os":"Macintosh"},"left":"2020-03-23T05:29:22.000Z"}}]},"aggregations":{"by_dimension":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"http://demo.logger.co.kr/item/list.php","doc_count":132,"duration":{"value":2294.0},"visitors":{"value":14},"visits":{"value":27},"pageviews":{"value":132}},{"key":"http://demo.logger.co.kr/item/view.php","doc_count":120,"duration":{"value":3496.0},"visitors":{"value":14},"visits":{"value":26},"pageviews":{"value":120}},{"key":"http://demo.logger.co.kr/cart/cart.php","doc_count":35,"duration":{"value":96.0},"visitors":{"value":9},"visits":{"value":15},"pageviews":{"value":35}},{"key":"http://demo.logger.co.kr/","doc_count":15,"duration":{"value":36.0},"visitors":{"value":9},"visits":{"value":14},"pageviews":{"value":15}},{"key":"http://demo.logger.co.kr/order/order.php","doc_count":15,"duration":{"value":59.0},"visitors":{"value":7},"visits":{"value":13},"pageviews":{"value":15}},{"key":"http://demo.logger.co.kr/order/orderSubmit.php","doc_count":14,"duration":{"value":1238.0},"visitors":{"value":7},"visits":{"value":13},"pageviews":{"value":14}},{"key":"http://bizspring.co.kr/website/home/","doc_count":9,"duration":{"value":71.0},"visitors":{"value":2},"visits":{"value":4},"pageviews":{"value":9}},{"key":"http://demo.logger.co.kr/login/login.php","doc_count":7,"duration":{"value":23.0},"visitors":{"value":5},"visits":{"value":5},"pageviews":{"value":7}},{"key":"http://demo.logger.co.kr/register/register.php","doc_count":7,"duration":{"value":16.0},"visitors":{"value":5},"visits":{"value":6},"pageviews":{"value":7}},{"key":"http://demo.logger.co.kr/register/registerInput.php","doc_count":6,"duration":{"value":14.0},"visitors":{"value":5},"visits":{"value":6},"pageviews":{"value":6}},{"key":"http://demo.logger.co.kr/register/registerSubmit.php","doc_count":6,"duration":{"value":9.0},"visitors":{"value":5},"visits":{"value":6},"pageviews":{"value":6}},{"key":"http://demo.logger.co.kr/login/loginSubmit.php","doc_count":4,"duration":{"value":4.0},"visitors":{"value":4},"visits":{"value":4},"pageviews":{"value":4}},{"key":"http://demo.logger.co.kr/index.php","doc_count":2,"duration":{"value":0.0},"visitors":{"value":2},"visits":{"value":2},"pageviews":{"value":2}},{"key":"http://demo.logger.co.kr/event/event.php","doc_count":1,"duration":{"value":4.0},"visitors":{"value":1},"visits":{"value":1},"pageviews":{"value":1}},{"key":"http://demo.logger.co.kr/wish/wish.php","doc_count":1,"duration":{"value":2.0},"visitors":{"value":1},"visits":{"value":1},"pageviews":{"value":1}},{"key":"http://demo11.logger.co.kr/","doc_count":1,"duration":{"value":0.0},"visitors":{"value":1},"visits":{"value":1},"pageviews":{"value":1}}]}}}hshwang-mm:git hshwang$
