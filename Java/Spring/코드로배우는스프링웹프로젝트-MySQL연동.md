@@ -314,5 +314,99 @@ public class RootConfig {
 
 
 
+## 4. MySQL Query 로그 출력
 
+- MyBatis 는 내부적으로 JDBC의 Prepared Statement를 사용하여 ? 로 치환되는 값을 쿼리로 출력할 수 없다.
+
+- SQL로그를 보기위해 `log4jdbc-log4j2` 라이브러리를 사용함
+
+  pom.xml 작성
+
+  ```xml
+  <!-- https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4 -->
+  <dependency>
+      <groupId>org.bgee.log4jdbc-log4j2</groupId>
+      <artifactId>log4jdbc-log4j2-jdbc4</artifactId>
+      <version>1.16</version>
+  </dependency>
+  
+  ```
+
+  log4jdbc.log4j2.properties 작성
+
+  ```properties
+  log4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
+  ```
+
+  root-context.xml 에 작성될 값
+
+  ```properties
+  jdbc.driver=net.sf.log4jdbc.sql.jdbcapi.DriverSpy 
+  jdbc.url=jdbc:log4jdbc:mysql://url주소:3306/db명?useUnicode=yes&characterEncoding=UTF8&autoReconnectForPools=true&serverTimezone=UTC&verifyServerCertificate=false&useSSL=false
+  ```
+
+  resource/log4j.xml
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+  <log4j:configuration
+  	xmlns:log4j="http://jakarta.apache.org/log4j/">
+  
+  	<!-- Appenders -->
+  	<appender name="console"
+  		class="org.apache.log4j.ConsoleAppender">
+  		<param name="Target" value="System.out" />
+  		<layout class="org.apache.log4j.PatternLayout">
+  			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+  		</layout>
+  	</appender>
+  
+  	<!-- Application Loggers -->
+  	<logger name="org.zerock.controller">
+  		<level value="info" />
+  	</logger>
+  
+  	<!-- 3rdparty Loggers -->
+  	<logger name="org.springframework.core">
+  		<level value="info" />
+  	</logger>
+  
+  	<logger name="org.springframework.beans">
+  		<level value="info" />
+  	</logger>
+  
+  	<logger name="org.springframework.context">
+  		<level value="info" />
+  	</logger>
+  
+  	<logger name="org.springframework.web">
+  		<level value="info" />
+  	</logger>
+  
+  	<logger name="jdbc.audit">
+  		<level value="warn" />
+  	</logger>
+  
+  	<logger name="jdbc.resultset">
+  		<level value="warn" />
+  	</logger>
+  	<logger name="jdbc.connection">
+  		<level value="warn" />
+  	</logger>
+  
+  
+  	<!-- Root Logger -->
+  	<root>
+  		<priority value="info" />
+  		<appender-ref ref="console" />
+  	</root>
+  
+  </log4j:configuration>
+  
+  ```
+
+  
+
+  
 
