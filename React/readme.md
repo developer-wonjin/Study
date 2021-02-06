@@ -34,6 +34,87 @@ npm: 한 번 다운받고 끝
 
 개발자 도구에 `147 kB` 용량으로 축소된 것을 확인할 수 있음
 
+# 재사용성
+
+`index.html 의 <div id="root"></div>` 과 `index.js` 
+
+index.js코드
+
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+ReactDOM.render(
+    <App />,
+  document.getElementById('root')
+);
+```
+
+```
+App  _____ Subject
+     \____ TOC
+     \____ Content
+```
+
+App.js
+
+```js
+import React, { Component } from 'react';
+import './App.css';
+
+import Subject from "./components/Subject"
+import TOC from "./components/TOC"
+import Content from "./components/Content"
+
+class App extends Component{
+  render(){
+    return (
+      <div className="App">
+        <Subject title="WEB" sub="world wide web!!"></Subject>
+        <TOC></TOC>
+        <Content title="HTML" desc="HTML is HyperText Markup Language."></Content>
+      </div>
+    );
+  }
+}
+```
+
+Subject.js
+
+```js
+import React, { Component } from 'react';
+
+class Subject extends Component{
+    render(){
+      return (
+        <header>
+          <h1>{this.props.title}</h1>
+          {this.props.sub}
+        </header>
+      );
+    }
+  }
+  
+  export default Subject;
+```
+
+TOC.js  와 Content.js 이하 동일
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
