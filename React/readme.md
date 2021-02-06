@@ -103,7 +103,14 @@ class Subject extends Component{
 
 TOC.js  와 Content.js 이하 동일
 
+# State  and Props
 
+- 사용자 입장
+  - 사용자가 Component를 이용할 때 값을 Props를 변경시킴
+  - Props
+- 개발자 입장
+  - 내부적 상태를 관리
+  - State
 
 
 
