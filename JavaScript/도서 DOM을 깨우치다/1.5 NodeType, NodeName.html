@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="#">Hi</a>
+    <script>
+        //Docuemt가 무엇인지는 다음 단원에 나옴
+
+        //문서의 타입 (DOCUMENT_TYPE_NOE)
+        console.log(
+            document.doctype.nodeName,
+            document.doctype.nodeType
+        )
+
+        console.log(
+            document.nodeName,
+            document.nodeType
+        )
+
+        console.log(
+            document.createDocumentFragment().nodeName,
+            document.createDocumentFragment().nodeType,
+        )
+
+        console.log(
+            document.querySelector('a').nodeName,
+            document.querySelector('a').nodeType,
+            document.querySelector('a').nodeType === Node.ELEMENT_NODE
+        )
+
+        console.log(
+            document.querySelector('a').firstChild.nodeName,
+            document.querySelector('a').firstChild.nodeType,
+        )
+
+    </script>
+</body>
+</html>

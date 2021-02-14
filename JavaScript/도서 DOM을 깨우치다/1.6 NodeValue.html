@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="#">Hi</a>
+    <script>
+
+        //아래 전부 null 
+        console.log(document.doctype.nodeValue);
+        console.log(document.nodeValue);
+        console.log(document.createDocumentFragment().nodeValue);
+        console.log(document.querySelector('a').nodeValue);
+
+        //Hi 출력
+        console.log(document.querySelector('a').firstChild.nodeValue);
+
+        console.log("body", document.body)
+        
+        //text를 포함한 childNodes
+        //text를 포함한 첫째 자식 firstChild (<a>태그 같이 자식요소가 TEXT밖에 없는 얘는 childNodes를 사용한다)
+        console.log("body의 childNodes", document.body.childNodes)
+        console.log("body의 firstChild", document.body.firstChild)//childNodes에서의 첫 노드
+        
+        //text, comment를 포함하지 않는 children
+        //text, comment를 포함하지 않는 첫째 자식 firstElementChild
+        console.log("body의 children", document.body.children)
+        console.log("body의 firstElementChild", document.body.firstElementChild)//children에서의 첫 노드
+
+        // document.body.firstChild.nodeValue = 'hi';
+        
+
+    </script>
+</body>
+</html>
