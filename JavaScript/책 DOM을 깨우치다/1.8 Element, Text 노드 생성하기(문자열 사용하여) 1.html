@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="A"></div>
+    <div id="B"></div>
+    <span id="C0"></span>
+    <span id="C1"></span>
+    <span id="C2">바보야</span>
+    <div id="D"></div>
+    <div id="E"></div>
+
+    <script>
+        var c0 = document.getElementById('C0')
+        var c1 = document.getElementById('C1')
+        var c2 = document.getElementById('C2')
+        var d = document.getElementById('D')
+        var e = document.getElementById('E')
+
+        //1. textContent 속성
+        console.log("c2: ", c2)     // 개발자도구의 화면상에는 아래의 코드들도 반영된 결과를 보여주기 때문에 'dude'가 태그안에 보인다.
+        console.dir(c2)             // 개발자도구의 화면상에는 아래의 코드들도 반영된 결과를 보여주기 때문에 'dude'가 속성 textContent의 값으로 보인다.
+        console.log("----------------------------------------")
+
+        //초기 속성값 확인
+        console.log("c0: ", c0.textContent)//""
+        console.log("c1: ", c1.textContent)//""
+        console.log("c2: ", c2.textContent)//"바보야"
+        console.log("----------------------------------------")
+
+        c2.textContent = 'dude'
+
+        //속성값 변화 확인
+        console.log("c0: ", c0.textContent)//""
+        console.log("c1: ", c1.textContent)//""
+        console.log("c2: ", c2.textContent, "\t\t//속성값 변화 확인")//"dude"
+        console.log("----------------------------------------")
+
+
+        console.log(c0.childNodes)
+        console.log(c1.childNodes)
+        console.log(c2.childNodes)
+        console.log("----------------------------------------")
+
+
+        //text노드가 내부에 생성됐음을 확인
+        console.log(`c1.textContent = 'Friend'`)
+        c1.textContent = 'Friend' //textNode가 생성하여 HTML *Element 노드에 붙는다
+        console.log(c0.childNodes)
+        console.log(c1.childNodes, "text노드가 내부에 생성됐음을 확인")// textNode가 생성됨
+        console.log(c2.childNodes)
+        console.log("----------------------------------------")
+
+        //innerText, outerText 비표준
+        d.innerText = '메롱'          //개체 d의 innerHTML, innerText, outerText, textContent 의 속성값이 '메롱'으로 변경됨
+        e.outerText = '약오르지롱'    //개체 e는 DOM에서 Text노드 '메롱'으로 교체되므로 내부 속성에 변화 유무는 신경쓸 필요없다
+
+        console.dir(d)
+        console.dir(e) //e 가 출력되긴 하나 실제론 div#E DOM에서 사라짐
+        console.log("----------------------------------------")
+
+
+    </script>
+</body>
+
+</html>

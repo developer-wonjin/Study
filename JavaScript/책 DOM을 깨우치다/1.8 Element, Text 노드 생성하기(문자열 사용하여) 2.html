@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="mood">
+        Good morning, sunshine!
+        <span style="display:block">You can read me!</span>
+        <span style="display:none">You cannot read me!</span>
+    </div>
+
+    <script>
+        console.log(document.body.textContent);
+        console.log(document.querySelector('#mood').innerText); // "Good morning, sunshine!"
+        console.log(document.querySelector('#mood').textContent); // "Good morning, sunshine!"
+    </script>
+</body>
+
+</html>
