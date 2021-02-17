@@ -143,15 +143,13 @@ Object
 
 
 <hr>
-**참고**
+## 참고
 
-Text, Coment 포함한 경우)  childNodes  -   firstChild
+**Text, Coment 포함한 경우)**   childNodes  -   firstChild
 
-else)                                     children      -   firstElementChild
+**else)**                                       children      -    firstElementChild
 
 <hr>
-
-
 ## 1.7 ElementNode, TextNode 생성 (create * 메소드 사용하여)
 
 ### 추가는 1.10 에서 다룸
@@ -249,6 +247,28 @@ ${HTML *Element 노드} .insertAdjacentHTML('${option}', '${HTML태그 string}')
 타겟노드**.insertBefore**(대상노드, 자식노드中 타겟이 되는 노드)
 
 >타겟이 되는 자식노드 앞에 추가됨
+
+그 외 prepend(), before(), after()가 있으니 검색해서 잘 사용할 것
+
+## 1.11 
+
+
+
+<hr> 
+
+## ParentNode vs ParentElement
+
+
+
+
+
+<hr>
+
+
+
+
+
+
 
 
 
