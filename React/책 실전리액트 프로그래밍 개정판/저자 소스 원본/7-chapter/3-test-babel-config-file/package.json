@@ -1,0 +1,19 @@
+{
+  "name": "3-test-babel-config-file",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-arrow-functions": "^7.8.3",
+    "@babel/plugin-transform-template-literals": "^7.8.3",
+    "@babel/preset-react": "^7.9.1"
+  }
+}
