@@ -144,10 +144,22 @@ Object
 
 <hr>
 ## 참고
+**현 노드의 자식 노드인 Text, Coment 포함한 경우** 
 
-**Text, Coment 포함한 경우)**   childNodes  -   firstChild
+- childNodes  
+- firstChild
 
-**else)**                                       children      -    firstElementChild
+**현 노드의 자식 노드들 중 TextNode, Comment 노드를 무시할 경우**
+
+* children
+* firstElementChild
+* lastElementChild
+
+https://hogni.tistory.com/122      
+
+https://m.blog.naver.com/PostView.nhn?blogId=yoon980208&logNo=221470007783&proxyReferer=https:%2F%2Fwww.google.com%2F
+
+https://www.zerocho.com/category/JavaScript/post/573b4165a54b5e8427432948
 
 <hr>
 ## 1.7 ElementNode, TextNode 생성 (create * 메소드 사용하여)
