@@ -2,7 +2,7 @@
 
 `sudo npm install -g create-react-app` : cra 설치
 
-또는, `npx create-react-app`
+또는, `npx create-react-app .`
 
 ## npm vs npx
 
