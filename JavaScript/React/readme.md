@@ -1,10 +1,24 @@
 # 환경설정
 
-`sudo npm install -g create-react-app` : cra 설치
+> `sudo npm install -g create-react-app` : cra 설치
+>
+> `$ create-react-app -V` : 설치확인
+>
+>  `mkdir react-app` 생성
+>
+> `cd react-app` : 프로젝트 폴더
+>
+> `create-react-app .`:  프로젝트 생성
+>
+> `npm start` : 프로젝트 실행
+>
+> create-react-app .
 
-또는, `npx create-react-app .`
+또는
 
-## npm vs npx
+>`npx create-react-app ${폴더명}`
+
+## npm vs npx 차이점
 
 npx : 실행할 때마다 새로 다운받아 최신버전을 유지시켜줌
 
@@ -14,13 +28,7 @@ npm: 한 번 다운받고 끝
 
 # 개발환경
 
-폴더 `react-app` 생성
 
-`cd react-app` : 프로젝트 폴더
-
-`create-react-app .`:  프로젝트 생성
-
-`npm start` : 프로젝트 실행
 
 # 배포
 
@@ -35,6 +43,10 @@ npm: 한 번 다운받고 끝
 `npx serve -s build` : 웹서버를 최신으로 1회용으로 설치해서 시작하는데 build 폴더에 있는 것을 기반으로 실행
 
 개발자 도구에 `147 kB` 용량으로 축소된 것을 확인할 수 있음
+
+> 개발용 : 1.8MB
+>
+> 배포용: 147KB
 
 # 재사용성
 
