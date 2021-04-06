@@ -8,14 +8,18 @@
     <title>Document</title>
 </head>
 
-<script src="test.js"></script>
-
 <body>
+    <a href='#' title="title" data-foo="dataFoo" class="yes" style="margin:0;" foo="boo"></a>
+    <script>
+        var atts = document.querySelector('a').attributes;
+        for (var i = 0; i < atts.length; i++) {
+            console.log(atts[i].nodeName + '(' + atts[i].nodeType + ')' + '=' + atts[i].nodeValue);
+        }
 
-    <a href="#">Hi</a> <!-- this is a HTMLAnchorElement which inherits from... -->
 
+
+    </script>
 </body>
 
-<!-- <script src="test.js"></script> -->
 
 </html>
