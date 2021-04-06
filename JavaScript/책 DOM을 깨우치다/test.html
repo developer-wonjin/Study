@@ -6,13 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-<body>
-    
-    <script>
-        var inside = document.querySelector('html').contains(document.querySelector('body'))
-        console.log(inside);
-    </script>
 
+<body>
+    <a href='#' title="title" data-foo="dataFoo" class="yes" style="margin:0;" foo="boo"></a>
+    <script>
+        var atts = document.querySelector('a').attributes;
+        for (var i = 0; i < atts.length; i++) {
+            console.log(atts[i].nodeName + '(' + atts[i].nodeType + ')' + '=' + atts[i].nodeValue);
+        }
+
+
+
+    </script>
 </body>
 
 </html>

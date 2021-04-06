@@ -41,16 +41,16 @@
 
 - ATTRIBUTE_NDOE는 실제 DOM 트리구조의 일부가 아님(역사적인 이유로 목록에 포함될 뿐)
   - DOM4 에서 사용금지됨
-- COMMENT_NODE는 거의 TEXT_NODE와 동일
+- COMMENT_NODE는 거의 TEXT_NODE(개행포함함)와 동일
 
-| 인터페이스 / 생성자                  | nodeType | 예시                    |      |
-| ------------------------------------ | -------- | ----------------------- | ---- |
-| HTML * Element (예: HTMLBodyElement) | 1        | Element_NODE            |      |
-| Text                                 | 3        | TEXT_NODE(COMMENT_NODE) |      |
-| Attr                                 | 2        | ATTRIBUTE_NODE          |      |
-| HTML_Document                        | 9        | DOCUMENT_NODE           |      |
-| DocumentFragment                     | 11       | DOCUMENT_FRAGMENT_NODE  |      |
-| DocumentType                         | 10       | DOCUMENT_TYPE_NODE      |      |
+| 인터페이스 / 생성자                           | nodeType | 예시(뒤에 _NODE가 붙지만 생략) |      |
+| --------------------------------------------- | -------- | ------------------------------ | ---- |
+| HTML * Element()    (예: HTMLBodyElement()  ) | 1        | Element                        |      |
+| Text()                                        | 3        | TEXT                           |      |
+| Attr()                                        | 2        | ATTRIBUTE                      |      |
+| HTMLDocument()                                | 9        | DOCUMENT                       |      |
+| DocumentFragment()                            | 11       | DOCUMENT_FRAGMENT              |      |
+| DocumentType()                                | 10       | DOCUMENT_TYPE                  |      |
 
 
 
