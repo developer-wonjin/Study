@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,13 +14,10 @@
         var elementNode = document.createElement('div');
         var textNode = document.createTextNode('Hi');
         var commentNode = document.createComment('안녕');
-        console.log(elementNode, elementNode.nodeType, elementNode.nodeName);
-        console.log(textNode, textNode.nodeType, textNode.nodeName);
-        console.log(commentNode, commentNode.nodeType, commentNode.nodeName);
-
-        console.dir(elementNode)
-        console.dir(textNode)
-        console.dir(commentNode)
+        console.log(`elementNode: ${elementNode}, ${elementNode.nodeType}, ${elementNode.nodeName}`);
+        console.log(`textNode: ${textNode}, ${textNode.nodeType}, ${textNode.nodeName}`);
+        console.log(`commentNode: ${commentNode}, ${commentNode.nodeType}, ${commentNode.nodeName}`);
+        
         /*
         createElement('{tagName}')
             1. Element 개체를 생성

@@ -18,7 +18,8 @@
     var divA = document.getElementById('A');
     var newSpan = document.createElement('span');
     newSpan.textContent = 'Howdy';
-    divA.parentNode.replaceChild(newSpan, divA);
+    console.log(divA.parentNode.replaceChild(newSpan, divA)); // replaceChild 리턴값은 교체대상이 되는 노드다.
+    
 
     var textNode_B = document.getElementById('B').firstChild;
     var newText = document.createTextNode('buddy');

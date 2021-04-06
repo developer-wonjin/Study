@@ -11,28 +11,32 @@
     <script>
         //Docuemt가 무엇인지는 다음 단원에 나옴
 
-        //문서의 타입 (DOCUMENT_TYPE_NOE)
+        //문서종류를 나타내는 노드 (DOCUMENT_TYPE_NOE)
         console.log(
             document.doctype.nodeName,
             document.doctype.nodeType
         )
 
+        //문서노드
         console.log(
             document.nodeName,
             document.nodeType
         )
 
+        //document-fragment노드
         console.log(
             document.createDocumentFragment().nodeName,
             document.createDocumentFragment().nodeType,
         )
 
+        //태그노드
         console.log(
             document.querySelector('a').nodeName,
             document.querySelector('a').nodeType,
             document.querySelector('a').nodeType === Node.ELEMENT_NODE
         )
 
+        //텍스트노드
         console.log(
             document.querySelector('a').firstChild.nodeName,
             document.querySelector('a').firstChild.nodeType,

@@ -17,7 +17,13 @@
         console.log(document.querySelector('a').nodeValue);
 
         //Hi 출력
-        console.log(document.querySelector('a').firstChild.nodeValue);
+        console.log("[1]a HTMLElement노드: ", document.querySelector('a'));
+        
+        console.log("[2]Text노드: ");
+        console.dir(document.querySelector('a').firstChild);
+        console.log()
+
+        console.log("[3]Text노드의 nodeValue: ", document.querySelector('a').firstChild.nodeValue);
 
         console.log("body", document.body)
         

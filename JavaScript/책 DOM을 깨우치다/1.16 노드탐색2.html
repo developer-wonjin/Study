@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body><ul><!-- comment-->
+<li id="A"></li>
+<li id="B"></li>
+<!-- comment -->
+</ul>
+<script>
+    var ul = document.querySelector('ul');
+    console.log(ul.parentNode.nodeName);
+    console.log(ul.firstElementChild.nodeName);
+    console.log(ul.lastElementChild.nodeName);
+
+    var x = ul.querySelector('#A').nextElementSibling
+    var y = ul.querySelector('#B').previousElementSibling
+
+    console.log(x)
+    console.log(y)
+
+
+</script>
+
+</body>
+
+</html>

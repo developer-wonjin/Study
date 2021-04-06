@@ -16,7 +16,8 @@
 <script>
 
     var divA = document.getElementById('A');
-    divA.parentNode.removeChild(divA);
+    console.log(divA.parentNode.removeChild(divA)); //removeChild 메소드 리턴값은 제거대상이 되는 노드다.
+    
 
     var textNode_B = document.getElementById('B').firstChild;
     textNode_B.parentNode.removeChild(textNode_B);

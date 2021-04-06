@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="A">
+        <script>
+            var x = 1;
+        </script>
+        <p style="display: none;"> Hello</p>
+        <p> My Friend</p>
+
+    </div>
+</body>
+<script>
+    var a = document.getElementById('A')
+    console.log('a.innerHTML: ', a.innerHTML);   //HTML태그들 전부
+    console.log('a.outerHTML: ', a.outerHTML);   //HTML태그들 전부(현 노드포함)
+    
+    console.log('a.textContent: ', a.textContent); //사람눈에 보이지 않는 텍스트들 모두 
+    console.log('a.innerText: ', a.innerText);   //사람 눈에 보이는 텍스트만
+    console.log('a.outerText: ', a.outerText);   //HTML태그들 전부
+</script>
+</html>

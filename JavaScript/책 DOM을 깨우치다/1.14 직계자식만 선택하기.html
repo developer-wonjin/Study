@@ -7,8 +7,18 @@
     <title>Document</title>
 </head>
 <body>
+    <ul>
+        <li>Hi</li>
+        <li>there</li>
+    </ul>
     <script>
-        console.log("Node.ELEMENT_NODE의 정수값: ", Node.ELEMENT_NODE)
+        var childNodesExample = document.querySelector('ul').childNodes;
+        console.log(childNodesExample)
+
+        childNodesExample.forEach(function(ele,key){
+            console.log(ele);
+        })
+
     </script>
 </body>
 </html>

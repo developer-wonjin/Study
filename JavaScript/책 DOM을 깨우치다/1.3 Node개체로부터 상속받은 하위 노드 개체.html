@@ -7,8 +7,17 @@
     <title>Document</title>
 </head>
 <body>
+    <a href="#">Hi</a>
     <script>
-        console.log("Node.ELEMENT_NODE의 정수값: ", Node.ELEMENT_NODE)
+        var nodeAnchor = document.querySelector('a');
+        var props = [];
+
+        for(var key in nodeAnchor){
+            props.push(key);
+        }
+
+        console.log('상속받은 속성들 목록')
+        console.log(props.sort());
     </script>
 </body>
 </html>
