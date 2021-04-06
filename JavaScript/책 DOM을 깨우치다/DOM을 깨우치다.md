@@ -260,19 +260,77 @@ createComment() 메소드도 존재함
 - addEventListener() 나 node.onclick 으로 추가된 것은 복제되지 않는다.
 - 요소ID도 복사되기 때문에 요소ID가 중복되는 것을 주의하자
 
-## 1.13 노드컬렉션에 대한 이해
 
-배열과 유사하나 배열과 다른 자료구조임
 
-- 라이브상태/정적 일 수 있다
-  - 컬렉션내 포함된 노드들은 현재문서/ 스냅샷의 일부일 수 있음
-- DOM 트리순서에 따라 정렬되어 컬렉션에 배치된다.
-- length속성을 갖음
+## 1.13 노드컬렉션에 대한 이해 _ 이절의 마지막에 표로 정리해놓음
 
-| 노드컬렉션 유형 | 설명 | 특징 | 예                           |
-| --------------- | ---- | ---- | ---------------------------- |
-| NodeList        |      |      | document.querySelectorAll(*) |
-| HTMLCollection  |      |      | document.scripts             |
+<a href="https://devsoyoung.github.io/posts/js-htmlcollection-nodelist">링크</a>
+
+**1.13.1 HTMLCollection**
+
+- 문서 내에 순서대로 정렬된 노드의 컬렉션
+- 유사배열임. 배열이 아니므로 array.prototype의 모든 메서드를 사용할 수 없음
+- 배열처럼 인덱스로 접근가능
+- 배열 구조분해나 `Array.from()`으로 `HTMLCollection`으로부터 배열을 생성해서 해당 메서드를 사용할 수 있습니다.
+
+```js
+const collection = document.body.children;
+
+// Array Destructuring을 사용
+[...collection].map(node => node.tagName);
+> (8) ["SCRIPT", "DIV", "SCRIPT", "DIV", "SCRIPT", "SCRIPT", "SCRIPT", "SCRIPT"]
+
+// Array.from()을 사용
+Array.from(collection).map(node => node.tagName);
+> (8) ["SCRIPT", "DIV", "SCRIPT", "DIV", "SCRIPT", "SCRIPT", "SCRIPT", "SCRIPT"]
+```
+
+**요소접근방법**
+
+```html
+<body>
+  <div name="myDiv"></div>
+  <div name="my Div"></div>
+  <div name="3"></div>
+</body>
+```
+
+- name속성값으로 위 첫번째 <div>태그를 선택할 수 있음.(두번째, 세번째 <div>태그의 name속성값은 불가능)
+
+- 별도의 대안으로 namedItem( ),  item( ) 을 사용할 수 있음
+
+  ```js
+  const collection = document.body.children;
+  
+  console.log(collection.myDiv); // <div name="myDiv"></div>
+  console.log(collection.3);     // Uncaught SyntaxError: Unexpected number
+  
+  //별도의 대안1
+  console.log(collection.namedItem("my Div")); // <div name="my Div"></div>
+  console.log(collection.namedItem(3));        // <div name="3"></div>
+  
+  //별도의 대안2
+  console.log(collection.item(0));
+  ```
+
+
+
+## Node 컬렉션정리표
+
+|                | HTMLCollection                                               | NodeList                                                     |      |
+| -------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ---- |
+| **특징**       | 문서에 배치된 HTML태그 순서대로 정렬됨                       | 문서에 배치된 HTML태그 순서대로 정렬됨                       |      |
+|                | 유사배열(**foreach**, **map**사용불가)                       | 유사배열(**map**사용불가)<br>`forEach`,`entries()`, `keys()`, `values()` 사용가능 |      |
+|                | Live Collection                                              | Live Collection<br>**querySelectorAll( ) 만 예외**           |      |
+|                | length속성                                                   | length속성                                                   |      |
+| **얻는 방법**  | Element.**children**<br>document.all<br/>document.images<br/>document.links<br/>document.scripts<br/>document.styleSheets<br/> | Element.**childNodes**         (live콜렉션)<br>Element.**querySelectorAll**(static콜렉션)<br/>document.**querySelectorAll**(static콜렉션) |      |
+| **배열로변환** | 배열구조분해, Array.from( ) 이용한다                         | 배열구조분해, Array.from( ) 이용한다                         |      |
+| **요소접근법** | collection['nam속성값'] <br>collection[idx]<br>collection.item(idx) | nodeList[0]<br/>nodeList.item(0)                             |      |
+| 요소의 타입    | Element                                                      | Element, Text, Comment                                       |      |
+
+- HTMLCollection타입인  children속성은 자식이 없는경우라도 null이 아닌 빈 HTMLCollection 개체를 갖음
+
+
 
 
 
@@ -347,6 +405,496 @@ createComment() 메소드도 존재함
 ## 1.18 두 노드가 동일한지 여부판단
 
 현노드.isEqualNode(타겟노드)
+
+
+
+
+
+
+
+
+
+# 2. document노드
+
+- DOM의 시작점
+- 문서전체를 의미
+- 인터페이스임 (규격일 뿐)
+- 실제 사용은 Document개체가 아닌 Document개체를 상속한 **HTMLDocument**를 사용함.
+
+~~~js
+console.log(window.document.constructor); // function HTMLDocument() 출력
+console.log(window.document.nodeType);    // Document_NODE에 매핑값인 9출력
+~~~
+
+[정리]
+
+HTMLDocument() 생성자호출로 Document_NODE인 window.document 객체 (전역객체 window생략해서 걍 document 객체 라고 써도 됨) 가 생성됨. 
+
+document 개체는 Document개체와 다름. 분명히 구별할 것. Document
+
+## 2.2 HTMLDocument의 속성 및 메서드(상속포함)
+
+```js
+//document own properties
+console.log(Object.keys(document).sort());
+
+//document own properties & inherited properties
+var documentPropertiesIncludeInherited = [];
+for (var p in document) {
+    documentPropertiesIncludeInherited.push(p);
+}
+console.log(documentPropertiesIncludeInherited.sort());
+
+//documment inherited properties only
+var documentPropertiesOnlyInherited = [];
+for (var p in document) {
+    if (!document.hasOwnProperty(p)) {
+        documentPropertiesOnlyInherited.push(p);
+    }
+}
+console.log(documentPropertiesOnlyInherited.sort());
+```
+
+
+
+## 2.3 document개체의 속성
+
+```js
+var d = document;
+console.log('title = ' +d.title);
+console.log('url = ' +d.URL);
+console.log('referrer = ' +d.referrer);
+console.log('lastModified = ' +d.lastModified);
+```
+
+
+
+## 2.4 [DOM상에서] document의 2개의 자식노드
+
+- docType
+- <html>태그라는 하나의 element
+
+```js
+//This is the doctype/DTD
+console.log(document.childNodes[0].nodeType); //logs 10, which is a numeric key mapping to DOCUMENT_TYPE_NODE
+
+//This is the <html> element
+console.log(document.childNodes[1].nodeType); //logs 1, which is a numeric key mapping to ELEMENT_TYPE_NODE
+
+```
+
+
+
+## 2.5 [개체의 속성상에서] document의 속성
+
+~~~js
+console.log(document.doctype); // logs DocumentType {nodeType=10, ownerDocument=document, ...}
+
+console.log(document.documentElement); // logs <html lang="en">
+
+console.log(document.head); // logs <head>
+
+console.log(document.body); // logs <body>
+~~~
+
+## 2.7 문서내 포커스를 가지고 있거나 활성상태인 노드에 대한 접근
+
+~~~js
+//set focus to <textarea>
+document.querySelector('textarea').focus();
+
+//get reference to element that is focused/active in the document
+console.log(document.activeElement); //logs <textarea>
+~~~
+
+## 2.8 document 혹은 element가 포커스를 가지고 있는지 판별
+
+```js
+//If you keep focus on the window/tab that has the document loaded its true. If not it's false.
+setTimeout(function(){console.log(document.hasFocus())},5000);
+```
+
+## 2.9 최상위/전역 개체로 접근
+
+```js
+console.log(document.defaultView) //reference, head JS object. Would be window object in a browser.
+```
+
+## 2.10 element에서 document로 접근
+
+~~~
+<iframe src="http://someFileServedFromServerOnSameDomain.html"></iframe>
+<script>
+    console.log(document.body.ownerElement);
+	console.log(window.frames[0].document.body.ownerElement)
+</script>
+~~~
+
+
+
+
+
+# 3장 Element노드
+
+## 3.3 Element 생성
+
+```js
+var elementNode = document.createElement('textarea'); //HTMLTextAreaElement() constructs <textarea>
+document.body.appendChild(elementNode);
+
+console.log(document.querySelector('textarea')); //verify it's now in the DOM
+```
+
+## 3.4. Element 노드의 속성
+
+- tagName
+- nodeName
+
+두 속성이 값이 같다. 대문자로 나타난다.
+
+## 3.5. Attribute 및 값에 대한 리스트/컬렉션 얻기
+
+[attributes 속성]
+
+> Attr노드의 컬렉션임(리스트)
+>
+> 리스트이나 정확한 타입명은 NameNodeMap임
+>
+> 유사배열컬렉션임
+>
+> length속성을 가짐
+>
+> option 엘리먼트의 경우 다음의 예에서 selected속성은 속성값을 갖지 않는다.
+>
+> <option selected>foo</option>
+>
+> option 엘리먼트의 경우 다음의 예에서 selected속성은 속성값을 갖는다.
+>
+> <option selected="selected">foo</option>
+
+```js
+<a href='#' title="title" data-foo="dataFoo" class="yes" style="margin:0;" foo="boo"></a>
+    <script>
+        var atts = document.querySelector('a').attributes;
+        for (var i = 0; i < atts.length; i++) {
+            console.log(atts[i].nodeName + '(' + atts[i].nodeType + ')' + '=' + atts[i].nodeValue);
+        }
+    </script>
+```
+
+
+
+
+
+## 3.6. Attribute값 get, set, remove
+
+- 값을 null, ''(빈문자열) 로 설정하지 말고 removeAttribute로 설정하라
+- body Element의 경우 attribute가 엘리먼트 노드의 개체속성으로 접근을 할 수 있지만(document.body.id, document.body.className) 지양하고 getAttribute, setAttribute, removeAtttribute를 사용할 것.
+
+```html
+<a href='#' title="title" data-foo="dataFoo" style="margin:0;" class="yes" foo="boo" hidden="hidden">#link</a>
+<script>
+var atts = document.querySelector('a');
+
+//remove attributes
+atts.removeAttribute('href');
+atts.removeAttribute('title');
+atts.removeAttribute('style');
+atts.removeAttribute('data-foo');
+atts.removeAttribute('class');
+atts.removeAttribute('foo'); //custom attribute
+atts.removeAttribute('hidden'); //boolean attribute
+
+//set (really re-set) attributes
+atts.setAttribute('href','#');
+atts.setAttribute('title','title');
+atts.setAttribute('style','margin:0;');
+atts.setAttribute('data-foo','dataFoo');
+atts.setAttribute('class','yes');
+atts.setAttribute('foo','boo');
+atts.setAttribute('hidden','hidden'); //boolean attribute requires sending the attribute as the value too
+
+//get attributes
+console.log(atts.getAttribute('href'));
+console.log(atts.getAttribute('title'));
+console.log(atts.getAttribute('style'));
+console.log(atts.getAttribute('data-foo'));
+console.log(atts.getAttribute('class'));
+console.log(atts.getAttribute('foo'));
+console.log(atts.hasAttribute('hidden'));
+
+</script>
+```
+
+
+
+## 3.7 attribute를 가지고 있나
+
+- 없는 속성에 대해 true를 반환
+
+```html
+<a href='#' title="title" data-foo="dataFoo" style="margin:0;" class="yes" foo></a>
+<script>
+	var atts = document.querySelector('a');
+    console.log(
+        atts.hasAttribute('href'),
+        atts.hasAttribute('title'),
+        atts.hasAttribute('style'),
+        atts.hasAttribute('data-foo'),
+        atts.hasAttribute('class'),
+        atts.hasAttribute('foo') //Notice this is true regardless if a value is defined 
+    )
+</script>
+```
+
+- Boolean attribute (checked)에 대해서도 유의미하게 사용됨.
+- 위의 없는 속성에 대한 처리와 혼동하지 말것
+- checked 없음 => false 반환
+- checked 있음 => true 반환
+
+```html
+<input type="checkbox" checked></input>
+<script>
+    var atts = document.querySelector('input');
+	console.log(atts.hasAttribute('checked')); //logs true
+</script>
+```
+
+
+
+## 3.8. class Attribute값에 대해 리스트 얻기
+
+- className은 클래스명 전부를 공백으로 연결한 문자열임.
+- classList 은 DOMTokenList 타입으로 `유사 배열 컬렉션`임
+  - length속성
+  - 읽기전용이지만 add(), remove(), contains(), toggle() 메서드를 사용해서 변경가능함
+
+```html
+<div class="big brown bear"></div>
+
+<script>
+	var elm = document.querySelector('div');
+    console.log(elm.classList); //big brown bear {0="big", 1="brown", 2="bear", length=3, ...}
+    console.log(elm.className); //logs 'big brown bear'
+</script>
+```
+
+## 3.9. class 속성 추가/제거/토글, 포함여부
+
+classList.add('속성명')
+
+classList.remove('속성명')
+
+classList.toggle('속성명')
+
+classList.contains('속성명')
+
+```html
+<div class="dog"></div>
+<scriptt>
+	var elm = document.querySelector('div');
+    elm.classList.add('cat');
+    elm.classList.remove('dog');
+    elm.classList.toggle('bug');
+    console.log(elm.className); // 'cat'
+</scriptt>
+```
+
+
+
+## 3.10 data-* attribute 값 가져오고 세팅하기
+
+- html 태그상의 data속성중 하이픈(-) 이 있는 경우는 javascript에서 카멜케이스로 대체된다.
+- 예) foo-foo  -> fooFoo
+- HTMLElement.dataset  은 DOMStringMap 개체를 리턴한다.
+- 삭제는 delete dataset.fooFoo
+- getAttribute/ setAttribute/ removeAttribute/ hasAttribute는 언제나 사용가능하다.
+
+```html
+<div data-foo-foo="foo" data-bar-bar="bar"></div>
+<script>
+	var elm = document.querySelector('div');
+
+    //get
+    console.log(elm.dataset.fooFoo); //logs 'foo'
+    console.log(elm.dataset.barBar); //logs 'bar'
+
+    //set
+    elm.dataset.gooGoo = 'goo';
+    console.log(elm.dataset); //logs DOMStringMap {fooFoo="foo", barBar="bar", gooGoo="goo"}
+
+    //what the element looks like in the DOM 
+    console.log(elm) //logs <div data-foo-foo="foo" data-bar-bar="bar" data-goo-goo="goo">
+</script>
+```
+
+
+
+# 4장. Element 선택하기
+
+## (1.13 표 참고)
+
+## 4.1. 특정Element 노드 하나 선택하기
+
+| 주체                 | 메소드                                 | 설명     | 특징                                                        |
+| -------------------- | -------------------------------------- | -------- | ----------------------------------------------------------- |
+| document,<br>element | Element **querySelector**(cssSelector) | 단일선택 | cssSelector자리 예)<br>  #score>tbody>tr>td:n th-of-type(2) |
+| document             | Element **getElementById**(cssID)      | 단일선택 |                                                             |
+
+
+
+## 4.2. Element노드 리스트 선택하기
+
+- 아래 메소드 전부 Element에도 정의되어있다.
+
+| 주체                 | 메소드                                      | 설명     | 특징                                                         |
+| -------------------- | ------------------------------------------- | -------- | ------------------------------------------------------------ |
+| document,<br>element | NodeList **querySelectorAll**()             | 다중선택 | static상태, 문서 스냅샷임, <br>문서의 변경내용을 반영하지 않음 |
+| document,<br>element | HTMLCollection **getElementsByTagName**()   | 다중선택 | Live상태                                                     |
+| document,<br>element | HTMLCollection **getElementsByClassName**() | 다중선택 | Live상태                                                     |
+| document             | NodeList **getElementsByName**()            | 다중선택 |                                                              |
+
+- name 속성을 갖는 element( form, img, frame, embed, object )를 선택할 때 getElementsByName를 사용한다.
+
+## 4.3.  컨텍스트 기반 Element선택
+
+- 위 두개의 표에서 주체에 element가 있는 메소드의 경우 DOM트리를 특정부분으로 제한할 수 있다. 즉, 컨텍스트를 선택할 수 있다.
+
+
+
+## 4.6. Element.matches 로 검증하기
+
+```html
+<ul id="birds">
+  <li>Orange-winged parrot</li>
+  <li class="endangered">Philippine eagle</li>
+  <li>Great white pelican</li>
+</ul>
+
+<script type="text/javascript">
+  var birds = document.getElementsByTagName('li');
+
+  for (var i = 0; i < birds.length; i++) {
+    if (birds[i].matches('.endangered')) {
+      console.log('The ' + birds[i].textContent + ' is endangered!');
+    }
+  }
+</script>
+```
+
+
+
+# 5. Element 노드의 Geometry 와 스크롤링 Geometry
+
+## 5.1. 개요
+
+Element노드의 지오메트리를 측정하고 조작하는 API를 제공함.
+
+## 5.2. offsetParent기준으로 element의 offsetTop및 offsetLeft 값을 가져오기
+
+
+
+
+
+# 6. 인라인스타일 (Element노드에 한해서)
+
+## 6.1. 개요
+
+Element의 style에 접근하는 방법
+
+**Element.style** 의 개체유형:  CSSStyleDeclaration(오직 인라인스타일을 위한 개체)
+
+```html
+<div style="background-color:red;border:1px solid black;height:100px;width:100px;"></div>
+<script>
+	var divStyle = document.querySelector('div').style; 
+
+    //logs CSSStyleDeclaration {0="background-color", ...}
+    console.log(divStyle);
+</script>
+```
+
+
+
+## 6.2. get/set/remove CSS속성
+
+CSS)  background-color 속성명
+
+Javascript) backgroundColor 로 camelCase를 사용한다.
+
+- Element.style에 대해서 getProperty, setProperty, removeProperty 를 사용한다.
+
+```html
+<script>
+    var divStyle = document.querySelector('div').style; 
+	divStyle.backgroundColor = 'red'
+    divStyle.setProperty('속성명', '값')
+    divStyle.getProperty('속성명', '값')
+    divStyle.removeProperty('속성명', '값')
+</script>
+
+
+```
+
+
+
+## 6.3 CSS속성값 여러개 일일이 바꾸기 귀찮을 때, 일괄변경
+
+방법A) Element.style.cssText 속성값
+
+방법B) Element의 setAttribute 로 설정,제거 모두 가능
+
+```html
+<script>
+    var div = document.querySelector('div');
+    var divStyle = div.style;
+
+    //set using cssText
+    divStyle.cssText = 'background-color:red;border:1px solid black;height:100px;width:100px;';
+    //get using cssText
+    console.log(divStyle.cssText);
+    //remove
+    divStyle.cssText = '';
+
+    //exactly that same outcome using setAttribute() and getAttribute()
+
+    //set using setAttribute
+    div.setAttribute('style','background-color:red;border:1px solid black;height:100px;width:100px;');
+    //get using getAttribute
+    console.log(div.getAttribute('style'));
+    //remove
+    div.setAttribute('style','');
+</script>
+```
+
+
+
+## 6.4. getComputedStyle() 을 사용하여 element의 계산된 스타일(계층화된 것을 포함한 실제 스타일) 가져오기
+
+
+
+## 6.5 class 및 id를 사용하여 CSS적용하기
+
+- class의 경우) Element.classList.add('클래스명')
+- id의 경우) Element.setAttribute('id', 'id명')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
