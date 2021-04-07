@@ -144,11 +144,11 @@ Object
 
 ## 1.6 노드 값 
 
-## 1.6.1. value값의 종류
+## 1.6.1. 텍스트 값의 종류
 
 | 노드유형          |                                               |
 | ----------------- | --------------------------------------------- |
-| Text 또는 Comment | nodeValue 값: 텍스트                          |
+| Text 또는 Comment | nodeValue 속성값: 텍스트 (data속성도 가능)    |
 | div, span, a, p   | nodeValue 값: null                            |
 | input, select     | nodeValue 값: null ,      value속성값을 사용. |
 
@@ -160,13 +160,33 @@ Object
 
 ## 1.6.2.  [ (inner/outer), (Text/HTML) ] , textContent
 
-| **textContent**                                              | **innerText**                                                | innerHTML                                                    |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| **Text, Comment노드면)    <br>Node.nodeValue 값을 리턴**     |                                                              | 단순 텍스트를 생성할 거면 권장X<br>HTML파서는 많은 성능악화를 불러옴 |
-| **자식요소가 많은 노드면)<br> 각 자식노드들의 Node.nodeValue값을 병합한 값을 리턴** |                                                              |                                                              |
-| **<script> <style> 내부의 텍스트들도 포함하여 리턴함**       | **사람이 읽을 수 있는 요소만 리턴<br>hidden처리된 요소는 리턴하지 않음** | HTML태그 전부를 텍스트로 보여줌                              |
-| **document와 document_node 타입일 경우 null리턴**            |                                                              |                                                              |
-| **XSS공격 위험이 없음**                                      |                                                              |                                                              |
+get할 때
+
+| **textContent**                                              | **innerText**                                                | innerHTML                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------- |
+| **Text, Comment노드면)    <br>Node.nodeValue 값을 리턴**     |                                                              |                                 |
+| **자식요소가 많은 노드면)<br> 각 자식노드들의 Node.nodeValue값을 병합한 값을 리턴** | **사람이 읽을 수 있는 요소만 리턴<br/>hidden처리된 요소는 리턴하지 않음**<br>즉, css반영함 |                                 |
+| **<script> , <style> 내부의 텍스트들도 포함하여 리턴함**     | <script>, <style> 내부 텍스트 무시함                         | HTML태그 전부를 텍스트로 보여줌 |
+| **document와 document_node 타입일 경우 null리턴**            |                                                              |                                 |
+| **XSS공격 위험이 없음**                                      | 공백, 개행을 정규화하여 반환                                 |                                 |
+| DOM사양으로 구현됨                                           | 비표준                                                       |                                 |
+|                                                              | <a href="https://wonism.github.io/reflow-repaint/">리플로우(reflow)가 발생</a> |                                 |
+
+
+
+set할 때
+
+| textContent                                           | innerText | innerHTML                                                    |
+| ----------------------------------------------------- | --------- | ------------------------------------------------------------ |
+| 모든 자식요소들을 제거하고 <br>단일 텍스트노드로 만듬 |           | 단순 텍스트를 생성할 거면 권장X<br/>HTML파서는 많은 성능악화를 불러옴 |
+|                                                       |           |                                                              |
+|                                                       |           |                                                              |
+
+
+
+
+
+
 
 | 메소드명           | 설명                                                         | 사용법                                                    | 특징                                                       |
 | ------------------ | ------------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------- |
@@ -879,6 +899,86 @@ Javascript) backgroundColor 로 camelCase를 사용한다.
 - id의 경우) Element.setAttribute('id', 'id명')
 
 
+
+# 7. Text노드
+
+## 7.1. 개요
+
+HTML문서의 텍스트(문자열, 띄어쓰기, 개행문자)는 Text()생성자로 인스턴스가 만들어지고 Element요소 사이사이에 text노드로 표현된다.
+
+## 7.4 Text노드 생성및 삽입
+
+document.createTextNode( )
+
+```js
+var textNode = document.createTextNode('Hi');
+document.querySelector('div').appendChild(textNode);
+
+console.log(document.querySelector('div').innerText); // logs Hi
+```
+
+## 7.5 값을 얻고 싶을 때 nodeValue
+
+nodeValue는 1.6.1절에 설명 참고
+
+
+
+## 7.6. Text노드 조작하기
+
+```js
+var pElementText = document.querySelector('p').firstChild;
+
+//add !
+pElementText.appendData('!');
+console.log(pElementText.data);
+
+//remove first 'Blue'
+pElementText.deleteData(7,5);
+console.log(pElementText.data);
+
+//insert it back 'Blue'
+pElementText.insertData(7,'Blue ');
+console.log(pElementText.data);
+
+//replace first 'Blue' with 'Bunny'
+pElementText.replaceData(7,5,'Bunny ');
+console.log(pElementText.data);
+
+//extract substring 'Blue Bunny'
+console.log(pElementText.substringData(7,10));
+
+
+```
+
+
+
+## 7.8 선택한 노드의 하위 텍스트 노드값을 병합하여 추출하기
+
+Element.textContent
+
+- get할 때 뿐만 아니라, set할 때도 하나의 덩어리 텍스트로 교체할 수 있다.
+- 즉, 모든 자식노드가 제거되고 단일 TEXT노드로 바뀐다
+- 단, document, doctype에서는 textContent값이 null임
+
+
+
+# 8. DocumentFragment노드
+
+## 8.1. 개요
+
+- 라이브DOM트리 외부에 경량화된 문서DOM을 만들 수 있다
+- 마치 라이브DOM처럼 동작.
+- 하지만 메모리상에서만 존재함
+- 라이브DOM에 추가하는것도 가능
+
+## 8.2. 
+
+**DocumentFragment(이하 DF) 가 갖는 createElement( ) 와의 차이점.**
+
+- 어떤 종류의 노드를 가질 수 있다.(<html>, <body> 제외)   반면, Element는 그렇지 않음
+- DF를 DOM에 추가하더라도 DF자체는 추가되지 않음. 노드의 내용만이 추가됨(Element자체도 추가동작에 속함)
+- DF를 DOM에 추가할 때 DF는 추가되는 위치로 이전되며 생성한 메모리상의 위치에 더 이상 존재하지 X
+  - 생성된 Element는 라이브DOM에 추가되어 이동되더라도 계속 메모리상에 존재함.
 
 
 
