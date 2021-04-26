@@ -525,3 +525,114 @@ int main() {
 
 
 
+다른사람풀이
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 1000;
+
+char myMap[MAX][MAX];
+
+int R, C;
+
+queue<pair<int, int>> j_q, f_q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0, 0, -1, 1 };
+
+int ans[MAX][MAX];
+
+void printMap() {
+	for (int i = 0; i < R; i++) {
+		for (int j = 0; j < C; j++) {
+			cout << myMap[i][j] << ' ';
+		}
+		cout << '\n';
+	}
+	cout << '\n';
+
+}
+
+bool BFS() {
+	//printMap();
+	while (!j_q.empty()) {//queue에 push된 이동가능한 지훈element가 더 이상 없을 때까지
+		for (int f = 0; f < f_q.size(); f++) { //무한반복 while이 아닌 유한으로 최외각 둘레만 BFS한다.
+			pair<int, int> fcurr = f_q.front(); f_q.pop();
+			
+			for (int dir = 0; dir < 4; dir++) {
+				int fnextY = fcurr.first  + dy[dir];
+				int fnextX = fcurr.second + dx[dir];
+				//cout << "(" << fnextY << "," << fnextX << ")->";
+				if (fnextY < 0 || fnextY >= R || fnextX < 0 || fnextX >= C)continue; //경계밖
+
+				if (myMap[fnextY][fnextX] == '.') {
+					myMap[fnextY][fnextX] = 'F';
+					f_q.push({ fnextY, fnextX });
+				}
+			}
+		}
+
+		for (int j = 0; j < j_q.size(); j++) {// 최외각 둘레만 BFS한다.
+			pair<int, int> jcurr = j_q.front(); j_q.pop();
+
+			for (int dir = 0; dir < 4; dir++) {
+				int jnextY = jcurr.first + dy[dir];
+				int jnextX = jcurr.second + dx[dir];
+
+				if (jnextY < 0 || jnextY >= R || jnextX < 0 || jnextX >= C) {
+					cout << ans[jcurr.first][jcurr.second] + 1;
+					return true;
+				}
+
+				if (myMap[jnextY][jnextX] == '.') {
+					myMap[jnextY][jnextX] = 'J';
+					ans[jnextY][jnextX] = ans[jcurr.first][jcurr.second] + 1;
+					j_q.push({ jnextY, jnextX });
+				}
+			}
+		}
+		//printMap();
+	}
+	return false;
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> R >> C;
+
+	for (int i = 0; i < R; i++) {
+		for (int j = 0; j < C; j++) {
+			cin >> myMap[i][j];
+			if (myMap[i][j] == 'J') {
+				j_q.push(make_pair(i, j));
+			}
+
+			if (myMap[i][j] == 'F') {
+				f_q.push(make_pair(i, j));
+			}
+		}
+	}
+
+	if (!BFS()) {
+		cout << "IMPOSSIBLE";
+	}
+
+	return 0;
+}
+```
+
+
+
+# 1697 숨박꼭질
+
+```c
+
+```
+
+
+
