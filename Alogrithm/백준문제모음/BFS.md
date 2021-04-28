@@ -631,8 +631,157 @@ int main(void) {
 # 1697 숨박꼭질
 
 ```c
+#include<bits/stdc++.h>
 
+using namespace std;
+
+queue<pair<int, int>> Queue; //위치, depth
+
+int N, K;
+int MAX = 100000;
+bool visited[100001];
+
+void BFS() {
+
+	while (!Queue.empty()) {
+		
+		pair<int, int> curr = Queue.front(); Queue.pop();
+
+		int pos = curr.first;
+		int depth = curr.second;
+
+		if (pos == K) {
+			cout << depth;
+			return;
+		}
+
+		int nextPos;
+		int nextDepth = depth + 1;
+		
+		//+1
+		nextPos = pos + 1;
+		if (0 <= nextPos && nextPos <= MAX && !visited[nextPos]) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+		}
+		//-1
+		nextPos = pos - 1;
+		if (0 <= nextPos && nextPos <= MAX && !visited[nextPos]) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+		}
+			
+		//*2
+		nextPos = pos * 2;
+		if (0 <= nextPos && nextPos <= MAX && !visited[nextPos]) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+		}
+	}
+}
+
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> N >> K;
+
+	visited[N] = true;
+	Queue.push(make_pair(N, 0));
+
+	BFS();
+
+	return 0;
+}
 ```
+
+
+
+# 유기농배추
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+int T;
+int M, N, K;
+const int MAX = 50;
+
+
+
+queue<pair<int, int>> Q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0, 0, -1, 1 };
+
+void BFS(int myMap[][MAX], bool visited[][MAX]) {
+	while (!Q.empty()) {
+		pair<int, int> curr = Q.front(); Q.pop();
+
+		for (int dir = 0; dir < 4; dir++) {
+
+			int nextY = curr.first + dy[dir];
+			int nextX = curr.second+ dx[dir];
+
+			if (nextY < 0 || nextY >= M || nextX < 0 || nextX >= N)continue;
+
+			if (myMap[nextY][nextX] == 1 && !visited[nextY][nextX]) {
+				visited[nextY][nextX] = true;
+				Q.push({ nextY, nextX });
+			}
+
+		}
+
+
+
+	}
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> T;
+
+	for (int i = 0; i < T; i++) {
+		int myMap[MAX][MAX] = { 0, };
+		bool visited[MAX][MAX] = { 0, };
+		int ans = 0;
+		/*for (int j = 0; j < MAX; j++) {
+			fill(myMap[i], myMap[i] + MAX, 0);
+		}*/
+		
+		cin >> M >> N >> K;
+		
+		for (int j = 0; j < K; j++) {
+			int r, c;
+			cin >> r >> c;
+			myMap[r][c] = 1;
+		}
+
+
+		for (int r = 0; r < MAX; r++) {
+			for (int c = 0; c < MAX; c++) {
+				if (!visited[r][c] && myMap[r][c] == 1) {
+					//cout << "(" << r << "," << c << ") ";
+					ans++;
+					visited[r][c] = true;
+					Q.push({ r,c });
+					BFS(myMap, visited);
+				}
+			}
+		}
+
+		cout << ans << '\n';
+
+	}
+
+	return 0;
+}
+```
+
+
 
 
 
