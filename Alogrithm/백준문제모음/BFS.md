@@ -783,5 +783,117 @@ int main(void) {
 
 
 
+# 7569 토마토(3차원)
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+
+const int MAX = 100;
+int M, N, H;
+
+int mymap[MAX][MAX][MAX];
+bool visited[MAX][MAX][MAX];
+struct node {
+	int y;
+	int x;
+	int z;
+};
+queue<node> Q;
+
+int tot_not_mature;
+int cnt_be_mature;
+int mytime = 0;
+
+int dy[6] = {-1,1,0,0,0,0};
+int dx[6] = {0,0,-1,1,0,0};
+int dz[6] = {0,0,0,0,-1,1};
+
+void printMap() {
+	cout << '\n';
+	for (int k = 0; k < H; k++) {
+		for (int j = 0; j < N; j++) {
+			for (int i = 0; i < M; i++) {
+				cout << mymap[i][j][k] << '\t';
+			}
+			cout << '\n';
+		}
+		cout << '\n';
+	}
+	
+}
+
+void BFS() {
+	//printMap();
+	while (!Q.empty()) {
+		//cout << "\nQ의 요소갯수: " << Q.size() << '\n';
+		int qsize = Q.size();
+
+		int flag = false;
+
+		for (int i = 0; i < qsize; i++) {
+			node curr = Q.front(); Q.pop();
+			//cout << "\n\n[(" << curr.y << "," << curr.x << ") 리스트 " << i << "]    ";
+			for (int dir = 0; dir < 6; dir++) {
+				int nextY = curr.y + dy[dir];
+				int nextX = curr.x + dx[dir];
+				int nextZ = curr.z + dz[dir];
+
+				if (nextY < 0 || nextY >= M || nextX < 0 || nextX >= N || nextZ < 0 || nextZ >= H)continue;
+				if (mymap[nextY][nextX][nextZ] == 0) {
+					
+					//cout << "(" << nextY << "," << nextX << ") -> ";
+
+					Q.push({ nextY , nextX, nextZ });
+					mymap[nextY][nextX][nextZ] = 1;
+					flag = true;
+					cnt_be_mature++;
+				}
+			}
+		}
+		//printMap();
+		if(flag)mytime++;
+		//cout << "mytime: " << mytime << '\n';
+	}
+
+	if (cnt_be_mature == tot_not_mature) {
+		cout << mytime;
+
+	}
+	else {
+		cout << -1;
+	}
+}
+
+
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+
+	cin >> M >> N >> H;
+
+	for (int k = 0; k < H; k++) {
+		for (int j = 0; j < N; j++) {
+			for (int i = 0; i < M; i++) {
+				cin >> mymap[i][j][k];
+				if (mymap[i][j][k] == 0)tot_not_mature++;
+				if (mymap[i][j][k] == 1)Q.push({ i,j,k });
+			}
+		}
+	}
+
+
+
+
+	BFS();
+
+	return 0;
+}
+```
+
 
 
