@@ -897,3 +897,229 @@ int main(void) {
 
 
 
+# 2583 영역구하기
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 101;
+
+int M, N, K;
+
+
+int myMap[MAX][MAX];
+bool visited[MAX][MAX];
+queue<pair<int, int>> Q;
+
+int dx[4] = { -1,1,0,0 };
+int dy[4] = { 0,0,-1,1 };
+
+vector<int> V;
+
+void BFS() {
+	int area = 0;
+
+	while (!Q.empty()) {
+		pair<int, int> curr = Q.front(); Q.pop();
+		area++;
+
+		for (int dir = 0; dir < 4; dir++) {
+			int nextX = curr.first + dx[dir];
+			int nextY = curr.second+ dy[dir];
+
+			if (nextX < 0 || nextX >= N || nextY < 0 || nextY >= M)continue;
+
+			if (myMap[nextX][nextY] == 0 && !visited[nextX][nextY]) {
+				visited[nextX][nextY] = true;
+				Q.push({ nextX , nextY });
+				
+			}
+		}
+	}
+	V.push_back(area);
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> M >> N >> K;
+
+	for (int i = 0; i < K; i++) {
+		int l_x, l_y, r_x, r_y;
+
+		cin >> l_x >> l_y >> r_x >> r_y;
+
+		for (int x = l_x; x < r_x; x++) {
+			for (int y = l_y; y < r_y; y++) {
+				myMap[x][y] = 1;
+			}
+		}
+	}
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (!visited[i][j] && myMap[i][j] == 0) {
+				Q.push({ i, j });
+				visited[i][j] = true;
+				BFS();
+			}
+		}
+	}
+	sort(V.begin(), V.end());
+	cout << V.size() << '\n';
+	for (auto ele : V) {
+		cout << ele << ' ';
+	}
+
+	return 0;
+}
+```
+
+
+
+# 2667 단지번호붙이기
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 25;
+
+int N;
+
+string myMap[MAX];
+bool visited[MAX][MAX];
+
+queue<pair<int, int>> Q;
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0, 0, -1, 1 };
+vector<int> V;
+void BFS() {
+	int cnt = 0;
+	while (!Q.empty()) {
+		pair<int, int> curr = Q.front(); Q.pop();
+		cnt++;
+		for (int dir = 0; dir < 4; dir++) {
+			int nextY = curr.first + dy[dir];
+			int nextX = curr.second+ dx[dir];
+
+			if (nextY < 0 || nextY >= N || nextX < 0 || nextX >= N)continue;
+
+			if (myMap[nextY][nextX] == '1' && !visited[nextY][nextX]) {
+				visited[nextY][nextX] = true;
+				Q.push({ nextY,nextX });
+			}
+		}
+	}
+	V.push_back(cnt);
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> N;
+
+	for (int i = 0; i < N; i++) {
+		cin >> myMap[i];
+	}
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (myMap[i][j] == '1' && !visited[i][j]) {
+				visited[i][j] = true;
+				Q.push({ i,j });
+				BFS();
+			}
+		}
+	}
+
+	cout << V.size() << '\n';
+	sort(V.begin(), V.end());
+	for (auto ele : V) {
+		cout << ele << '\n';
+	}
+	
+
+	return 0;
+}
+```
+
+
+
+# 7562 나이트의 이동
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 300;
+
+int dy[8] = { -2, -1,  1,  2, 2, 1, -1, -2 };
+int dx[8] = { -1, -2, -2, -1, 1, 2,  2, 1 };
+
+
+
+int T;
+int n;
+pair<int, int> from_node, to_node;
+
+void bfs() {
+	queue<pair<int, int>> Q;
+
+	Q.push(from_node);
+
+	int res[MAX][MAX] = { 0, };
+	while (!Q.empty()) {
+
+		pair<int, int> curr = Q.front(); Q.pop();
+
+		if (curr.first == to_node.first && curr.second == to_node.second) {
+			cout << res[curr.first][curr.second]<< '\n';
+			return;
+		}
+
+		for (int dir = 0; dir < 8; dir++) {
+			int nextY = curr.first + dy[dir];
+			int nextX = curr.second+ dx[dir];
+			if (nextY < 0 || nextY >= n || nextX < 0 || nextX >= n)continue;
+			if (res[nextY][nextX] > 0 || (nextY == from_node.first && nextX == from_node.second))continue;
+			res[nextY][nextX] = res[curr.first][curr.second] + 1;
+			Q.push({ nextY, nextX });
+		}
+
+	}
+}
+
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> T;
+
+	for (int t = 0; t < T; t++) {
+		
+		cin >> n;
+
+		int a, b;
+		cin >> a >> b;
+		from_node = { a, b };
+		cin >> a >> b;
+		to_node = { a, b };
+
+		bfs();
+
+	}
+
+	
+
+	return 0;
+}
+```
+
