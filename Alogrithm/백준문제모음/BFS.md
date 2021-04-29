@@ -1123,3 +1123,614 @@ int main(void) {
 }
 ```
 
+
+
+
+
+# 10026 적록색약
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 100;
+
+int n;
+
+string myMap[MAX];
+queue<pair<int, int>> Q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0,0,-1,1 };
+void bfs1() {
+	bool visited[MAX][MAX] = { 0, };
+	int section_num = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (!visited[i][j]) {
+				char color = myMap[i][j];
+				section_num++;
+				visited[i][j] = true;
+				Q.push({ i,j });
+				
+				while (!Q.empty()) {
+					pair<int, int> curr = Q.front(); Q.pop();
+					int y = curr.first;
+					int x = curr.second;
+
+
+					for (int dir = 0; dir < 4; dir++) {
+						int ny = y + dy[dir];
+						int nx = x + dx[dir];
+
+						if (ny < 0 || ny >= n || nx < 0 || nx >= n)continue;
+
+						if (myMap[ny][nx] == color && !visited[ny][nx]) {
+							visited[ny][nx] = true;
+							Q.push({ ny, nx });
+						}
+					}
+
+
+				}
+
+
+
+			}
+		}
+	}
+
+	cout << section_num << ' ';
+
+}
+
+void bfs2() {
+	bool visited[MAX][MAX] = { 0, };
+	int section_num = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (!visited[i][j]) {
+				char color = myMap[i][j];
+				section_num++;
+				visited[i][j] = true;
+				Q.push({ i,j });
+
+				while (!Q.empty()) {
+					pair<int, int> curr = Q.front(); Q.pop();
+					int y = curr.first;
+					int x = curr.second;
+
+
+					for (int dir = 0; dir < 4; dir++) {
+						int ny = y + dy[dir];
+						int nx = x + dx[dir];
+
+						if (ny < 0 || ny >= n || nx < 0 || nx >= n)continue;
+
+						if (color == 'R' || color == 'G') {
+							if ((myMap[ny][nx] == 'R' || myMap[ny][nx] == 'G')&& !visited[ny][nx]) {
+								visited[ny][nx] = true;
+								Q.push({ ny, nx });
+							}
+						}
+						else {
+							if (myMap[ny][nx] == color && !visited[ny][nx]) {
+								visited[ny][nx] = true;
+								Q.push({ ny, nx });
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	cout << section_num;
+
+}
+
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> n;
+
+	for (int i = 0; i < n; i++) {
+		cin >> myMap[i];
+	}
+
+	bfs1();
+
+	bfs2();
+
+	return 0;
+}
+```
+
+
+
+
+
+# 2206 벽부수고 이동하기
+
+
+
+**실패한 코드**
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 1005;
+
+int N, M;
+
+string myMap[MAX];
+
+struct Node {
+	int y;
+	int x;
+	bool z;
+};
+
+queue<Node> Q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0,0,-1,1 };
+
+int  res[MAX][MAX];
+
+void printArr(int arr[][MAX]) {
+	
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			cout << arr[i][j] << ' ';
+		}
+		cout << '\n';
+	}
+	cout << '\n';
+}
+
+void bfs() {
+	printArr(res);
+	while (!Q.empty()) {
+		int q_size = Q.size();
+		while (q_size--) {
+			Node curr = Q.front(); Q.pop();
+			int cy = curr.y;
+			int cx = curr.x;
+			bool cz = curr.z;
+
+			//cout << "(" << cy << ", " << cx << ")\n";
+
+			if (cy == N-1 && cx == M-1) {
+				cout << res[cy][cx];
+				return;
+			}
+			for (int dir = 0; dir < 4; dir++) {
+				int ny = cy + dy[dir];
+				int nx = cx + dx[dir];
+
+				if (ny < 0 || ny >= N || nx < 0 || nx >= N)continue;
+				if (!cz && myMap[ny][nx] == '1')continue; //벽꺨수있는기회 없고 , 벽이면
+
+				if (cz && myMap[ny][nx] == '1' && res[ny][nx] == 0) { //벽 깰수있고 벽이면
+					//cout << "벽 꺨수있음 (" << ny << "," << nx << ")\n";
+					res[ny][nx] = res[cy][cx] + 1;
+					Q.push({ ny,nx, false });
+				}
+				else if (myMap[ny][nx] == '0' && res[ny][nx] == 0) { //0으로 진입가능하고 , 방문했던 적없으면
+
+					//cout << "0으로 진입가능하고 , 방문했던 적없으면 (" << ny << "," << nx << "): " << myMap[ny][nx] << "\n";
+					res[ny][nx] = res[cy][cx] + 1;
+					Q.push({ ny, nx, cz });
+				}
+				else if (res[cy][cx] + 1 < res[ny][nx]) {
+					//cout << "이미 방문했던 적있으나 더 작은 최소값이 될 수 있으면 (" << ny << "," << nx << ")\n";
+					res[ny][nx] = res[cy][cx] + 1;
+					Q.push({ ny, nx, cz });
+				}
+				else {
+					//cout << "[" << ny << ", " << nx << "]X \n";
+				}
+			}
+		}
+		printArr(res);
+	}
+	cout << -1;
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> N >> M;
+
+	for (int i = 0; i < N; i++)
+		cin >> myMap[i];
+
+	res[0][0] = 1;
+	Q.push({ 0,0,true });
+
+	bfs();
+	
+
+	return 0;
+}
+
+/*
+6 4
+0000
+1110
+1000
+0000
+0111
+0000
+*/
+```
+
+
+
+# 2468 안전 영역
+
+런타임에러(Out of bound)
+
+```
+#include<bits/stdc++.h>
+
+using namespace std;
+
+queue<pair<int, int>> Q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0,0,-1,1 };
+const int MAX = 101;
+int myMap[MAX][MAX];
+
+int curr[MAX][MAX];
+bool visited[MAX][MAX];
+
+int n;
+int minH = 100, maxH = 1;
+vector<int> V;
+
+void bfs() {
+	
+	while (!Q.empty()) {
+
+		int q_size = Q.size();
+		while (q_size--) {
+
+			pair<int, int> node = Q.front(); Q.pop();
+
+			int y = node.first;
+			int x = node.second;
+
+			for (int dir = 0; dir < 4; dir++) {
+				int ny = y + dy[dir];
+				int nx = x + dx[dir];
+				if (ny < 0 || ny >= n || nx < 0 || nx >= n)continue;
+				if (curr[ny][nx] == 0 || visited[ny][nx])continue;
+				visited[ny][nx] = true;
+				Q.push({ ny, nx });
+			}
+		}
+	}
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> n; 
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			cin >> myMap[i][j];
+			if (minH > myMap[i][j])minH = myMap[i][j];
+			if (maxH < myMap[i][j])maxH = myMap[i][j];
+		}
+	}
+
+	for (int water = minH; water < maxH; water++) {
+		
+		for (int i = 0; i < MAX; i++) {
+			fill(curr[i], curr[i] + MAX, 0);
+			fill(visited[i], visited[i] + MAX, 0);
+
+		}
+		
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (myMap[i][j] > water) {
+					curr[i][j] = 1;
+				}
+			}
+		}
+
+		int tot = 0;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (!visited[i][j] && curr[i][j] == 1) {
+					visited[i][j] = true;
+					Q.push({ i,j });
+					bfs();
+					tot++;
+				}
+			}
+		}
+		V.push_back(tot);
+	}
+
+	sort(V.begin(), V.end(), greater<int>());
+	if (V.size() > 0) {
+		cout << V[0];
+	}
+	else {
+		cout << 0;
+	}
+	
+	return 0;
+}
+
+
+```
+
+
+
+# 2573 빙하
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+queue<pair<int, int>> Q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0,0,-1,1 };
+const int MAX = 305;
+
+int myMap[MAX][MAX];
+
+int N, M;
+
+int getVelocity(int y, int x) {
+	int tot = 0;
+	for (int dir = 0; dir < 4; dir++) {
+		int ny = y + dy[dir];
+		int nx = x + dx[dir];
+		
+		if (ny < 0 || ny >= N || nx < 0 || nx >= M)continue;
+		if(myMap[ny][nx] == 0)tot++;
+	}
+	return tot;
+}
+
+void bfs(bool visited[][MAX]) {
+
+	while (!Q.empty()) {
+
+		int q_size = Q.size();
+
+		while (q_size--) {
+
+			pair<int, int> curr = Q.front(); Q.pop();
+			int y = curr.first;
+			int x = curr.second;
+
+			for (int dir = 0; dir < 4; dir++) {
+				int ny = y + dy[dir];
+				int nx = x + dx[dir];
+
+				if (ny < 0 || ny >= N || nx < 0 || nx >= M)continue;
+				if (myMap[ny][nx] > 0 && !visited[ny][nx]) {
+					visited[ny][nx] = true;
+					Q.push({ ny, nx });
+				}
+			}
+
+		}
+
+	}
+
+}
+
+void printArr(int arr[][MAX]) {
+	cout << '\n';
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			cout << myMap[i][j] << ' ';
+		}
+		cout << '\n';
+	}
+	cout << '\n';
+}
+
+void solution() {
+	int time = 0;
+
+	//printArr(myMap);
+
+	while (++time) {
+		int temp[MAX][MAX] = { 0, };
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				if (myMap[i][j] != 0) {
+					int v = getVelocity(i, j);
+					temp[i][j] = myMap[i][j] - v < 0 ? 0 : myMap[i][j] - v;
+				}
+			}
+		}
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				myMap[i][j] = temp[i][j];
+			}
+		}
+		//printArr(myMap);
+
+		bool visited[MAX][MAX] = { 0, };
+		int area_cnt = 0;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				if (myMap[i][j] != 0 && !visited[i][j]) {
+					//cout << "(" << i << "," << j << ")-> ";
+					area_cnt++;
+					visited[i][j] = true;
+					Q.push({ i, j });
+					bfs(visited);
+				}
+			}
+		}
+		//cout << '\n';
+		if (area_cnt >= 2) {
+			cout << time;
+			return;
+		}
+
+		if (area_cnt == 0) {
+			cout << 0;
+			return;
+		}
+	}
+}
+
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> N >> M;
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			cin >> myMap[i][j];
+
+		}
+	}
+	solution();
+	return 0;
+}
+
+
+```
+
+
+
+# 5427 불
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+queue<pair<int, int>> Q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0,0,-1,1 };
+const int MAX = 1001;
+
+char myMap[MAX][MAX];
+int ans[MAX][MAX];
+int w, h;
+
+
+void printArr() {
+	for (int i = 0; i < h; i++) {
+		for (int j = 0; j < w; j++) {
+			cout << myMap[i][j] << ' ';
+		}
+		cout << '\n';
+	}
+	cout << '\n';
+}
+
+void BFS(queue<pair<int, int>> h_q, queue<pair<int, int>> f_q) {
+
+	for (int i = 0; i < MAX; i++)
+		fill(ans[i], ans[i] + MAX, 0);
+	//printArr();
+	while (!h_q.empty()) {
+		int f_q_size = f_q.size();
+		while (f_q_size--) {
+			pair<int, int> curr = f_q.front(); f_q.pop();
+			int y = curr.first;
+			int x = curr.second;
+			for (int dir = 0; dir < 4; dir++) {
+				int ny = y + dy[dir];
+				int nx = x + dx[dir];
+				if (myMap[ny][nx] == '.' || myMap[ny][nx] == '@') {
+					myMap[ny][nx] = '*';
+					f_q.push({ ny,nx });
+				}
+			}
+		}
+
+		int h_q_size = h_q.size();
+		while (h_q_size--) {
+			pair<int, int> curr = h_q.front(); h_q.pop();
+			int y = curr.first;
+			int x = curr.second;
+
+			for (int dir = 0; dir < 4; dir++) {
+				int ny = y + dy[dir];
+				int nx = x + dx[dir];
+
+				if (ny < 0 || ny >= h || nx < 0 || nx >= w) {
+					cout << ans[y][x] + 1 << '\n';
+					return;
+				}
+				if (myMap[ny][nx] == '.') {
+					myMap[ny][nx] = '@';
+					ans[ny][nx] = ans[y][x] + 1;
+					h_q.push({ ny,nx });
+				}
+			}
+		}
+
+		
+		//printArr();
+	}
+
+	cout << "IMPOSSIBLE\n";
+
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int T;
+
+	cin >> T;
+
+	while (T--) {
+		queue<pair<int, int>> h_q, f_q;
+
+		cin >> w >> h;
+
+		for (int i = 0; i < h; i++) {
+			for (int j = 0; j < w; j++) {
+				cin >> myMap[i][j];
+				if (myMap[i][j] == '@') h_q.push({ i,j });
+				if (myMap[i][j] == '*') f_q.push({ i,j });
+			}
+		}
+
+		BFS(h_q, f_q);
+	}
+
+
+	
+	return 0;
+}
+
+
+```
+
+
+
