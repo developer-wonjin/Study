@@ -1734,3 +1734,294 @@ int main(void) {
 
 
 
+
+
+# 2146 다리만들기
+
+보류하기... 유튜브에 문제풀이 있음
+
+
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+queue<pair<int, int>> Q;
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0,0,-1,1 };
+const int MAX = 101;
+int n;
+
+int myMap[MAX][MAX];
+int newMap[MAX][MAX];
+bool visited[MAX][MAX];
+
+int nthContinent;
+
+
+pair<int, int> start;
+
+void printArr(int arr[][MAX]) {
+	cout << '\n';
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			cout << arr[i][j] << ' ';
+		}
+		cout << '\n';
+	}
+	cout << '\n';
+}
+
+void BFS() {
+	queue<pair<int, int>> Q;
+	Q.push(start);
+	while (!Q.empty()) {
+		pair<int, int> curr = Q.front(); Q.pop();
+
+		int y = curr.first;
+		int x = curr.second;
+		newMap[y][x] = nthContinent;
+
+		for (int dir = 0; dir < 4; dir++) {
+			int ny = y + dy[dir];
+			int nx = x + dx[dir];
+			if (ny < 0 || ny >= n || nx < 0 || nx >= n)continue;
+			if (myMap[ny][nx] == 1 && !visited[ny][nx]) {
+				visited[ny][nx] = true;
+				Q.push({ ny,nx });
+			}
+		}
+		
+	}
+	
+}
+
+
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cin >> n;
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			cin >> myMap[i][j];
+		}
+	}
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (!visited[i][j] && myMap[i][j] == 1) {
+				start = { i,j };
+				visited[i][j] = true;				
+				nthContinent++;
+				BFS();
+			}
+		}
+	}
+	
+	printArr(newMap);
+	
+
+
+	return 0;
+}
+
+
+```
+
+
+
+# 5014 스타트링크
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+
+queue<int> Q;
+
+int F, S, G, U, D;
+bool visited[1000001];
+
+int dx[2] = {};
+int cnt;
+
+void BFS() {
+
+	while (!Q.empty()) {
+		int q_size = Q.size();
+		cnt++;
+
+		//cout << "현재 depth: "<< cnt << " ) " ;
+		for (int i = 0; i < q_size; i++) {
+			int curr = Q.front(); Q.pop();
+			
+			//cout << curr << ' ';
+			if (curr == G) {
+				//cout << "\n\n";
+				cout << cnt-1;
+				return;
+			}
+
+			for (int dir = 0; dir < 2; dir++) {
+				int next = curr + dx[dir];
+
+				if (next < 1 || next > F)continue;
+				if (visited[next])continue;
+				visited[next] = true;
+				Q.push(next);
+			}
+		}
+		//cout << "\n";
+		
+
+	}
+	cout << "use the stairs";
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cin >> F >> S >> G >> U >> D;
+	dx[0] = U;
+	dx[1] = (-1)*D;
+	visited[S] = true;
+	Q.push(S);
+
+	BFS();
+
+
+	return 0;
+}
+
+
+```
+
+
+
+# 6593 상범 빌딩
+
+못품..
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+int L, R, C;
+const int MAX = 30;
+char myMap[MAX][MAX][MAX];
+
+int res[MAX][MAX][MAX];
+struct Node {
+	int h;
+	int y;
+	int x;
+};
+int dh[6] = { -1, 1,  0, 0, 0, 0 };
+int dy[6] = {  0, 0, -1, 1, 0, 0 };
+int dx[6] = {  0, 0,  0, 0,-1, 1 };
+
+Node startPos, endPos;
+
+void printArr() {
+	cout << '\n';
+	for (int i = 0; i < L; i++) {
+		for (int j = 0; j < R; j++) {
+			for (int k = 0; k < C; k++) {
+				cout << myMap[i][j][k] << ' ';
+			}
+			cout << '\n';
+		}
+		cout << '\n';
+	}
+	cout << '\n';
+}
+
+void bfs() {
+	queue<Node> Q;
+	Q.push(startPos);
+	printArr();
+	while (!Q.empty()) {
+		int q_size = Q.size();
+
+		//cout << "Q.size(): " << Q.size() << "\n";
+
+		for (int i = 0; i < q_size; i++) {
+			Node curr = Q.front(); Q.pop();
+
+			int h = curr.h;
+			int y = curr.y;
+			int x = curr.x;
+
+			//cout << "(" << h << "," << y << "," << x << ")-> ";
+
+			//cout << "PUSH대상 노드: \n";
+
+			for (int dir = 0; dir < 6; dir++) {
+				int nh = h + dh[dir];
+				int ny = y + dy[dir];
+				int nx = x + dx[dir];
+
+				//cout << "(" << dh[dir] << "," << dy[dir] << "," << dx[dir] << "): ";
+				//cout << "(" << nh << "," << ny << "," << nx << ")-> \n";
+
+				if (nh < 0 || nh >= L || ny < 0 || ny >= R || nx < 0 || nx >= C)continue;
+				if (myMap[nh][ny][nx] == 'E') {
+					cout << "Escaped in " << res[h][y][x] + 1 << " minute(s).\n";
+					return;
+				}
+
+				if (myMap[nh][ny][nx] == '.') {
+					myMap[nh][ny][nx] = 'S';
+					res[nh][ny][nx] = res[h][y][x] + 1;
+					Q.push({ nh, ny, nx });
+				}
+			}
+		}
+		printArr();
+		//cout << '\n';
+	}
+	cout << "Trapped!\n";
+}
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	 
+
+
+	while (1) {
+
+		cin >> L >> R >> C;
+		if (L == 0 && R == 0 && C == 0)break;
+
+		for (int i = 0; i < L; i++) {
+			for (int j = 0; j < R; j++) {
+				for (int k = 0; k < C; k++) {
+					cin >> myMap[i][j][k];
+					if (myMap[i][j][k] == 'S') {
+						startPos = { i,j,k };
+					}
+					if (myMap[i][j][k] == 'E') {
+						endPos = { i,j,k };
+					}
+				}
+			}
+		}
+		
+		bfs();
+		
+	}
+	
+	return 0;
+}
+
+/*
+
+*/
+```
+
