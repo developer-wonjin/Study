@@ -2025,3 +2025,283 @@ int main(void) {
 */
 ```
 
+
+
+# 13549 숨바꼭질3
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 100001;
+int N, K;
+queue<pair<int, int>> Q;
+int visited[MAX];
+int dx[2] = { -1, 1 };
+
+void BFS() {
+	while (!Q.empty()) {
+
+		int size = Q.size();
+		for (int i = 0; i < size; i++) {
+			pair<int, int> curr = Q.front(); Q.pop();
+			int x = curr.first;
+			int time = curr.second;
+
+			//cout << x << "-> ";
+
+
+
+			if (x == K) {
+				cout << time;
+				return;
+			}
+
+
+			int nx = 2 * x;
+			if (nx <= 100000 && !visited[nx]) {
+				visited[nx] = true;
+				Q.push({ nx, time });
+			}
+
+			for (int i = 0; i < 2; i++) {
+				int nx = x + dx[i];
+
+				if (nx < 0 || nx > 100000)continue;
+				if (visited[nx])continue;
+
+				visited[nx] = true;
+				Q.push({ nx, time + 1 });
+			}
+
+		}
+		//cout << '\n';
+	}
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	 
+	cin >> N >> K;
+
+	visited[N] = true;
+	Q.push({ N,0 });
+
+	BFS();
+
+	return 0;
+}
+
+/*
+
+*/
+```
+
+
+
+
+
+# 13913 숨바꼭질4
+
+못품..
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+queue<pair<int, int>> Queue; //위치, depth
+
+int N, K;
+int MAX = 100000;
+bool visited[100001];
+
+int path[100001];
+
+void printDFS(int pos) {
+
+	if (path[pos] == 0) {
+		cout << pos << ' ';
+		return;
+	}
+
+	printDFS(path[pos]);
+	cout << pos << ' ';
+}
+
+void BFS() {
+
+	while (!Queue.empty()) {
+
+		pair<int, int> curr = Queue.front(); Queue.pop();
+
+		int pos = curr.first;
+		int depth = curr.second;
+
+		if (pos == K) {
+			cout << depth << '\n';
+			printDFS(pos);
+
+			/*for (int i = 0; i <= 17; i++) {
+				cout << i << '\t';
+			}
+
+			cout << '\n';
+
+			for (int i = 0; i <= 17; i++) {
+				cout << path[i] << '\t';
+			}*/
+
+			return;
+		}
+
+		int nextPos;
+		int nextDepth = depth + 1;
+
+		//+1
+		nextPos = pos + 1;
+		
+		if (0 <= nextPos && nextPos <= MAX && !visited[nextPos]) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+			path[nextPos] = pos;
+		}
+		//-1
+		nextPos = pos - 1;
+		
+		if (0 <= nextPos && nextPos <= MAX && !visited[nextPos]) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+			path[nextPos] = pos;
+		}
+
+		//*2
+		nextPos = pos * 2;
+		
+		if (0 <= nextPos && nextPos <= MAX && !visited[nextPos]) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+			path[nextPos] = pos;
+		}
+	}
+
+	
+}
+
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> N >> K;
+
+	visited[N] = true;
+	Queue.push(make_pair(N, 0));
+
+	BFS();
+
+	return 0;
+}
+```
+
+
+
+# 1600 말이되고 싶은 원숭이
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+const int MAX = 200;
+int K;
+int W, H;
+int myMap[MAX][MAX];
+
+struct Node {
+	int y;
+	int x;
+	int jump;
+	int ans;
+};
+queue<Node> Q;
+
+int dy_horse[8] = { -2, -1, 1, 2, 2, 1,-1,-2};
+int dx_horse[8] = { -1, -2,-2,-1, 1, 2, 2, 1};
+
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0, 0, -1, 1 };
+
+bool visited[MAX + 1][MAX + 1];
+
+void BFS() {
+
+	visited[0][0] = true;
+	Q.push({ 0,0,K,0 });
+
+	while (!Q.empty()) {
+		int size = Q.size();
+
+		for (int s = 0; s < size; s++) {
+			Node curr = Q.front(); Q.pop();
+			int y = curr.y;
+			int x = curr.x;
+			int jump = curr.jump;
+			int ans = curr.ans;
+
+			cout << "(" << y << "," << x << ") ";
+
+			if (y == H - 1 && x == W - 1) {
+				cout<< ans;
+				return;
+			}
+
+			if (jump > 0) {
+				for (int dir = 0; dir < 8; dir++) {
+					int ny = y + dy_horse[dir];
+					int nx = x + dx_horse[dir];
+					if (ny < 0 || ny >= W || nx < 0 || nx >= H)continue;
+					if (myMap[ny][nx] == 1 || visited[ny][nx])continue;
+					visited[ny][nx] = true;
+					Q.push({ ny,nx,jump-1, ans + 1 });
+				}
+			}
+
+			for (int dir = 0; dir < 4; dir++) {
+				int ny = y + dy[dir];
+				int nx = x + dx[dir];
+				if (ny < 0 || ny >= W || nx < 0 || nx >= H)continue;
+				if (myMap[ny][nx] == 1 || visited[ny][nx])continue;
+				visited[ny][nx] = true;
+				Q.push({ ny,nx,jump, ans + 1 });
+			}
+		}
+		cout << '\n';
+	}
+	cout << -1;
+	return;
+}
+
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> K;
+	cin >> W >> H;
+
+	for (int i = 0; i < H; i++) {
+		for (int j = 0; j < W; j++) {
+			cin >> myMap[i][j];
+		}
+	}
+
+	BFS();
+
+	return 0;
+}
+```
+
+
+
+
+
