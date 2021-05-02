@@ -2303,5 +2303,140 @@ int main() {
 
 
 
+# 11967  불켜기
+
+시간초괗 남.
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+const int MAX = 100;
+
+int N, M;
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = {  0, 0,-1, 1 };
+
+struct Node {
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+};
+
+vector<Node> L;
+queue<pair<int, int>> Q;
+
+bool myMap[MAX + 1][MAX + 1];
+
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	int res = 0;
+	cin >> N >> M;
+
+	myMap[1][1] = true;
+	Q.push({ 1,1 });
+	for (int i = 0; i < M; i++) {
+		int a, b, c, d;
+		cin >> a >> b >> c >> d;
+		L.push_back({ a,b,c,d });
+	}
+
+	
+
+	while (!Q.empty()) {
+		pair<int, int> curr = Q.front(); Q.pop();
+		//cout << "(" << curr.first << "," << curr.second << ") ";
+		for (int i = 0; i < L.size(); i++) {
+			if (L[i].x1 == curr.first && L[i].y1 == curr.second) {
+				myMap[L[i].x2][L[i].y2] = true;
+				Q.push({ L[i].x2, L[i].y2 });
+				res++;
+			}
+		}
+	}
+	cout << res;
+	return 0;
+}
+```
+
+
+
+# 17071  숨바꼭질 5
+
+네번쨰 테스트케이스 통과안됨.
+
+```c
+#include<bits/stdc++.h>
+
+using namespace std;
+
+queue<pair<int, int>> Queue; //위치, depth
+
+int N, K;
+int MAX = 100000;
+bool visited[100001];
+
+void BFS() {
+
+	while (!Queue.empty()) {
+
+		pair<int, int> curr = Queue.front(); Queue.pop();
+
+		int pos = curr.first;
+		int depth = curr.second;
+
+		if (pos == K + depth * (depth+1)/2) {
+			cout << depth;
+			return;
+		}
+
+		int nextPos;
+		int nextDepth = depth + 1;
+
+		//*2
+		nextPos = pos * 2;
+		if (0 <= nextPos && nextPos <= MAX) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+		}
+
+		//+1
+		nextPos = pos + 1;
+		if (0 <= nextPos && nextPos <= MAX) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+		}
+		//-1
+		nextPos = pos - 1;
+		if (0 <= nextPos && nextPos <= MAX) {
+			Queue.push(make_pair(nextPos, nextDepth));
+			visited[nextPos] = true;
+		}
+
+		
+	}
+}
+
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> N >> K;
+
+	visited[N] = true;
+	Queue.push(make_pair(N, 0));
+
+	BFS();
+
+	return 0;
+}
+```
+
+
+
 
 
