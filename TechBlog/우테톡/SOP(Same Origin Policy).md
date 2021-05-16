@@ -26,7 +26,4 @@ document.location.origin
 
 
 
-# 중요성
-
-- SOP가 없을 경우의 심각성
-  - 
+ 
