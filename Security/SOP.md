@@ -54,7 +54,7 @@ oReq.open("GET", "https://api.dokydoky.com/profile");
 
 - 일반적인 경우 
 
-  - 다른 Origin으로 요청을 보낸는 것 허용.
+  - **다른 Origin으로 요청을 보낸는 것 허용**.
   - 응답이 필요없는 UPDATE, DELETE종류는 요청만으로도 가능(WRITE가능)
   - 단, CSRF공격에 대한 대비를 해야한다.
   - 다른 Origin으로 부터의 응답은 못받음.
