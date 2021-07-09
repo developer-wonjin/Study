@@ -19,7 +19,7 @@
 ## 2.1. REST를 구성하는 제약조건(스타일)
 
 - Client-Server
-- Stateless
+- Stateless(상태를 유지하지 않음)
 - Cache
 - **Uniform Interface**
 - Layered System
