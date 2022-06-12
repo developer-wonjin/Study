@@ -1,10 +1,17 @@
 # SQL Trace
 
 
+
 # 1. 아주 편한 SQL Trace확인방법(.trc 파일을 메모리에 로드해서 보기)
 
 ## 1.1. sql을 수행하면서 '실제실행계획', '실행통계'를 `메모리상`에 수집하기
 ```sql
+-- 출력 컬럼수 조정
+SET LINESIZE 200
+-- 출력 로우수 조정
+SET PAGESIZE 999
+
+
 SELECT /*+ gather_plan_statistics */ *  --메모리상에 실행통계가 로드됨.
 FROM
     emp
@@ -77,6 +84,7 @@ FROM table(dbms_xplan.display_cursor(null     , null           , 'allstats last'
 
 -----------------------------------------------------------------------------------------------
 --| id |   Operation   |   Name   | Starts | E-Rows | A-Rows |    A-Time    | Buffers | Reads |
+                                                      ★★★                  ★★★
 -----------------------------------------------------------------------------------------------
 --|  1 |     Table Acc |     DEPT |      1 |      1 |      12|00:00:00:00.04|      20 |     18|
 --|  2 |      NESTED L |          |      1 |     12 |      25|00:00:00:00.93|       8 |     17|
