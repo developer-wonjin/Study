@@ -1,4 +1,13 @@
 ```sql
+
+/*+ gather_plan_statistics */
+select * from table(dbms_xplan.display_cursor(null, null, 'allstats last'));
+
+-- 인덱스 힌트 적용방법
+/*+ index(테이블명 인덱스명)  */
+/*+ index(별칭     인덱스명)  */
+/*+ index(별칭     (c1,c2))   */
+
 -- 테이블이 소유한 인덱스의 구성컬럼 정보
 SELECT a.table_name 
      , a.index_name  
