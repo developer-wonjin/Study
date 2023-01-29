@@ -18,10 +18,18 @@ begin
 end;
 /
 
-set autotrace traceonly exp
-
 
 ------------------------------------------------------------------------------------------
+select
+	count(*) Total,
+	count(case when owner = 'SYS' then 1 end) SYS,
+	round(count(case when owner = 'SYS' then 1 end) / count(*) * 100) 비율
+from t;
+-- sys데이터가 전체레코드의 71%를 차지함
+
+
+set autotrace traceonly exp; -- 실행계획만 보여줄것
+
 alter session set optimizer_mode = 'ALL_ROWS' ;
 select * from t
 where owner = 'SYS'
@@ -39,7 +47,7 @@ select * from t
 where owner = 'SYS'
 order by created ;
 /* 전체데이터가 아닌 첫 커서가 가르키는 데이터만 빠르게 부분범위로 가져옴
- * 따라서 IndexRangeScan이더 빠르다고 판단함
+ * 따라서 IndexRangeScan OF t_idx 가 빠르다고 판단함
  */
 
 
@@ -50,7 +58,7 @@ select /*+ first_rows */ * from t
 where owner = 'SYS'
 order by created ;
 /*
- *  단, 옵티마이저모드보다 힌트가 더 우선순위가 높다.
+ *  단, 옵티마이저모드는 시스템 < 세션 < 힌트 순으로 우선순위가 높아진다.
  */
 
 ```
