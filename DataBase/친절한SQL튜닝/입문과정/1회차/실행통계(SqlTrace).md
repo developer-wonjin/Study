@@ -1,5 +1,24 @@
 # SQL Trace
 
+# 0. 어려운 방법
+```sql
+alter session set sql_trace = true;
+select * from big_table where id = 10;
+select * from dual;
+alter session set sql_trace = false;
+-- C:\app\ora19c\diag\rdbms\ora19c\ora19c\trace 경로에 트레이스 파일 생성됨
+```
+
+```sql
+select value from v$diag_info
+where name = 'Diag Trace';
+
+select value from v$diag_info
+where name = 'Default Trace File';
+```
+
+
+
 
 
 # 1. 아주 편한 SQL Trace확인방법(.trc 파일을 메모리에 로드해서 보기)
