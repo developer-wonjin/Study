@@ -54,7 +54,8 @@ CON_ID  NAME        OPEN_MODE
 3       ORCLPDB     MOUNTED
 
 -- PDB를 OPEN시키자
-alter pluggable database orclpdb open -- MOUNTED => READ WRITE
+-- (ORA-01109 : 데이터베이스가 개방되지 않았습니다의 해결책이다)
+alter pluggable database orclpdb open; -- MOUNTED => READ WRITE
 
 select con_id, name, open_mode from v$containers;
 
