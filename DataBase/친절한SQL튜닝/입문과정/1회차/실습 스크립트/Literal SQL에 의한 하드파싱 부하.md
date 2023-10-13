@@ -18,7 +18,7 @@ from (
 where  cnt > 5
 --and    rnum = 1
 order by cnt desc, sql_text
-
+;
 
 
 

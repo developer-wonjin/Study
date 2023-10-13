@@ -19,4 +19,19 @@ SELECT a.table_name
 
 -- 테이블이 소유한 인덱스의 클러스터링펙터
 select INDEX_NAME, TABLE_NAME, CLUSTERING_FACTOR from dba_indexes where table_name = 'A_TBL';
+
+-- 현재 세션 정보 확인
+SELECT sid, serial#, username, status, machine, program
+FROM v$session
+WHERE username IS NOT NULL;
+
+
+
+
+
+
+
+
+
 ```
+
