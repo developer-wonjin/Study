@@ -2,104 +2,119 @@
 -- PART III - 8.1.2 SQL1
 -- ************************************************
 
-	-- °èÁÂ Å×ÀÌºí ¹× °èÁÂ µ¥ÀÌÅÍ »ý¼º
-	-- °èÁÂ Å×ÀÌºíÀ» »ý¼º
-	CREATE TABLE M_ACC
-	(
-		ACC_NO VARCHAR2(40)  NOT NULL,
-		ACC_NM VARCHAR2(100)  NULL,
-		BAL_AMT NUMBER(18,3)  NULL 
-	);
+-- ê³„ì¢Œ í…Œì´ë¸” ë° ê³„ì¢Œ ë°ì´í„° ìƒì„±
+-- ê³„ì¢Œ í…Œì´ë¸”ì„ ìƒì„±
+CREATE TABLE M_ACC
+(
+	ACC_NO VARCHAR2(40)  NOT NULL,
+	ACC_NM VARCHAR2(100)  NULL,
+	BAL_AMT NUMBER(18,3)  NULL 
+);
 
-	ALTER TABLE M_ACC
-		ADD CONSTRAINT  PK_M_ACC PRIMARY KEY (ACC_NO) USING INDEX;
+SELECT * FROM M_ACC;
 
-	-- Å×½ºÆ® µ¥ÀÌÅÍ¸¦ »ý¼º.
-	INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT)
-	SELECT 'ACC1' ,'1¹ø°èÁÂ' ,3000 FROM DUAL UNION ALL
-	SELECT 'ACC2' ,'2¹ø°èÁÂ' ,500 FROM DUAL UNION ALL
-	SELECT 'ACC3' ,'3¹ø°èÁÂ' ,0 FROM DUAL;
+ALTER TABLE M_ACC
+	ADD CONSTRAINT  PK_M_ACC PRIMARY KEY (ACC_NO) USING INDEX;
 
+-- í…ŒìŠ¤íŠ¸ ë°ì´í„°ë¥¼ ìƒì„±.
+INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT)
+SELECT 'ACC1' ,'1ë²ˆê³„ì¢Œ' ,3000 FROM DUAL UNION ALL
+SELECT 'ACC2' ,'2ë²ˆê³„ì¢Œ' ,500 FROM DUAL UNION ALL
+SELECT 'ACC3' ,'3ë²ˆê³„ì¢Œ' ,0 FROM DUAL;
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	3000
+ACC2	2ë²ˆê³„ì¢Œ	 500
+ACC3	3ë²ˆê³„ì¢Œ	0
 
 -- ************************************************
 -- PART III - 8.1.2 SQL2
 -- ************************************************
 
-	-- °èÁÂÀÌÃ¼ ? ACC1¿¡¼­ ACC2·Î 500¿ø ÀÌÃ¼
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT - 500
-	WHERE   T1.ACC_NO = 'ACC1';
+-- ê³„ì¢Œì´ì²´ - ACC1ì—ì„œ ACC2ë¡œ 500ì› ì´ì²´
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT - 500
+WHERE   T1.ACC_NO = 'ACC1';
 
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT + 500
-	WHERE   T1.ACC_NO = 'ACC2';
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT + 500
+WHERE   T1.ACC_NO = 'ACC2';
 
-	COMMIT;
-
+COMMIT;
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	2500
+ACC2	2ë²ˆê³„ì¢Œ	1000
+ACC3	3ë²ˆê³„ì¢Œ	0
 
 -- ************************************************
 -- PART III - 8.1.2 SQL3
 -- ************************************************
 
-	-- °èÁÂÀÌÃ¼ ? ACC1¿¡¼­ ACC4·Î 500¿ø ÀÌÃ¼
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT - 500
-	WHERE   T1.ACC_NO = 'ACC1';
+ì¡´ìž¬í•˜ì§€ ì•ŠëŠ” ê³„ì¢ŒACC4ì— ì´ì²´ë¥¼ ì‹œë„í•  ê²½ìš° ì ìš©ë˜ëŠ” row 0ê±´ (ì—…ë¬´ìƒ ì—ëŸ¬)
 
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT + 500
-	WHERE   T1.ACC_NO = 'ACC4';
+-- ê³„ì¢Œì´ì²´ - ACC1ì—ì„œ ACC4ë¡œ 500ì› ì´ì²´
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT - 500
+WHERE   T1.ACC_NO = 'ACC1';
 
-	SELECT  * FROM M_ACC;
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT + 500
+WHERE   T1.ACC_NO = 'ACC4';
 
+SELECT  * FROM M_ACC;
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	2000 -- ACC1ê³„ì¢Œë§Œ 500ì› ê°ì†Œí•˜ê³  ACC4ê³„ì¢ŒëŠ” updateì¿¼ë¦¬ëŠ” ë¬´ìš©ì§€ë¬¼ë¨
+ACC2	2ë²ˆê³„ì¢Œ	1000
+ACC3	3ë²ˆê³„ì¢Œ	0
 
 
 -- ************************************************
 -- PART III - 8.1.2 SQL4
 -- ************************************************
 
-	-- °èÁÂÀÌÃ¼ ? ACC1¿¡¼­ ACC4·Î 500¿ø ÀÌÃ¼, ROLLBACK Ã³¸®
-	ROLLBACK;
-
-	SELECT  * FROM M_ACC;
-
+-- ê³„ì¢Œì´ì²´ - ACC1ì—ì„œ ACC4ë¡œ 500ì› ì´ì²´, ROLLBACK ì²˜ë¦¬
+ROLLBACK;
+SELECT  * FROM M_ACC;
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	2500
+ACC2	2ë²ˆê³„ì¢Œ	1000
+ACC3	3ë²ˆê³„ì¢Œ	0
 
 -- ************************************************
 -- PART III - 8.1.2 SQL5
 -- ************************************************
 
-	-- °èÁÂÀÌÃ¼ ? °èÁÂÁ¸Àç¿©ºÎ °ËÁõ
-	SELECT  NVL(MAX('Y'),'N')
-	FROM    DUAL T1
-	WHERE   EXISTS(
-			  SELECT * FROM M_ACC A WHERE A.ACC_NO = 'ACC4');
-			  
+-- ê³„ì¢Œì´ì²´ - ê³„ì¢Œì¡´ìž¬ì—¬ë¶€ ê²€ì¦
+SELECT  NVL(MAX('Y'),'N')
+FROM    DUAL T1
+WHERE   EXISTS(
+			SELECT * FROM M_ACC A WHERE A.ACC_NO = 'ACC4');
+			
 
-		  
-		  
+		
+		
 -- ************************************************
 -- PART III - 8.1.2 SQL6
 -- ************************************************
 
-	-- °èÁÂÀÌÃ¼ ? ACC1¿¡¼­ ACC3·Î 5000¿ø ÀÌÃ¼
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT - 5000
-	WHERE   T1.ACC_NO = 'ACC1';
+-- ê³„ì¢Œì´ì²´ - ACC1ì—ì„œ ACC3ë¡œ 5000ì› ì´ì²´
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT - 5000
+WHERE   T1.ACC_NO = 'ACC1';
 
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT + 5000
-	WHERE   T1.ACC_NO = 'ACC3';
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT + 5000
+WHERE   T1.ACC_NO = 'ACC3';
 
-	SELECT  * FROM M_ACC;
+SELECT  * FROM M_ACC;
 
 
 
 -- ************************************************
 -- PART III - 8.1.2 SQL7
 -- ************************************************
-	ROLLBACK;
+ROLLBACK;
 
-	SELECT  * FROM M_ACC;
+SELECT  * FROM M_ACC;
 
 
 
@@ -107,36 +122,37 @@
 -- PART III - 8.1.2 SQL8
 -- ************************************************
 
-	-- »õ·Î¿î °èÁÂ¸¦ INSERT
-	INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT)
-	VALUES('ACC4' ,'4¹ø°èÁÂ' ,0);
+-- ìƒˆë¡œìš´ ê³„ì¢Œë¥¼ INSERT
+INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT)
+VALUES('ACC4' ,'4ë²ˆê³„ì¢Œ' ,0);
 
-	INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT)
-	VALUES('ACC1' ,'1¹ø°èÁÂ' ,0); --ACC1Àº ÀÌ¹Ì Á¸ÀçÇÏ¹Ç·Î ¿¡·¯°¡ ¹ß»ýÇÑ´Ù.
+INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT)
+VALUES('ACC1' ,'1ë²ˆê³„ì¢Œ' ,0); --ACC1ì€ ì´ë¯¸ ì¡´ìž¬í•˜ë¯€ë¡œ ì—ëŸ¬ê°€ ë°œìƒí•œë‹¤.
 
-	-- ORA-00001: unique constraint (TEST.PK_M_ACC) violated
+-- ORA-00001: unique constraint (TEST.PK_M_ACC) violated
 
-	SELECT  * FROM M_ACC;
+SELECT  * FROM M_ACC;
 
-	ROLLBACK;
-
-
+ROLLBACK;
 
 
 
+
+-- P.242
 -- ************************************************
 -- PART III - 8.1.3 SQL1
 -- ************************************************
 
-	-- UPDATE-SELECT Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç SQL
-	SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ÀÇ ÀÜ¾×Àº 2500¿ø
+-- UPDATE-SELECT í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ SQL
+SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ì˜ ìž”ì•¡ì€ 2500ì›
 
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = 5000
-	WHERE   T1.ACC_NO = 'ACC1';
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = 5000
+WHERE   T1.ACC_NO = 'ACC1';
 
-	SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ÀÇ ÀÜ¾× 5000¿ø
-
+SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ì˜ ìž”ì•¡ 5000ì›
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	5000
 
 
 
@@ -144,16 +160,17 @@
 -- PART III - 8.1.3 SQL2
 -- ************************************************
 
-	-- UPDATE-SELECT Å×½ºÆ® ? µÎ ¹øÂ° ¼¼¼Ç SQL
-	SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ÀÇ ÀÜ¾×Àº 2500¿ø
-
+-- UPDATE-SELECT í…ŒìŠ¤íŠ¸ - ë‘ ë²ˆì§¸ ì„¸ì…˜ SQL
+SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ì˜ ìž”ì•¡ì€ 2500ì›
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	2500
 
 -- ************************************************
 -- PART III - 8.1.3 SQL3
 -- ************************************************
 
-	-- UPDATE-SELECT Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç COMMIT Ã³¸®
-	COMMIT;
+-- UPDATE-SELECT í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ COMMIT ì²˜ë¦¬
+COMMIT;
 
 
 
@@ -161,36 +178,43 @@
 -- PART III - 8.1.3 SQL4
 -- ************************************************
 
-	-- UPDATE ? UPDATE Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç SQL
-	--ÇöÀç ACC1ÀÇ ÀÜ¾×Àº 5,000
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT - 500
-	WHERE   T1.ACC_NO = 'ACC1';
+-- UPDATE - UPDATE í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ SQL
+--í˜„ìž¬ ACC1ì˜ ìž”ì•¡ì€ 5,000
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	5000
 
-	SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ÀÇ ÀÜ¾×Àº 4,500¿ø
 
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT - 500
+WHERE   T1.ACC_NO = 'ACC1';
+
+SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ì˜ ìž”ì•¡ì€ 4,500ì›
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	4500
 
 
 -- ************************************************
 -- PART III - 8.1.3 SQL5
 -- ************************************************
 
-	--UPDATE ? UPDATE Å×½ºÆ® ? µÎ ¹øÂ° ¼¼¼Ç SQL
-	-- ¾ÆÁ÷ Ã¹ ¹øÂ° ¼¼¼ÇÀÇ UPDATE ¹®ÀÌ COMMIT µÇÁö ¾Ê¾ÒÀ¸¹Ç·Î
-	-- µÎ ¹øÂ° ¼¼¼Ç¿¡¼­´Â Ã¹ ¹øÂ° ¼¼¼ÇÀÇ UPDATE ÀÌÀü µ¥ÀÌÅÍ°¡ Á¶È¸µÈ´Ù.
-	SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ÀÇ ÀÜ¾×Àº 5,000¿ø
+--UPDATE - UPDATE í…ŒìŠ¤íŠ¸ - ë‘ ë²ˆì§¸ ì„¸ì…˜ SQL
+-- ì•„ì§ ì²« ë²ˆì§¸ ì„¸ì…˜ì˜ UPDATE ë¬¸ì´ COMMIT ë˜ì§€ ì•Šì•˜ìœ¼ë¯€ë¡œ
+-- ë‘ ë²ˆì§¸ ì„¸ì…˜ì—ì„œëŠ” ì²« ë²ˆì§¸ ì„¸ì…˜ì˜ UPDATE ì´ì „ ë°ì´í„°ê°€ ì¡°íšŒëœë‹¤.
+SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ì˜ ìž”ì•¡ì€ 5,000ì›
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	5000
 
-	-- ¾Æ·¡ SQLÀº Ã¹ ¹øÂ° ¼¼¼Ç¿¡ ¸·Çô ÁøÇàµÇÁö ¸øÇÑ´Ù.
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT - 500
-	WHERE   T1.ACC_NO = 'ACC1';
+-- ì•„ëž˜ SQLì€ ì²« ë²ˆì§¸ ì„¸ì…˜ì— ë§‰í˜€ ì§„í–‰ë˜ì§€ ëª»í•œë‹¤.
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT - 500
+WHERE   T1.ACC_NO = 'ACC1';
 
 -- ************************************************
 -- PART III - 8.1.3 SQL6
 -- ************************************************
 
-	-- UPDATE ? UPDATE Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç COMMIT
-	COMMIT;
+-- UPDATE - UPDATE í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ COMMIT
+COMMIT;
 
 
 
@@ -198,11 +222,12 @@
 -- PART III - 8.1.3 SQL7
 -- ************************************************
 
-	-- UPDATE ? UPDATE Å×½ºÆ® ? µÎ ¹øÂ° ¼¼¼Ç È®ÀÎ
-	COMMIT;
+-- UPDATE - UPDATE í…ŒìŠ¤íŠ¸ - ë‘ ë²ˆì§¸ ì„¸ì…˜ í™•ì¸
+COMMIT;
 
-	SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ÀÇ ÀÜ¾×Àº 4,000¿ø
-
+SELECT  * FROM M_ACC T1 WHERE T1.ACC_NO = 'ACC1'; --ACC1ì˜ ìž”ì•¡ì€ 4,000ì›
+--------------------
+ACC1	1ë²ˆê³„ì¢Œ	4000
 
 
 
@@ -210,56 +235,56 @@
 -- PART III - 8.1.3 SQL8
 -- ************************************************
 
-	-- INSERT ? INSERT Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç ACC4 »ý¼º
-	INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC4','4¹ø°èÁÂ',0);
+-- INSERT - INSERT í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ ACC4 ìƒì„±
+INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC4','4ë²ˆê³„ì¢Œ',0);
 
 
 -- ************************************************
 -- PART III - 8.1.3 SQL9
 -- ************************************************
 
-	-- INSERT ? INSERT Å×½ºÆ® ? µÎ ¹øÂ° ¼¼¼Ç ACC4 »ý¼º
-	INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC4','4¹ø°èÁÂ',0);
+-- INSERT - INSERT í…ŒìŠ¤íŠ¸ - ë‘ ë²ˆì§¸ ì„¸ì…˜ ACC4 ìƒì„±
+INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC4','4ë²ˆê³„ì¢Œ',0);
 
 
 -- ************************************************
 -- PART III - 8.1.3 SQL10
 -- ************************************************
 
-	-- INSERT ? INSERT Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç COMMIT
-	COMMIT;
+-- INSERT - INSERT í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ COMMIT
+COMMIT;
 
 
 -- ************************************************
 -- PART III - 8.1.3 SQL11
 -- ************************************************
 
-	-- INSERT ? INSERT Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç ACC5 »ý¼º
-	INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC5','5¹ø°èÁÂ',0);
+-- INSERT - INSERT í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ ACC5 ìƒì„±
+INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC5','5ë²ˆê³„ì¢Œ',0);
 
 
 -- ************************************************
 -- PART III - 8.1.3 SQL12
 -- ************************************************
 
-	-- INSERT ? INSERT Å×½ºÆ® ? µÎ ¹øÂ° ¼¼¼Ç ACC6 »ý¼º
-	INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC6','6¹ø°èÁÂ',0);
+-- INSERT - INSERT í…ŒìŠ¤íŠ¸ - ë‘ ë²ˆì§¸ ì„¸ì…˜ ACC6 ìƒì„±
+INSERT INTO M_ACC(ACC_NO, ACC_NM, BAL_AMT) VALUES('ACC6','6ë²ˆê³„ì¢Œ',0);
 
 
 -- ************************************************
 -- PART III - 8.1.3 SQL13
 -- ************************************************
 
-	-- INSERT ? INSERT Å×½ºÆ® ? µÎ ¹øÂ° ¼¼¼Ç ACC5 »ý¼º
-	INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT) VALUES('ACC5' ,'5¹ø°èÁÂ' ,0);
+-- INSERT - INSERT í…ŒìŠ¤íŠ¸ - ë‘ ë²ˆì§¸ ì„¸ì…˜ ACC5 ìƒì„±
+INSERT INTO M_ACC(ACC_NO ,ACC_NM ,BAL_AMT) VALUES('ACC5' ,'5ë²ˆê³„ì¢Œ' ,0);
 
 
 
 -- ************************************************
 -- PART III - 8.1.3	 SQL14
 -- ************************************************
-	-- INSERT ? INSERT Å×½ºÆ® ? Ã¹ ¹øÂ° ¼¼¼Ç COMMIT
-	COMMIT;
+-- INSERT - INSERT í…ŒìŠ¤íŠ¸ - ì²« ë²ˆì§¸ ì„¸ì…˜ COMMIT
+COMMIT;
 
 
 
@@ -268,48 +293,48 @@
 -- PART III - 8.2.2 SQL1
 -- ************************************************
 
-	-- µ¿½Ã¿¡ µÎ °³ÀÇ ¼¼¼ÇÀÌ ACC1ÀÇ ÀÜ¾×¿¡¼­ 4,000¿ø¾¿À» Ãâ±ÝÇÏ·Á°í ÇÑ´Ù.
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--1.ACC1¿¡¼­ 4,000¿øÀ» Ãâ±ÝÇÏ·Á°í ÇÑ´Ù.
-	SELECT T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO = 'ACC1'; --4,000¿øÀÌ Á¶È¸µÈ´Ù.
+-- ë™ì‹œì— ë‘ ê°œì˜ ì„¸ì…˜ì´ ACC1ì˜ ìž”ì•¡ì—ì„œ 4,000ì›ì”©ì„ ì¶œê¸ˆí•˜ë ¤ê³  í•œë‹¤.
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--1.ACC1ì—ì„œ 4,000ì›ì„ ì¶œê¸ˆí•˜ë ¤ê³  í•œë‹¤.
+SELECT T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO = 'ACC1'; --4,000ì›ì´ ì¡°íšŒëœë‹¤.
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--2.ACC1¿¡¼­ 4,000¿øÀ» Ãâ±ÝÇÏ·Á°í ÇÑ´Ù.
-			SELECT T1.BAL_AMT FROM M_ACC T1
-			WHERE T1.ACC_NO = 'ACC1'; --4,000¿øÀÌ Á¶È¸µÈ´Ù.
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--2.ACC1ì—ì„œ 4,000ì›ì„ ì¶œê¸ˆí•˜ë ¤ê³  í•œë‹¤.
+		SELECT T1.BAL_AMT FROM M_ACC T1
+		WHERE T1.ACC_NO = 'ACC1'; --4,000ì›ì´ ì¡°íšŒëœë‹¤.
 
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--IF BAL_AMT >= 4,000 THEN UPDATE
-	--3.ÀÜ¾×ÀÌ 4,000¿øÀÌ ÀÖÀ¸¹Ç·Î 4,000¿øÀ» Ãâ±ÝÃ³¸®.
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 4000 
-	WHERE T1.ACC_NO = 'ACC1';
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--IF BAL_AMT >= 4,000 THEN UPDATE
+--3.ìž”ì•¡ì´ 4,000ì›ì´ ìžˆìœ¼ë¯€ë¡œ 4,000ì›ì„ ì¶œê¸ˆì²˜ë¦¬.
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 4000 
+WHERE T1.ACC_NO = 'ACC1';
 
 
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--4.ÀÜ¾×ÀÌ 0¿øÀÌ µÇ¾î ÀÖ´Ù.
-	SELECT T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO = 'ACC1';
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--4.ìž”ì•¡ì´ 0ì›ì´ ë˜ì–´ ìžˆë‹¤.
+SELECT T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO = 'ACC1';
+	
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--IF BAL_AMT >= 4,000 THEN UPDATE
+		--5.ìž”ì•¡ì´ 4,000ì›ì´ ìžˆìœ¼ë¯€ë¡œ 4,000ì›ì„ ì¶œê¸ˆì²˜ë¦¬.
+		--ì²« ë²ˆì§¸ ì„¸ì…˜ì— ì˜í•´ ëŒ€ê¸° ìƒíƒœì— ë¹ ì§„ë‹¤.
+		UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 4000
+		WHERE T1.ACC_NO = 'ACC1';
+
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--6.COMMITì²˜ë¦¬.
+COMMIT;
+
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--7. ìž”ì•¡ì´ ë§ˆì´ë„ˆìŠ¤ 4,000ì›ì´ ë˜ì–´ ìžˆë‹¤.
+		SELECT T1.BAL_AMT FROM M_ACC T1
+		WHERE T1.ACC_NO = 'ACC1';
 		
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--IF BAL_AMT >= 4,000 THEN UPDATE
-			--5.ÀÜ¾×ÀÌ 4,000¿øÀÌ ÀÖÀ¸¹Ç·Î 4,000¿øÀ» Ãâ±ÝÃ³¸®.
-			--Ã¹ ¹øÂ° ¼¼¼Ç¿¡ ÀÇÇØ ´ë±â »óÅÂ¿¡ ºüÁø´Ù.
-			UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 4000
-			WHERE T1.ACC_NO = 'ACC1';
-
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--6.COMMITÃ³¸®.
-	COMMIT;
-
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--7. ÀÜ¾×ÀÌ ¸¶ÀÌ³Ê½º 4,000¿øÀÌ µÇ¾î ÀÖ´Ù.
-			SELECT T1.BAL_AMT FROM M_ACC T1
-			WHERE T1.ACC_NO = 'ACC1';
-			
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--8. COMMITÃ³¸®
-			COMMIT;
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--8. COMMITì²˜ë¦¬
+		COMMIT;
 
 
 
@@ -321,10 +346,10 @@
 -- PART III - 8.2.2 SQL2
 -- ************************************************
 
-	-- ACC1ÀÇ ÀÜ¾×À» 4,000¿øÀ¸·Î º¯°æ
-	UPDATE M_ACC SET BAL_AMT = 4000 WHERE ACC_NO = 'ACC1';
+-- ACC1ì˜ ìž”ì•¡ì„ 4,000ì›ìœ¼ë¡œ ë³€ê²½
+UPDATE M_ACC SET BAL_AMT = 4000 WHERE ACC_NO = 'ACC1';
 
-	COMMIT;
+COMMIT;
 
 
 
@@ -333,56 +358,56 @@
 -- ************************************************
 
 
-	--µ¿½Ã¿¡ µÎ °³ÀÇ ¼¼¼ÇÀÌ ACC1ÀÇ °èÁÂ¿¡¼­ 4,000¿ø¾¿À» Ãâ±ÝÇÏ·Á°í ÇÑ´Ù. ? SELECT ~ FOR UPDATE»ç¿ë.
+--ë™ì‹œì— ë‘ ê°œì˜ ì„¸ì…˜ì´ ACC1ì˜ ê³„ì¢Œì—ì„œ 4,000ì›ì”©ì„ ì¶œê¸ˆí•˜ë ¤ê³  í•œë‹¤. - SELECT ~ FOR UPDATEì‚¬ìš©.
 
-	-- Ã¹ ¹øÂ° ¼¼¼Ç
-	--1. ACC1¿¡¼­ 4,000¿øÀ» Ãâ±ÝÇÏ·Á°í ÇÑ´Ù.
-	SELECT T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO = 'ACC1'
-	FOR UPDATE; --4,000¿øÀÌ Á¶È¸µÈ´Ù.
+-- ì²« ë²ˆì§¸ ì„¸ì…˜
+--1. ACC1ì—ì„œ 4,000ì›ì„ ì¶œê¸ˆí•˜ë ¤ê³  í•œë‹¤.
+SELECT T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO = 'ACC1'
+FOR UPDATE; --4,000ì›ì´ ì¡°íšŒëœë‹¤.
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--2. ACC1¿¡¼­ 4,000¿øÀ» Ãâ±ÝÇÏ·Á°í ÇÑ´Ù.
-			SELECT T1.BAL_AMT FROM M_ACC T1
-			WHERE T1.ACC_NO = 'ACC1'
-			FOR UPDATE;
-			-- ´ë±â »óÅÂ¿¡ ºüÁ³´Ù°¡ Ã¹ ¹øÂ° ¼¼¼ÇÀÌ COMMITµÈ ÈÄ
-			-- 0¿øÀÌ Á¶È¸µÈ´Ù.
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--2. ACC1ì—ì„œ 4,000ì›ì„ ì¶œê¸ˆí•˜ë ¤ê³  í•œë‹¤.
+		SELECT T1.BAL_AMT FROM M_ACC T1
+		WHERE T1.ACC_NO = 'ACC1'
+		FOR UPDATE;
+		-- ëŒ€ê¸° ìƒíƒœì— ë¹ ì¡Œë‹¤ê°€ ì²« ë²ˆì§¸ ì„¸ì…˜ì´ COMMITëœ í›„
+		-- 0ì›ì´ ì¡°íšŒëœë‹¤.
 
-	-- Ã¹ ¹øÂ° ¼¼¼Ç
-	--3. ÀÜ¾×ÀÌ 4,000¿øÀÌ ÀÖÀ¸¹Ç·Î 4,000¿øÀ» Ãâ±ÝÃ³¸®.
-	-- IF BAL_AMT >= 4,000 THEN UPDATE
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 4000 
-	WHERE T1.ACC_NO = 'ACC1';
-
-
-	-- Ã¹ ¹øÂ° ¼¼¼Ç
-	--4. ÀÜ¾×ÀÌ 0¿øÀÌ µÇ¾î ÀÖ´Ù.
-	SELECT T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO = 'ACC1';
+-- ì²« ë²ˆì§¸ ì„¸ì…˜
+--3. ìž”ì•¡ì´ 4,000ì›ì´ ìžˆìœ¼ë¯€ë¡œ 4,000ì›ì„ ì¶œê¸ˆì²˜ë¦¬.
+-- IF BAL_AMT >= 4,000 THEN UPDATE
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 4000 
+WHERE T1.ACC_NO = 'ACC1';
 
 
-	-- Ã¹ ¹øÂ° ¼¼¼Ç
-	--5. COMMITÃ³¸®.
-	COMMIT;
-			
+-- ì²« ë²ˆì§¸ ì„¸ì…˜
+--4. ìž”ì•¡ì´ 0ì›ì´ ë˜ì–´ ìžˆë‹¤.
+SELECT T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO = 'ACC1';
 
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			-- IF BAL_AMT >= 4,000 THEN UPDATE
-			-- ÀÜ¾×ÀÌ 4,000º¸´Ù ÀÛÀ¸¹Ç·Î Ãâ±Ý ºÒ°¡.
-
-			--µÎ ¹øÂ° ¼¼¼Ç
-			ROLLBACK;
-
+-- ì²« ë²ˆì§¸ ì„¸ì…˜
+--5. COMMITì²˜ë¦¬.
+COMMIT;
 		
-		
+
+
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		-- IF BAL_AMT >= 4,000 THEN UPDATE
+		-- ìž”ì•¡ì´ 4,000ë³´ë‹¤ ìž‘ìœ¼ë¯€ë¡œ ì¶œê¸ˆ ë¶ˆê°€.
+
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		ROLLBACK;
+
+	
+	
 -- ************************************************
 -- PART III - 8.2.3 SQL1
 -- ************************************************
 
-	-- °èÁÂÁ¶È¸ ÇÁ·Î¼¼½º
-	SELECT  T1.* FROM M_ACC T1 FOR UPDATE;
+-- ê³„ì¢Œì¡°íšŒ í”„ë¡œì„¸ìŠ¤
+SELECT  T1.* FROM M_ACC T1 FOR UPDATE;
 
 
 
@@ -390,9 +415,9 @@
 -- PART III - 8.2.4 SQL1
 -- ************************************************
 
-	-- ACC1, ACC2ÀÇ ÀÜ¾× ÃÊ±âÈ­
-	UPDATE M_ACC SET BAL_AMT = 5000 WHERE ACC_NO IN ('ACC1','ACC2');
-	COMMIT;
+-- ACC1, ACC2ì˜ ìž”ì•¡ ì´ˆê¸°í™”
+UPDATE M_ACC SET BAL_AMT = 5000 WHERE ACC_NO IN ('ACC1','ACC2');
+COMMIT;
 
 
 
@@ -402,60 +427,60 @@
 -- PART III - 8.2.4 SQL2
 -- ************************************************
 
-	-- µ¥µå¶ô Å×½ºÆ® ? µÎ °³ÀÇ ¼¼¼Ç¿¡¼­ °èÁÂÀÌÃ¼ ½ÇÇà
-	--Ã¹ ¹øÂ° ¼¼¼Ç, ACC1->ACC2 2,000¿ø ÀÌÃ¼
-	--1.ACC1ÀÇ ÀÜ¾× È®ÀÎ
-	SELECT T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO = 'ACC1' FOR UPDATE;
+-- ë°ë“œë½ í…ŒìŠ¤íŠ¸ - ë‘ ê°œì˜ ì„¸ì…˜ì—ì„œ ê³„ì¢Œì´ì²´ ì‹¤í–‰
+--ì²« ë²ˆì§¸ ì„¸ì…˜, ACC1->ACC2 2,000ì› ì´ì²´
+--1.ACC1ì˜ ìž”ì•¡ í™•ì¸
+SELECT T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO = 'ACC1' FOR UPDATE;
 
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--2.ACC1¿¡¼­ ÀÜ¾× ¸¶ÀÌ³Ê½º
-	--(ÀÜ¾×ÀÌ ÀÌÃ¼±Ý¾× ÀÌ»óÀÌ¸é ÀÌÃ¼ ¼öÇà)
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 2000 
-	WHERE T1.ACC_NO = 'ACC1';
-
-
-			--µÎ ¹øÂ° ¼¼¼Ç, ACC2->ACC1 3,000¿ø ÀÌÃ¼
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--3.ACC2ÀÇ ÀÜ¾× È®ÀÎ
-			SELECT T1.BAL_AMT FROM M_ACC T1
-			WHERE T1.ACC_NO = 'ACC2' FOR UPDATE;
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--2.ACC1ì—ì„œ ìž”ì•¡ ë§ˆì´ë„ˆìŠ¤
+--(ìž”ì•¡ì´ ì´ì²´ê¸ˆì•¡ ì´ìƒì´ë©´ ì´ì²´ ìˆ˜í–‰)
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 2000 
+WHERE T1.ACC_NO = 'ACC1';
 
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--4. ACC2¿¡¼­ ÀÜ¾× ¸¶ÀÌ³Ê½º
-			--IF BAL_AMT >= 3,000 THEN UPDATE
-			UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 3000 
-			WHERE T1.ACC_NO = 'ACC2';
-			
-			
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--5. ACC2ÀÇ ÀÜ¾× ÇÃ·¯½º
-	--µÎ ¹øÂ° ¼¼¼Ç 3¹ø,4¹ø SQL¿¡ ÀÇÇØ ´ë±â¿¡ ºüÁø´Ù.
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 2000 
-	WHERE T1.ACC_NO = 'ACC2';
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜, ACC2->ACC1 3,000ì› ì´ì²´
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--3.ACC2ì˜ ìž”ì•¡ í™•ì¸
+		SELECT T1.BAL_AMT FROM M_ACC T1
+		WHERE T1.ACC_NO = 'ACC2' FOR UPDATE;
 
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--6.ACC1ÀÇ ÀÜ¾× ÇÃ·¯½º
-			--Ã¹ ¹øÂ° ¼¼¼Ç 1¹ø,5¹ø SQL¿¡ ÀÇÇØ ´ë±â¿¡ ºüÁø´Ù.
-			UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 3000 
-			WHERE T1.ACC_NO = 'ACC1';
-			
-			
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--7. ¾à°£ÀÇ ½Ã°£ ÈÄ¿¡ ¾Æ·¡¿Í °°ÀÌ µ¥µå¶ôÀÌ ¹ß»ý
-	-- SQL ¿À·ù: ORA-00060: deadlock detected while waiting for resource
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--4. ACC2ì—ì„œ ìž”ì•¡ ë§ˆì´ë„ˆìŠ¤
+		--IF BAL_AMT >= 3,000 THEN UPDATE
+		UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 3000 
+		WHERE T1.ACC_NO = 'ACC2';
+		
+		
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--5. ACC2ì˜ ìž”ì•¡ í”ŒëŸ¬ìŠ¤
+--ë‘ ë²ˆì§¸ ì„¸ì…˜ 3ë²ˆ,4ë²ˆ SQLì— ì˜í•´ ëŒ€ê¸°ì— ë¹ ì§„ë‹¤.
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 2000 
+WHERE T1.ACC_NO = 'ACC2';
 
 
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	-- 8. µ¥µå¶ôÀÌ ³ª¿ÔÀ¸¹Ç·Î ROLLBACKÃ³¸®ÇÑ´Ù.
-	ROLLBACK;
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--6.ACC1ì˜ ìž”ì•¡ í”ŒëŸ¬ìŠ¤
+		--ì²« ë²ˆì§¸ ì„¸ì…˜ 1ë²ˆ,5ë²ˆ SQLì— ì˜í•´ ëŒ€ê¸°ì— ë¹ ì§„ë‹¤.
+		UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 3000 
+		WHERE T1.ACC_NO = 'ACC1';
+		
+		
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--7. ì•½ê°„ì˜ ì‹œê°„ í›„ì— ì•„ëž˜ì™€ ê°™ì´ ë°ë“œë½ì´ ë°œìƒ
+-- SQL ì˜¤ë¥˜: ORA-00060: deadlock detected while waiting for resource
 
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			-- 9. µÎ ¹øÂ° ¼¼¼Çµµ ROLLBACKÃ³¸®ÇÑ´Ù.
-			ROLLBACK;
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+-- 8. ë°ë“œë½ì´ ë‚˜ì™”ìœ¼ë¯€ë¡œ ROLLBACKì²˜ë¦¬í•œë‹¤.
+ROLLBACK;
+
+
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		-- 9. ë‘ ë²ˆì§¸ ì„¸ì…˜ë„ ROLLBACKì²˜ë¦¬í•œë‹¤.
+		ROLLBACK;
 
 
 
@@ -464,50 +489,50 @@
 -- PART III - 8.2.4 SQL3
 -- ************************************************
 
-	-- µ¥µå¶ô ÇÇÇÏ±â ? µÎ °³ÀÇ ¼¼¼Ç¿¡¼­ °èÁÂÀÌÃ¼ ½ÇÇà
-	-- Ã¹ ¹øÂ° ¼¼¼Ç, ACC1->ACC2 2,000¿ø ÀÌÃ¼
-	-- 1.ACC1, ACC2ÀÇ ÀÜ¾× È®ÀÎ
-	SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO IN ('ACC1','ACC2') FOR UPDATE;
+-- ë°ë“œë½ í”¼í•˜ê¸° - ë‘ ê°œì˜ ì„¸ì…˜ì—ì„œ ê³„ì¢Œì´ì²´ ì‹¤í–‰
+-- ì²« ë²ˆì§¸ ì„¸ì…˜, ACC1->ACC2 2,000ì› ì´ì²´
+-- 1.ACC1, ACC2ì˜ ìž”ì•¡ í™•ì¸
+SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO IN ('ACC1','ACC2') FOR UPDATE;
 
-	-- Ã¹ ¹øÂ° ¼¼¼Ç
-	-- 2.ACC1¿¡¼­ ÀÜ¾× ¸¶ÀÌ³Ê½º
-	-- (ÀÜ¾×ÀÌ ÀÌÃ¼±Ý¾× ÀÌ»óÀÌ¸é ÀÌÃ¼ ¼öÇà)
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 2000 
-	WHERE T1.ACC_NO = 'ACC1';
-
-
-			-- µÎ ¹øÂ° ¼¼¼Ç, ACC2->ACC1 3,000¿ø ÀÌÃ¼
-
-			-- µÎ ¹øÂ° ¼¼¼Ç
-			-- 3.ACC1, ACC2ÀÇ ÀÜ¾× È®ÀÎ
-			-- Ã¹ ¹øÂ° ¼¼¼Ç 1¹ø SQL·Î ÀÎÇØ ´ë±â »óÅÂ¿¡ ºüÁø´Ù.
-			SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
-			WHERE T1.ACC_NO IN ('ACC2','ACC1') FOR UPDATE;
-			
-			
-	-- Ã¹ ¹øÂ° ¼¼¼Ç
-	-- 4. ACC2ÀÇ ÀÜ¾× ÇÃ·¯½º
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 2000 
-	WHERE T1.ACC_NO = 'ACC2';
-
-	-- Ã¹ ¹øÂ° ¼¼¼Ç
-	COMMIT;
+-- ì²« ë²ˆì§¸ ì„¸ì…˜
+-- 2.ACC1ì—ì„œ ìž”ì•¡ ë§ˆì´ë„ˆìŠ¤
+-- (ìž”ì•¡ì´ ì´ì²´ê¸ˆì•¡ ì´ìƒì´ë©´ ì´ì²´ ìˆ˜í–‰)
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 2000 
+WHERE T1.ACC_NO = 'ACC1';
 
 
-			-- µÎ ¹øÂ° ¼¼¼Ç
-			-- 5. ACC2¿¡¼­ ÀÜ¾× ¸¶ÀÌ³Ê½º
-			-- IF BAL_AMT >= 3,000 THEN UPDATE
-			UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 3000 
-			WHERE T1.ACC_NO = 'ACC2';
+		-- ë‘ ë²ˆì§¸ ì„¸ì…˜, ACC2->ACC1 3,000ì› ì´ì²´
 
-			-- µÎ ¹øÂ° ¼¼¼Ç
-			-- 6.ACC1ÀÇ ÀÜ¾× ÇÃ·¯½º
-			UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 3000 
-			WHERE T1.ACC_NO = 'ACC1';
-			
-			-- µÎ ¹øÂ° ¼¼¼Ç
-			COMMIT;
+		-- ë‘ ë²ˆì§¸ ì„¸ì…˜
+		-- 3.ACC1, ACC2ì˜ ìž”ì•¡ í™•ì¸
+		-- ì²« ë²ˆì§¸ ì„¸ì…˜ 1ë²ˆ SQLë¡œ ì¸í•´ ëŒ€ê¸° ìƒíƒœì— ë¹ ì§„ë‹¤.
+		SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
+		WHERE T1.ACC_NO IN ('ACC2','ACC1') FOR UPDATE;
+		
+		
+-- ì²« ë²ˆì§¸ ì„¸ì…˜
+-- 4. ACC2ì˜ ìž”ì•¡ í”ŒëŸ¬ìŠ¤
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 2000 
+WHERE T1.ACC_NO = 'ACC2';
+
+-- ì²« ë²ˆì§¸ ì„¸ì…˜
+COMMIT;
+
+
+		-- ë‘ ë²ˆì§¸ ì„¸ì…˜
+		-- 5. ACC2ì—ì„œ ìž”ì•¡ ë§ˆì´ë„ˆìŠ¤
+		-- IF BAL_AMT >= 3,000 THEN UPDATE
+		UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 3000 
+		WHERE T1.ACC_NO = 'ACC2';
+
+		-- ë‘ ë²ˆì§¸ ì„¸ì…˜
+		-- 6.ACC1ì˜ ìž”ì•¡ í”ŒëŸ¬ìŠ¤
+		UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 3000 
+		WHERE T1.ACC_NO = 'ACC1';
+		
+		-- ë‘ ë²ˆì§¸ ì„¸ì…˜
+		COMMIT;
 
 
 
@@ -516,19 +541,19 @@
 -- PART III - 8.2.5 SQL1
 -- ************************************************
 
-	-- ACC1->ACC2 2,000¿ø °èÁÂÀÌÃ¼ Æ®·£Àè¼Ç SQL
-	-- 1.ACC1, ACC2ÀÇ ÀÜ¾× È®ÀÎ
-	SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO IN ('ACC1','ACC2') FOR UPDATE;
+-- ACC1->ACC2 2,000ì› ê³„ì¢Œì´ì²´ íŠ¸ëžœìž­ì…˜ SQL
+-- 1.ACC1, ACC2ì˜ ìž”ì•¡ í™•ì¸
+SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO IN ('ACC1','ACC2') FOR UPDATE;
 
-	-- 2.ACC1ÀÇ ÀÜ¾×ÀÌ ÀÌÃ¼±Ý¾× ÀÌ»óÀÌ¸é ÀÌÃ¼ ¼öÇà
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 2000 
-	WHERE T1.ACC_NO = 'ACC1';
+-- 2.ACC1ì˜ ìž”ì•¡ì´ ì´ì²´ê¸ˆì•¡ ì´ìƒì´ë©´ ì´ì²´ ìˆ˜í–‰
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT - 2000 
+WHERE T1.ACC_NO = 'ACC1';
 
-	-- 3. ACC2ÀÇ ÀÜ¾× ÇÃ·¯½º
-	UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 2000 
-	WHERE T1.ACC_NO = 'ACC2';
-	COMMIT;
+-- 3. ACC2ì˜ ìž”ì•¡ í”ŒëŸ¬ìŠ¤
+UPDATE M_ACC T1 SET T1.BAL_AMT = T1.BAL_AMT + 2000 
+WHERE T1.ACC_NO = 'ACC2';
+COMMIT;
 
 
 
@@ -536,40 +561,40 @@
 -- PART III - 8.2.5 SQL2
 -- ************************************************
 
-	-- ACC1->ACC2 2,000¿ø °èÁÂÀÌÃ¼ Æ®·£Àè¼Ç SQL
-	-- 1.ACC1, ACC2ÀÇ ÀÜ¾× È®ÀÎ
-	SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO IN ('ACC1','ACC2') FOR UPDATE;
+-- ACC1->ACC2 2,000ì› ê³„ì¢Œì´ì²´ íŠ¸ëžœìž­ì…˜ SQL
+-- 1.ACC1, ACC2ì˜ ìž”ì•¡ í™•ì¸
+SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO IN ('ACC1','ACC2') FOR UPDATE;
 
-	-- 2.ACC1ÀÇ BAL_AMT°¡ ÀÌÃ¼ ±Ý¾×º¸´Ù ÀÛÀ¸¸é ROLLBACKÃ³¸®(ÀÜ¾×ÀÌ ºÎÁ·ÇÕ´Ï´Ù.)
+-- 2.ACC1ì˜ BAL_AMTê°€ ì´ì²´ ê¸ˆì•¡ë³´ë‹¤ ìž‘ìœ¼ë©´ ROLLBACKì²˜ë¦¬(ìž”ì•¡ì´ ë¶€ì¡±í•©ë‹ˆë‹¤.)
 
-	-- 3.ACC2°¡ Á¸ÀçÇÏÁö ¾Ê´Â´Ù¸é ROLLBACKÃ³¸®(¼ö½Å °èÁÂ°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.)
+-- 3.ACC2ê°€ ì¡´ìž¬í•˜ì§€ ì•ŠëŠ”ë‹¤ë©´ ROLLBACKì²˜ë¦¬(ìˆ˜ì‹  ê³„ì¢Œê°€ ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.)
 
-	-- 4.ACC1°ú ACC2ÀÇ ÀÜ¾×À» µ¿½Ã¿¡ Ã³¸®
-	UPDATE M_ACC T1 
-	SET     T1.BAL_AMT = T1.BAL_AMT +
-				   CASE  WHEN T1.ACC_NO = 'ACC1' THEN -1 * 2000
-						 WHEN T1.ACC_NO = 'ACC2' THEN 1 * 2000 END
-	WHERE T1.ACC_NO IN ('ACC1','ACC2');
-	COMMIT;
+-- 4.ACC1ê³¼ ACC2ì˜ ìž”ì•¡ì„ ë™ì‹œì— ì²˜ë¦¬
+UPDATE M_ACC T1 
+SET     T1.BAL_AMT = T1.BAL_AMT +
+				CASE  WHEN T1.ACC_NO = 'ACC1' THEN -1 * 2000
+						WHEN T1.ACC_NO = 'ACC2' THEN 1 * 2000 END
+WHERE T1.ACC_NO IN ('ACC1','ACC2');
+COMMIT;
 
 
 -- ************************************************
 -- PART III - 8.2.5 SQL3
 -- ************************************************
 
-	-- ACC1->ACC2 2,000¿ø °èÁÂÀÌÃ¼ Æ®·£Àè¼Ç SQL ? ÇÑ ¹®ÀåÀ¸·Î Ã³¸®
-	UPDATE  M_ACC T1
-	SET     T1.BAL_AMT = T1.BAL_AMT +
-							CASE  WHEN T1.ACC_NO = 'ACC1' THEN -1 * 2000
-								  WHEN T1.ACC_NO = 'ACC2' THEN 1 * 2000 END
-	WHERE   T1.ACC_NO IN ('ACC1','ACC2')
-	AND     T1.BAL_AMT >= CASE WHEN   T1.ACC_NO = 'ACC1' THEN 2000
-								WHEN T1.ACC_NO = 'ACC2' THEN 0 END;
+-- ACC1->ACC2 2,000ì› ê³„ì¢Œì´ì²´ íŠ¸ëžœìž­ì…˜ SQL - í•œ ë¬¸ìž¥ìœ¼ë¡œ ì²˜ë¦¬
+UPDATE  M_ACC T1
+SET     T1.BAL_AMT = T1.BAL_AMT +
+						CASE  WHEN T1.ACC_NO = 'ACC1' THEN -1 * 2000
+								WHEN T1.ACC_NO = 'ACC2' THEN 1 * 2000 END
+WHERE   T1.ACC_NO IN ('ACC1','ACC2')
+AND     T1.BAL_AMT >= CASE WHEN   T1.ACC_NO = 'ACC1' THEN 2000
+							WHEN T1.ACC_NO = 'ACC2' THEN 0 END;
 
-	-- UPDATEµÈ °Ç¼ö°¡ µÎ °ÇÀÌ¸é COMMIT.
-	-- UPDATEµÈ °Ç¼ö°¡ µÎ °ÇÀÌ ¾Æ´Ï¸é ROLLBACK
-	COMMIT;
+-- UPDATEëœ ê±´ìˆ˜ê°€ ë‘ ê±´ì´ë©´ COMMIT.
+-- UPDATEëœ ê±´ìˆ˜ê°€ ë‘ ê±´ì´ ì•„ë‹ˆë©´ ROLLBACK
+COMMIT;
 
 
 
@@ -577,34 +602,34 @@
 -- ************************************************
 -- PART III - 8.2.6 SQL1
 -- ************************************************
-	UPDATE  M_ACC T1 SET T1.BAL_AMT = 3000;
-	COMMIT;
+UPDATE  M_ACC T1 SET T1.BAL_AMT = 3000;
+COMMIT;
 
 -- ************************************************
 -- PART III - 8.2.6 SQL2
 -- ************************************************
-	-- 1.ACC1, ACC2ÀÇ ÀÜ¾× È®ÀÎ(ACC1°ú ACC2 ¸ðµÎ 3000¿øÀÌ Á¶È¸µÈ´Ù.)
-	-- ACC1ÀÇ ÀÜ¾×Àº @FROM_BAL_AMT¿¡, ACC2ÀÇ ÀÜ¾àÀº @TO_BAL_AMT¿¡ ÀúÀåÇÑ´Ù.
-	SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
-	WHERE T1.ACC_NO IN ('ACC1','ACC2'); -- SELECT~FOR UPDATE¸¦ »ç¿ëÇÏÁö ¾Ê´Â´Ù.
+-- 1.ACC1, ACC2ì˜ ìž”ì•¡ í™•ì¸(ACC1ê³¼ ACC2 ëª¨ë‘ 3000ì›ì´ ì¡°íšŒëœë‹¤.)
+-- ACC1ì˜ ìž”ì•¡ì€ @FROM_BAL_AMTì—, ACC2ì˜ ìž”ì•½ì€ @TO_BAL_AMTì— ì €ìž¥í•œë‹¤.
+SELECT T1.ACC_NO ,T1.BAL_AMT FROM M_ACC T1
+WHERE T1.ACC_NO IN ('ACC1','ACC2'); -- SELECT~FOR UPDATEë¥¼ ì‚¬ìš©í•˜ì§€ ì•ŠëŠ”ë‹¤.
 
-	-- 2.ACC1ÀÇ BAL_AMT°¡ ÀÌÃ¼ ±Ý¾×º¸´Ù ÀÛÀ¸¸é ROLLBACKÃ³¸®(ÀÜ¾×ÀÌ ºÎÁ·ÇÕ´Ï´Ù.)
+-- 2.ACC1ì˜ BAL_AMTê°€ ì´ì²´ ê¸ˆì•¡ë³´ë‹¤ ìž‘ìœ¼ë©´ ROLLBACKì²˜ë¦¬(ìž”ì•¡ì´ ë¶€ì¡±í•©ë‹ˆë‹¤.)
 
-	-- 3.ACC2°¡ Á¸ÀçÇÏÁö ¾Ê´Â´Ù¸é ROLLBACKÃ³¸®(¼ö½Å °èÁÂ°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.)
+-- 3.ACC2ê°€ ì¡´ìž¬í•˜ì§€ ì•ŠëŠ”ë‹¤ë©´ ROLLBACKì²˜ë¦¬(ìˆ˜ì‹  ê³„ì¢Œê°€ ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.)
 
-	-- 4.ACC1°ú ACC2ÀÇ ÀÜ¾×À» µ¿½Ã¿¡ Ã³¸®
-	UPDATE  M_ACC T1 
-	SET     T1.BAL_AMT = T1.BAL_AMT +
-				   CASE  WHEN T1.ACC_NO = 'ACC1' THEN -1 * 2000
-						 WHEN T1.ACC_NO = 'ACC2' THEN 1 * 2000 END
-	WHERE   T1.ACC_NO IN ('ACC1','ACC2')
-	AND     T1.BAL_AMT = CASE WHEN T1.ACC_NO = 'ACC1' THEN 3000 --@FROM_BAL_AMT °ªÀ» »ç¿ë
-							  WHEN T1.ACC_NO = 'ACC2' THEN 3000 --@TO_BAL_AMT  °ªÀ» »ç¿ë
-							  END
-	;
+-- 4.ACC1ê³¼ ACC2ì˜ ìž”ì•¡ì„ ë™ì‹œì— ì²˜ë¦¬
+UPDATE  M_ACC T1 
+SET     T1.BAL_AMT = T1.BAL_AMT +
+				CASE  WHEN T1.ACC_NO = 'ACC1' THEN -1 * 2000
+						WHEN T1.ACC_NO = 'ACC2' THEN 1 * 2000 END
+WHERE   T1.ACC_NO IN ('ACC1','ACC2')
+AND     T1.BAL_AMT = CASE WHEN T1.ACC_NO = 'ACC1' THEN 3000 --@FROM_BAL_AMT ê°’ì„ ì‚¬ìš©
+							WHEN T1.ACC_NO = 'ACC2' THEN 3000 --@TO_BAL_AMT  ê°’ì„ ì‚¬ìš©
+							END
+;
 
-	-- 5. UPDATEµÈ °Ç¼ö°¡ 2°Ç ÀÏ¶§¸¸ COMMITÃ³¸®.
-	COMMIT;
+-- 5. UPDATEëœ ê±´ìˆ˜ê°€ 2ê±´ ì¼ë•Œë§Œ COMMITì²˜ë¦¬.
+COMMIT;
 
 
 
@@ -612,62 +637,64 @@
 -- PART III - 8.3.1 SQL1
 -- ************************************************
 
-	-- ±¸¸Å¿À´õ(T_PO)Å×ÀÌºí »ý¼º
-	CREATE TABLE T_PO
-	(	
-		PO_NO                 VARCHAR2(40)  NOT NULL,
-		TIT                   VARCHAR2(100) NULL,
-		SUP_ID                VARCHAR2(40)  NULL,
-		PO_ST                 VARCHAR2(40)  NULL,
-		REQ_DT                DATE  NULL,
-		REQ_UID               VARCHAR2(40)  NULL,
-		CNF_DT                DATE  NULL,
-		CNF_UID               VARCHAR2(40)  NULL,
-		CMP_DT                DATE  NULL,
-		CMP_UID               VARCHAR2(40)  NULL 
-	);
+-- êµ¬ë§¤ì˜¤ë”(T_PO)í…Œì´ë¸” ìƒì„±
+CREATE TABLE T_PO
+(	
+	PO_NO                 VARCHAR2(40)  NOT NULL,
+	TIT                   VARCHAR2(100) NULL,
+	SUP_ID                VARCHAR2(40)  NULL,
+	PO_ST                 VARCHAR2(40)  NULL,
+	REQ_DT                DATE  NULL,
+	REQ_UID               VARCHAR2(40)  NULL,
+	CNF_DT                DATE  NULL,
+	CNF_UID               VARCHAR2(40)  NULL,
+	CMP_DT                DATE  NULL,
+	CMP_UID               VARCHAR2(40)  NULL 
+);
 
-	CREATE UNIQUE INDEX PK_T_PO ON T_PO (PO_NO);
+CREATE UNIQUE INDEX PK_T_PO ON T_PO (PO_NO);
 
-	ALTER TABLE T_PO
-		ADD CONSTRAINT  PK_T_PO PRIMARY KEY (PO_NO) USING INDEX;
+ALTER TABLE T_PO
+	ADD CONSTRAINT  PK_T_PO PRIMARY KEY (PO_NO) USING INDEX;
 
-		
+	
 
 -- ************************************************
 -- PART III - 8.3.1 SQL2
 -- ************************************************
 
-	-- PO + YYYYMMDD + NNNNNNNN ÇüÅÂ Ã¤¹ø SQL
-	DECLARE
-		v_NEW_PO_NO VARCHAR2(40);
-		v_REQ_DT DATE;
-		v_REQ_YMD VARCHAR2(8);
-	BEGIN
-		v_REQ_DT := TO_DATE('20170301 23:59:59','YYYYMMDD HH24:MI:SS');
-		v_REQ_YMD := TO_CHAR(v_REQ_DT,'YYYYMMDD'); -- ÀÔ·Â¹ÞÀº v_REQ_DT¸¦ v_REQ_YMD·Î º¯È¯
-			
-		SELECT 'PO' || v_REQ_YMD || 
-				LPAD(
-					TO_CHAR(
-						TO_NUMBER(
-							  NVL(SUBSTR(
-								  MAX(T1.PO_NO)
-							  ,-8),'0')
-						) + 1
-					)
-				,8,'0')
-		INTO    v_NEW_PO_NO
-		FROM    T_PO T1
-		WHERE   T1.REQ_DT >= TO_DATE(v_REQ_YMD,'YYYYMMDD')
-		AND     T1.REQ_DT < TO_DATE(v_REQ_YMD,'YYYYMMDD') + 1
-		;
+-- PO + YYYYMMDD + NNNNNNNN í˜•íƒœ ì±„ë²ˆ SQL
+DECLARE
+	v_NEW_PO_NO VARCHAR2(40);
+	v_REQ_DT DATE;
+	v_REQ_YMD VARCHAR2(8);
+BEGIN
+	v_REQ_DT := TO_DATE('20170301 23:59:59','YYYYMMDD HH24:MI:SS');
+	v_REQ_YMD := TO_CHAR(v_REQ_DT,'YYYYMMDD'); -- ìž…ë ¥ë°›ì€ v_REQ_DTë¥¼ v_REQ_YMDë¡œ ë³€í™˜
 		
-		INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
-		VALUES (v_NEW_PO_NO ,'TEST_'||v_NEW_PO_NO ,v_REQ_DT ,'TEST');
+	SELECT 'PO' || v_REQ_YMD || 
+			LPAD(
+				TO_CHAR(
+					TO_NUMBER(
+							NVL(
+								SUBSTR(MAX(T1.PO_NO), -8),'0' 
+							)
+								
+							
+					) + 1
+				)
+			,8,'0')
+	INTO    v_NEW_PO_NO
+	FROM    T_PO T1
+	WHERE   T1.REQ_DT >= TO_DATE(v_REQ_YMD,'YYYYMMDD')
+	AND     T1.REQ_DT < TO_DATE(v_REQ_YMD,'YYYYMMDD') + 1
+	;
+	
+	INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
+	VALUES (v_NEW_PO_NO ,'TEST_'||v_NEW_PO_NO ,v_REQ_DT ,'TEST');
 
-		COMMIT;
-	END;
+	COMMIT;
+END;
 
 
 
@@ -675,23 +702,23 @@
 -- PART III - 8.3.2 SQL1
 -- ************************************************
 
-	-- ¹é¸¸ °ÇÀÇ PO µ¥ÀÌÅÍ¸¦ »ý¼º
-	TRUNCATE TABLE T_PO;
+-- ë°±ë§Œ ê±´ì˜ PO ë°ì´í„°ë¥¼ ìƒì„±
+TRUNCATE TABLE T_PO;
 
-	INSERT INTO T_PO
-			(PO_NO ,TIT ,REQ_DT ,REQ_UID)
-	SELECT  'PO'||T2.REQ_YMD||LPAD(TO_CHAR(T1.RNO),8,'0') PO_NO
-			,'TEST PO' TIT
-			,TO_DATE(T2.REQ_YMD,'YYYYMMDD') REQ_DT
-			,'TEST' REQ_UID
-	FROM    (SELECT ROWNUM RNO FROM DUAL CONNECT BY ROWNUM <= 10000) T1 --ÇÏ·ç¿¡ ¸¸ °ÇÀÇ PO µ¥ÀÌÅÍ »ý¼º.
-			,(
-			  SELECT TO_CHAR(TO_DATE('20170101','YYYYMMDD') + (ROWNUM -1 ),'YYYYMMDD') REQ_YMD
-			  FROM DUAL A
-			  CONNECT BY ROWNUM <= 100 --100ÀÏ°£ÀÇ µ¥ÀÌÅÍ¸¦ »ý¼º.
-			) T2;
-			
-	COMMIT;
+INSERT INTO T_PO
+		(PO_NO ,TIT ,REQ_DT ,REQ_UID)
+SELECT  'PO'||T2.REQ_YMD||LPAD(TO_CHAR(T1.RNO),8,'0') PO_NO
+		,'TEST PO' TIT
+		,TO_DATE(T2.REQ_YMD,'YYYYMMDD') REQ_DT
+		,'TEST' REQ_UID
+FROM    (SELECT ROWNUM RNO FROM DUAL CONNECT BY ROWNUM <= 10000) T1 --í•˜ë£¨ì— ë§Œ ê±´ì˜ PO ë°ì´í„° ìƒì„±.
+		,(
+			SELECT TO_CHAR(TO_DATE('20170101','YYYYMMDD') + (ROWNUM -1 ),'YYYYMMDD') REQ_YMD
+			FROM DUAL A
+			CONNECT BY ROWNUM <= 100 --100ì¼ê°„ì˜ ë°ì´í„°ë¥¼ ìƒì„±.
+		) T2;
+		
+COMMIT;
 
 
 
@@ -699,12 +726,12 @@
 -- PART III - 8.3.2 SQL2
 -- ************************************************
 
-	-- SELECT~MAXÀÇ ¼º´É ÃøÁ¤
-	SELECT  /*+ GATHER_PLAN_STATISTICS */
-			MAX(T1.PO_NO)
-	FROM    T_PO T1
-	WHERE   T1.REQ_DT >= TO_DATE('20170302','YYYYMMDD')
-	AND     T1.REQ_DT < TO_DATE('20170302','YYYYMMDD') + 1;
+-- SELECT~MAXì˜ ì„±ëŠ¥ ì¸¡ì •
+SELECT  /*+ GATHER_PLAN_STATISTICS */
+		MAX(T1.PO_NO)
+FROM    T_PO T1
+WHERE   T1.REQ_DT >= TO_DATE('20170302','YYYYMMDD')
+AND     T1.REQ_DT < TO_DATE('20170302','YYYYMMDD') + 1; -- TFS
 
 
 
@@ -715,14 +742,14 @@
 -- PART III - 8.3.2 SQL3
 -- ************************************************
 
-	-- SELECT~MAXÀÇ ¼º´É ÃøÁ¤ ? ÀÎµ¦½º Ãß°¡
-	CREATE INDEX X_T_PO_1 ON T_PO(REQ_DT, PO_NO);
+-- SELECT~MAXì˜ ì„±ëŠ¥ ì¸¡ì • - ì¸ë±ìŠ¤ ì¶”ê°€
+CREATE INDEX X_T_PO_1 ON T_PO(REQ_DT, PO_NO);
 
-	SELECT  /*+ GATHER_PLAN_STATISTICS */
-			MAX(T1.PO_NO)
-	FROM    T_PO T1
-	WHERE   T1.REQ_DT >= TO_DATE('20170302','YYYYMMDD')
-	AND     T1.REQ_DT < TO_DATE('20170302','YYYYMMDD') + 1;
+SELECT  /*+ GATHER_PLAN_STATISTICS */
+		MAX(T1.PO_NO)
+FROM    T_PO T1
+WHERE   T1.REQ_DT >= TO_DATE('20170302','YYYYMMDD')
+AND     T1.REQ_DT < TO_DATE('20170302','YYYYMMDD') + 1; -- INDEX RANGE SCAN
 
 
 
@@ -730,15 +757,15 @@
 -- PART III - 8.3.2 SQL4
 -- ************************************************
 
-	-- REQ_YMD, PO_NOº¹ÇÕ ÀÎµ¦½º Ãß°¡
-	ALTER TABLE T_PO ADD REQ_YMD VARCHAR(8);
+-- REQ_YMD, PO_NOë³µí•© ì¸ë±ìŠ¤ ì¶”ê°€
+ALTER TABLE T_PO ADD REQ_YMD VARCHAR(8);
 
-	UPDATE  T_PO
-	SET     REQ_YMD = TO_CHAR(REQ_DT,'YYYYMMDD')
-	;
-	COMMIT;
+UPDATE  T_PO
+SET     REQ_YMD = TO_CHAR(REQ_DT,'YYYYMMDD')
+;
+COMMIT;
 
-	CREATE INDEX X_T_PO_2 ON T_PO(REQ_YMD, PO_NO);
+CREATE INDEX X_T_PO_2 ON T_PO(REQ_YMD, PO_NO);
 
 
 
@@ -746,11 +773,11 @@
 -- PART III - 8.3.2 SQL5
 -- ************************************************
 
-	-- SELECT~MAXÀÇ ¼º´É ÃøÁ¤ ? REQ_YMDÄÃ·³ »ç¿ë
-	SELECT  /*+ GATHER_PLAN_STATISTICS */
-			MAX(T1.PO_NO)
-	FROM    T_PO T1
-	WHERE   T1.REQ_YMD = '20170302';
+-- SELECT~MAXì˜ ì„±ëŠ¥ ì¸¡ì • - REQ_YMDì»¬ëŸ¼ ì‚¬ìš©
+SELECT  /*+ GATHER_PLAN_STATISTICS */
+		MAX(T1.PO_NO)
+FROM    T_PO T1
+WHERE   T1.REQ_YMD = '20170302';
 
 
 
@@ -760,12 +787,12 @@
 -- PART III - 8.3.2 SQL6
 -- ************************************************
 
-	-- SELECT~MAXÀÇ ¼º´É ÃøÁ¤ ? PO_NOÄÃ·³À» È°¿ë
-	SELECT  /*+ GATHER_PLAN_STATISTICS */
-			MAX(T1.PO_NO)
-	FROM    T_PO T1
-	WHERE   T1.PO_NO >= 'PO'||'20170302'
-	AND     T1.PO_NO < 'PO'||TO_CHAR(TO_DATE('20170302','YYYYMMDD')+1,'YYYYMMDD');
+-- SELECT~MAXì˜ ì„±ëŠ¥ ì¸¡ì • - PO_NOì»¬ëŸ¼ì„ í™œìš©
+SELECT  /*+ GATHER_PLAN_STATISTICS */
+		MAX(T1.PO_NO)
+FROM    T_PO T1
+WHERE   T1.PO_NO >= 'PO'||'20170302'
+AND     T1.PO_NO < 'PO'||TO_CHAR(TO_DATE('20170302','YYYYMMDD')+1,'YYYYMMDD');
 
 
 
@@ -774,56 +801,56 @@
 -- PART III - 8.3.3 SQL1
 -- ************************************************
 
-	-- µ¿½Ã¿¡ µÎ °³ÀÇ ¼¼¼Ç¿¡¼­ Ã¤¹ø°ú INSERT ÀÛ¾÷À» ½ÇÇà
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--1.Ã¤¹øÀ» ½ÇÇà(PO2017030200010001°¡ Á¶È¸µÈ´Ù.)
-	SELECT  'PO' || '20170302' || 
-			LPAD(TO_CHAR(TO_NUMBER(
-			  NVL(SUBSTR(MAX(T1.PO_NO),-8),'0')) + 1
-			  ),8,'0')
-	FROM    T_PO T1
-	WHERE   T1.PO_NO >= 'PO'||'20170302'
-	AND     T1.PO_NO < 
-		  'PO'||TO_CHAR(TO_DATE('20170302','YYYYMMDD')+1
-				  ,'YYYYMMDD');
+-- ë™ì‹œì— ë‘ ê°œì˜ ì„¸ì…˜ì—ì„œ ì±„ë²ˆê³¼ INSERT ìž‘ì—…ì„ ì‹¤í–‰
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--1.ì±„ë²ˆì„ ì‹¤í–‰(PO2017030200010001ê°€ ì¡°íšŒëœë‹¤.)
+SELECT  'PO' || '20170302' || 
+		LPAD(TO_CHAR(TO_NUMBER(
+			NVL(SUBSTR(MAX(T1.PO_NO),-8),'0')) + 1
+			),8,'0')
+FROM    T_PO T1
+WHERE   T1.PO_NO >= 'PO'||'20170302'
+AND     T1.PO_NO < 
+		'PO'||TO_CHAR(TO_DATE('20170302','YYYYMMDD')+1
+				,'YYYYMMDD');
 
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--2.Ã¤¹øµÈ ¹øÈ£¸¦ ÀÌ¿ë INSERTÃ³¸®.
-	INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
-	VALUES('PO2017030200010001','TEST',
-	TO_DATE('20170302','YYYYMMDD'),'TEST');
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--2.ì±„ë²ˆëœ ë²ˆí˜¸ë¥¼ ì´ìš© INSERTì²˜ë¦¬.
+INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
+VALUES('PO2017030200010001','TEST',
+TO_DATE('20170302','YYYYMMDD'),'TEST');
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--3.Ã¤¹øÀ» ½ÇÇà(PO2017030200010001°¡ Á¶È¸µÈ´Ù.)
-			--Ã¹ ¹øÂ° ¼¼¼Ç°ú °°Àº ¹øÈ£°¡ Ã¤¹øµÈ´Ù.
-			SELECT  'PO' || '20170302' || 
-					LPAD(TO_CHAR(TO_NUMBER(
-					  NVL(SUBSTR(MAX(T1.PO_NO),-8),'0')) + 1
-					  ),8,'0')
-			FROM    T_PO T1
-			WHERE   T1.PO_NO >= 'PO'||'20170302'
-			AND     T1.PO_NO < 
-				'PO'||TO_CHAR(TO_DATE('20170302','YYYYMMDD')+1
-						  ,'YYYYMMDD');
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--3.ì±„ë²ˆì„ ì‹¤í–‰(PO2017030200010001ê°€ ì¡°íšŒëœë‹¤.)
+		--ì²« ë²ˆì§¸ ì„¸ì…˜ê³¼ ê°™ì€ ë²ˆí˜¸ê°€ ì±„ë²ˆëœë‹¤.
+		SELECT  'PO' || '20170302' || 
+				LPAD(TO_CHAR(TO_NUMBER(
+					NVL(SUBSTR(MAX(T1.PO_NO),-8),'0')) + 1
+					),8,'0')
+		FROM    T_PO T1
+		WHERE   T1.PO_NO >= 'PO'||'20170302'
+		AND     T1.PO_NO < 
+			'PO'||TO_CHAR(TO_DATE('20170302','YYYYMMDD')+1
+						,'YYYYMMDD');
 
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--4.Ã¤¹øµÈ ¹øÈ£¸¦ ÀÌ¿ë INSERTÃ³¸®.
-			--'PO2017030200010001'¸¦ Ã¹ ¹øÂ° ¼¼¼Ç¿¡¼­ ÀÌ¹Ì
-			--INSERTÁßÀÌ¹Ç·Î ´ë±â »óÅÂ¿¡ ºüÁø´Ù.
-			--Ã¹ ¹øÂ° ¼¼¼ÇÀÌ COMMITÃ³¸®ÇÏ¸é Áßº¹ ¿À·ù°¡ ¹ß»ý.
-			INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
-			VALUES('PO2017030200010001','TEST',
-			TO_DATE('20170302','YYYYMMDD'),'TEST');
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--4.ì±„ë²ˆëœ ë²ˆí˜¸ë¥¼ ì´ìš© INSERTì²˜ë¦¬.
+		--'PO2017030200010001'ë¥¼ ì²« ë²ˆì§¸ ì„¸ì…˜ì—ì„œ ì´ë¯¸
+		--INSERTì¤‘ì´ë¯€ë¡œ ëŒ€ê¸° ìƒíƒœì— ë¹ ì§„ë‹¤.
+		--ì²« ë²ˆì§¸ ì„¸ì…˜ì´ COMMITì²˜ë¦¬í•˜ë©´ ì¤‘ë³µ ì˜¤ë¥˜ê°€ ë°œìƒ.
+		INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
+		VALUES('PO2017030200010001','TEST',
+		TO_DATE('20170302','YYYYMMDD'),'TEST');
 
 
 
-	--Ã¹ ¹øÂ° ¼¼¼Ç
-	--5.COMMITÃ³¸®.
-	COMMIT;
-			
-			--µÎ ¹øÂ° ¼¼¼Ç
-			--6.¿À·ù°¡ ¹ß»ýÇßÀ¸¹Ç·Î ROLLBACKÇÑ´Ù.
-			ROLLBACK;
+--ì²« ë²ˆì§¸ ì„¸ì…˜
+--5.COMMITì²˜ë¦¬.
+COMMIT;
+		
+		--ë‘ ë²ˆì§¸ ì„¸ì…˜
+		--6.ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìœ¼ë¯€ë¡œ ROLLBACKí•œë‹¤.
+		ROLLBACK;
 
 
 
@@ -831,68 +858,68 @@
 -- PART III - 8.3.4 SQL1
 -- ************************************************
 
-	-- ±¸¸Å¿À´õ(T_PO)Å×ÀÌºí ºñ¿ì±â
-	TRUNCATE TABLE T_PO;
+-- êµ¬ë§¤ì˜¤ë”(T_PO)í…Œì´ë¸” ë¹„ìš°ê¸°
+TRUNCATE TABLE T_PO;
 
 
 -- ************************************************
 -- PART III - 8.3.4 SQL2
 -- ************************************************
 
-	-- ±¸¸Å¿À´õÃ¤¹ø(T_PO_NUM)Å×ÀÌºí »ý¼º
-	CREATE TABLE T_PO_NUM
-	(   
-		BAS_YMD VARCHAR(8) NOT NULL,
-		LST_PO_NO VARCHAR2(40)  NOT NULL
-	);
+-- êµ¬ë§¤ì˜¤ë”ì±„ë²ˆ(T_PO_NUM)í…Œì´ë¸” ìƒì„±
+CREATE TABLE T_PO_NUM
+(   
+	BAS_YMD VARCHAR(8) NOT NULL,
+	LST_PO_NO VARCHAR2(40)  NOT NULL
+);
 
-	CREATE UNIQUE INDEX PK_T_PO_NUM ON T_PO_NUM (BAS_YMD);
+CREATE UNIQUE INDEX PK_T_PO_NUM ON T_PO_NUM (BAS_YMD);
 
-	ALTER TABLE T_PO_NUM
-		ADD CONSTRAINT PK_T_PO_NUM PRIMARY KEY (BAS_YMD) USING INDEX;
+ALTER TABLE T_PO_NUM
+	ADD CONSTRAINT PK_T_PO_NUM PRIMARY KEY (BAS_YMD) USING INDEX;
 
-	
+
 
 -- ************************************************
 -- PART III - 8.3.4 SQL3
 -- ************************************************
 
-	-- ±¸¸Å¿À´õÃ¤¹ø(T_PO_NUM)Å×ÀÌºíÀ» ÀÌ¿ëÇÑ Ã¤¹ø
-	DECLARE
-		v_NEW_PO_NO VARCHAR2(40);
-		v_REQ_DT DATE;
-		v_REQ_YMD VARCHAR2(8);
-	BEGIN
-		v_REQ_DT := TO_DATE('20170301 23:59:59','YYYYMMDD HH24:MI:SS');
-		v_REQ_YMD := TO_CHAR(v_REQ_DT,'YYYYMMDD'); -- ÀÔ·Â¹ÞÀº v_REQ_DT¸¦ v_REQ_YMD·Î º¯È¯
-			
-		MERGE INTO T_PO_NUM T1
-		USING (
-			  SELECT  'PO' || v_REQ_YMD || 
-							LPAD(TO_CHAR(
-							  TO_NUMBER(
-								NVL(SUBSTR(MAX(A.LST_PO_NO),-8),'0')) 
-							  + 1
-							),8,'0') NEW_PO_NO
-			  FROM    T_PO_NUM A
-			  WHERE   A.BAS_YMD = v_REQ_YMD
-			  ) T2
-			  ON (T1.BAS_YMD = v_REQ_YMD)
-		WHEN MATCHED THEN UPDATE SET T1.LST_PO_NO = T2.NEW_PO_NO
-		WHEN NOT MATCHED THEN INSERT (BAS_YMD ,LST_PO_NO)
-							VALUES(v_REQ_YMD ,T2.NEW_PO_NO)
-		;
+-- êµ¬ë§¤ì˜¤ë”ì±„ë²ˆ(T_PO_NUM)í…Œì´ë¸”ì„ ì´ìš©í•œ ì±„ë²ˆ
+DECLARE
+	v_NEW_PO_NO VARCHAR2(40);
+	v_REQ_DT DATE;
+	v_REQ_YMD VARCHAR2(8);
+BEGIN
+	v_REQ_DT := TO_DATE('20170301 23:59:59','YYYYMMDD HH24:MI:SS');
+	v_REQ_YMD := TO_CHAR(v_REQ_DT,'YYYYMMDD'); -- ìž…ë ¥ë°›ì€ v_REQ_DTë¥¼ v_REQ_YMDë¡œ ë³€í™˜
 		
-		SELECT  T1.LST_PO_NO
-		INTO    v_NEW_PO_NO
-		FROM    T_PO_NUM T1
-		WHERE   T1.BAS_YMD = v_REQ_YMD;
-			
-		INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
-		VALUES (v_NEW_PO_NO ,'TEST_'||v_NEW_PO_NO ,v_REQ_DT ,'TEST');
-			
-		COMMIT;
-	END;
+	MERGE INTO T_PO_NUM T1
+	USING (
+			SELECT  'PO' || v_REQ_YMD || 
+						LPAD(TO_CHAR(
+							TO_NUMBER(
+							NVL(SUBSTR(MAX(A.LST_PO_NO),-8),'0')) 
+							+ 1
+						),8,'0') NEW_PO_NO
+			FROM    T_PO_NUM A
+			WHERE   A.BAS_YMD = v_REQ_YMD
+			) T2
+			ON (T1.BAS_YMD = v_REQ_YMD)
+	WHEN MATCHED THEN UPDATE SET T1.LST_PO_NO = T2.NEW_PO_NO
+	WHEN NOT MATCHED THEN INSERT (BAS_YMD ,LST_PO_NO)
+						VALUES(v_REQ_YMD ,T2.NEW_PO_NO)
+	;
+	
+	SELECT  T1.LST_PO_NO
+	INTO    v_NEW_PO_NO
+	FROM    T_PO_NUM T1
+	WHERE   T1.BAS_YMD = v_REQ_YMD;
+		
+	INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
+	VALUES (v_NEW_PO_NO ,'TEST_'||v_NEW_PO_NO ,v_REQ_DT ,'TEST');
+		
+	COMMIT;
+END;
 
 
 
@@ -902,59 +929,59 @@
 -- PART III - 8.3.5 SQL1
 -- ************************************************
 
-	-- Ã¤¹øÇÔ¼ö
-	CREATE OR REPLACE FUNCTION UFN_GET_PO_NO
-	(    v_BAS_YMD IN VARCHAR2
-	)
-	RETURN VARCHAR2 IS PRAGMA AUTONOMOUS_TRANSACTION;
-		v_NEW_PO_NO VARCHAR2(40);
-	BEGIN
-		--Ã¤¹ø ½ÇÇà.
-		UPDATE  T_PO_NUM T1
-		SET     T1.LST_PO_NO = 'PO' || v_BAS_YMD || 
-					LPAD(TO_CHAR(TO_NUMBER(
-							NVL(SUBSTR(T1.LST_PO_NO,-8),'0')
-				) + 1),8,'0') 
-		WHERE   T1.BAS_YMD = v_BAS_YMD;
+-- ì±„ë²ˆí•¨ìˆ˜
+CREATE OR REPLACE FUNCTION UFN_GET_PO_NO
+(    v_BAS_YMD IN VARCHAR2
+)
+RETURN VARCHAR2 IS PRAGMA AUTONOMOUS_TRANSACTION;
+	v_NEW_PO_NO VARCHAR2(40);
+BEGIN
+	--ì±„ë²ˆ ì‹¤í–‰.
+	UPDATE  T_PO_NUM T1
+	SET     T1.LST_PO_NO = 'PO' || v_BAS_YMD || 
+				LPAD(TO_CHAR(TO_NUMBER(
+						NVL(SUBSTR(T1.LST_PO_NO,-8),'0')
+			) + 1),8,'0') 
+	WHERE   T1.BAS_YMD = v_BAS_YMD;
+	
+	--ì—…ë°ì´íŠ¸ ë°ì´í„°ê°€ ì—†ìœ¼ë©´, ìµœì´ˆ ì±„ë²ˆì´ë¯€ë¡œ INSERTìˆ˜í–‰.
+	IF SQL%ROWCOUNT=0 THEN
+		INSERT INTO T_PO_NUM (BAS_YMD, LST_PO_NO) VALUES  (v_BAS_YMD, 'PO'||v_BAS_YMD||'00000001');
+	END IF;
+	
+	--ì±„ë²ˆê°’ GET
+	SELECT  T1.LST_PO_NO
+	INTO    v_NEW_PO_NO
+	FROM    T_PO_NUM T1
+	WHERE   T1.BAS_YMD = v_BAS_YMD;
+	
 		
-		--¾÷µ¥ÀÌÆ® µ¥ÀÌÅÍ°¡ ¾øÀ¸¸é, ÃÖÃÊ Ã¤¹øÀÌ¹Ç·Î INSERT¼öÇà.
-		IF SQL%ROWCOUNT=0 THEN
-			INSERT INTO T_PO_NUM (BAS_YMD, LST_PO_NO) VALUES  (v_BAS_YMD, 'PO'||v_BAS_YMD||'00000001');
-		END IF;
-		
-		--Ã¤¹ø°ª GET
-		SELECT  T1.LST_PO_NO
-		INTO    v_NEW_PO_NO
-		FROM    T_PO_NUM T1
-		WHERE   T1.BAS_YMD = v_BAS_YMD;
-		
-			
-		COMMIT; --Æ®·£Àè¼Ç COMMITÃ³¸®.
-		
-		RETURN v_NEW_PO_NO;
-		
-	END;
+	COMMIT; --íŠ¸ëžœìž­ì…˜ COMMITì²˜ë¦¬.
+	
+	RETURN v_NEW_PO_NO;
+	
+END;
 
 -- ************************************************
 -- PART III - 8.3.5 SQL2
 -- ************************************************
 
-	-- Ã¤¹øÇÔ¼ö¸¦ »ç¿ëÇÑ Ã¤¹ø
-	DECLARE
-		v_NEW_PO_NO VARCHAR2(40);
-		v_REQ_DT DATE;
-		v_REQ_YMD VARCHAR2(8);
-	BEGIN
-		v_REQ_DT := TO_DATE('20170305 23:59:59','YYYYMMDD HH24:MI:SS');
-		v_REQ_YMD := TO_CHAR(v_REQ_DT,'YYYYMMDD'); -- ÀÔ·Â¹ÞÀº v_REQ_DT¸¦ v_REQ_YMD·Î º¯È¯
+-- ì±„ë²ˆí•¨ìˆ˜ë¥¼ ì‚¬ìš©í•œ ì±„ë²ˆ
+DECLARE
+	v_NEW_PO_NO VARCHAR2(40);
+	v_REQ_DT DATE;
+	v_REQ_YMD VARCHAR2(8);
+BEGIN
+	v_REQ_DT := TO_DATE('20170305 23:59:59','YYYYMMDD HH24:MI:SS');
+	v_REQ_YMD := TO_CHAR(v_REQ_DT,'YYYYMMDD'); -- ìž…ë ¥ë°›ì€ v_REQ_DTë¥¼ v_REQ_YMDë¡œ ë³€í™˜
+	
+	v_NEW_PO_NO := UFN_GET_PO_NO(v_REQ_YMD);
+	
+	INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
+	VALUES (v_NEW_PO_NO ,'TEST_'||v_NEW_PO_NO ,v_REQ_DT ,'TEST');
 		
-		v_NEW_PO_NO := UFN_GET_PO_NO(v_REQ_YMD);
-		
-		INSERT INTO T_PO (PO_NO ,TIT ,REQ_DT ,REQ_UID)
-		VALUES (v_NEW_PO_NO ,'TEST_'||v_NEW_PO_NO ,v_REQ_DT ,'TEST');
-			
-		COMMIT;
-	END;
+	COMMIT;
+END;
 
 
 
@@ -963,72 +990,72 @@
 -- PART III - 8.3.5 SQL3
 -- ************************************************
 
-	-- ÅëÇÕÃ¤¹ø Å×ÀÌºí »ý¼º
-	CREATE TABLE M_NUM
-	(   
-		NUM_TP VARCHAR2(40) NOT NULL,
-		BAS_YMD VARCHAR(8) NOT NULL,
-		LST_NO VARCHAR2(40)  NOT NULL
-	);
+-- í†µí•©ì±„ë²ˆ í…Œì´ë¸” ìƒì„±
+CREATE TABLE M_NUM
+(   
+	NUM_TP VARCHAR2(40) NOT NULL,
+	BAS_YMD VARCHAR(8) NOT NULL,
+	LST_NO VARCHAR2(40)  NOT NULL
+);
 
-	CREATE UNIQUE INDEX PK_M_NUM ON M_NUM(NUM_TP, BAS_YMD);
+CREATE UNIQUE INDEX PK_M_NUM ON M_NUM(NUM_TP, BAS_YMD);
 
-	ALTER TABLE M_NUM
-		ADD CONSTRAINT  PK_M_NUM PRIMARY KEY (NUM_TP, BAS_YMD) USING INDEX;
+ALTER TABLE M_NUM
+	ADD CONSTRAINT  PK_M_NUM PRIMARY KEY (NUM_TP, BAS_YMD) USING INDEX;
 
 
-	
+
 -- ************************************************
 -- PART III - 8.3.5 SQL4
 -- ************************************************
 
-	-- ÅëÇÕµÈ ÇüÅÂÀÇ Ã¤¹øÇÔ¼ö
-	CREATE OR REPLACE FUNCTION UFN_GET_NUM
-	(    v_NUM_TP IN VARCHAR2
-		,v_BAS_YMD IN VARCHAR2 )
-	RETURN VARCHAR2 IS PRAGMA AUTONOMOUS_TRANSACTION;
-		v_NEW_NO VARCHAR2(40);
-		v_PREFIX VARCHAR2(40);
-		v_LENGTH INT;
-	BEGIN
-		SELECT  CASE  WHEN v_NUM_TP = 'PO' THEN 'PO'
-					  WHEN v_NUM_TP = 'SO' THEN 'SO'
-					  WHEN v_NUM_TP = 'CS' THEN 'CS'
-				END
-				,CASE WHEN v_NUM_TP = 'PO' THEN 8
-					  WHEN v_NUM_TP = 'SO' THEN 8
-					  WHEN v_NUM_TP = 'CS' THEN 4
-				END
-		INTO    v_PREFIX
-				,v_LENGTH
-		FROM    DUAL;
+-- í†µí•©ëœ í˜•íƒœì˜ ì±„ë²ˆí•¨ìˆ˜
+CREATE OR REPLACE FUNCTION UFN_GET_NUM
+(    v_NUM_TP IN VARCHAR2
+	,v_BAS_YMD IN VARCHAR2 )
+RETURN VARCHAR2 IS PRAGMA AUTONOMOUS_TRANSACTION;
+	v_NEW_NO VARCHAR2(40);
+	v_PREFIX VARCHAR2(40);
+	v_LENGTH INT;
+BEGIN
+	SELECT  CASE  WHEN v_NUM_TP = 'PO' THEN 'PO'
+					WHEN v_NUM_TP = 'SO' THEN 'SO'
+					WHEN v_NUM_TP = 'CS' THEN 'CS'
+			END
+			,CASE WHEN v_NUM_TP = 'PO' THEN 8
+					WHEN v_NUM_TP = 'SO' THEN 8
+					WHEN v_NUM_TP = 'CS' THEN 4
+			END
+	INTO    v_PREFIX
+			,v_LENGTH
+	FROM    DUAL;
 
-		--Ã¤¹ø ½ÇÇà.
-		UPDATE  M_NUM T1
-		SET     T1.LST_NO = v_PREFIX || v_BAS_YMD || 
-					LPAD(TO_CHAR(TO_NUMBER(
-							NVL(SUBSTR(T1.LST_NO,(-1*v_LENGTH)),'0')
-				) + 1),v_LENGTH,'0') 
-		WHERE   T1.NUM_TP = v_NUM_TP
-		AND     T1.BAS_YMD = v_BAS_YMD;
-		
-		--¾÷µ¥ÀÌÆ® µ¥ÀÌÅÍ°¡ ¾øÀ¸¸é, ÃÖÃÊ Ã¤¹øÀÌ¹Ç·Î INSERT¼öÇà.
-		IF SQL%ROWCOUNT=0 THEN
-			INSERT INTO M_NUM (NUM_TP ,BAS_YMD ,LST_NO)
-			VALUES  (v_NUM_TP ,v_BAS_YMD ,v_PREFIX||v_BAS_YMD||LPAD('1',v_LENGTH,'0'));
-		END IF;
-		
-		--Ã¤¹ø°ª GET(Ã¤¹ø À¯Çü±îÁö º¯¼ö·Î »ç¿ë)
-		SELECT  T1.LST_NO
-		INTO    v_NEW_NO
-		FROM    M_NUM T1
-		WHERE   T1.NUM_TP = v_NUM_TP
-		AND     T1.BAS_YMD = v_BAS_YMD;
-		
-		COMMIT; --Æ®·£Àè¼Ç COMMITÃ³¸®.
-		
-		RETURN v_NEW_NO;
-	END;
+	--ì±„ë²ˆ ì‹¤í–‰.
+	UPDATE  M_NUM T1
+	SET     T1.LST_NO = v_PREFIX || v_BAS_YMD || 
+				LPAD(TO_CHAR(TO_NUMBER(
+						NVL(SUBSTR(T1.LST_NO,(-1*v_LENGTH)),'0')
+			) + 1),v_LENGTH,'0') 
+	WHERE   T1.NUM_TP = v_NUM_TP
+	AND     T1.BAS_YMD = v_BAS_YMD;
+	
+	--ì—…ë°ì´íŠ¸ ë°ì´í„°ê°€ ì—†ìœ¼ë©´, ìµœì´ˆ ì±„ë²ˆì´ë¯€ë¡œ INSERTìˆ˜í–‰.
+	IF SQL%ROWCOUNT=0 THEN
+		INSERT INTO M_NUM (NUM_TP ,BAS_YMD ,LST_NO)
+		VALUES  (v_NUM_TP ,v_BAS_YMD ,v_PREFIX||v_BAS_YMD||LPAD('1',v_LENGTH,'0'));
+	END IF;
+	
+	--ì±„ë²ˆê°’ GET(ì±„ë²ˆ ìœ í˜•ê¹Œì§€ ë³€ìˆ˜ë¡œ ì‚¬ìš©)
+	SELECT  T1.LST_NO
+	INTO    v_NEW_NO
+	FROM    M_NUM T1
+	WHERE   T1.NUM_TP = v_NUM_TP
+	AND     T1.BAS_YMD = v_BAS_YMD;
+	
+	COMMIT; --íŠ¸ëžœìž­ì…˜ COMMITì²˜ë¦¬.
+	
+	RETURN v_NEW_NO;
+END;
 
 
 
@@ -1038,11 +1065,11 @@
 -- PART III - 8.3.5 SQL5
 -- ************************************************
 
-	-- ÅëÇÕ Ã¤¹øÇÔ¼ö »ç¿ë
-	SELECT  UFN_GET_NUM('PO','20170501') PO_NO
-			,UFN_GET_NUM('SO','20170501') SO_NO
-			,UFN_GET_NUM('CS','20170501') CS_ID
-	FROM    DUAL;
+-- í†µí•© ì±„ë²ˆí•¨ìˆ˜ ì‚¬ìš©
+SELECT  UFN_GET_NUM('PO','20170501') PO_NO
+		,UFN_GET_NUM('SO','20170501') SO_NO
+		,UFN_GET_NUM('CS','20170501') CS_ID
+FROM    DUAL;
 
 
 
@@ -1051,27 +1078,27 @@
 -- PART III - 8.4.1 SQL1
 -- ************************************************
 
-	-- °èÁÂÀÌÃ¼ Å×ÀÌºí »ý¼º
-	CREATE TABLE T_ACC_TRN
-	(
-		ACC_TRN_SEQ           NUMBER(18)  NOT NULL,
-		FR_ACC_NO             VARCHAR2(40)  NULL,
-		TO_ACC_NO             VARCHAR2(40)  NULL,
-		TRN_AMT               NUMBER(18,3)  NULL,
-		TRN_HND_ST            VARCHAR2(40)  NULL,
-		TRN_ERR_CD            VARCHAR2(40)  NULL,
-		TRN_REQ_DT            TIMESTAMP  NULL,
-		TRN_CMP_DT            TIMESTAMP  NULL 
-	);
+-- ê³„ì¢Œì´ì²´ í…Œì´ë¸” ìƒì„±
+CREATE TABLE T_ACC_TRN
+(
+	ACC_TRN_SEQ           NUMBER(18)  NOT NULL,
+	FR_ACC_NO             VARCHAR2(40)  NULL,
+	TO_ACC_NO             VARCHAR2(40)  NULL,
+	TRN_AMT               NUMBER(18,3)  NULL,
+	TRN_HND_ST            VARCHAR2(40)  NULL,
+	TRN_ERR_CD            VARCHAR2(40)  NULL,
+	TRN_REQ_DT            TIMESTAMP  NULL,
+	TRN_CMP_DT            TIMESTAMP  NULL 
+);
 
-	ALTER TABLE T_ACC_TRN 
-		ADD CONSTRAINT T_ACC_TRN PRIMARY KEY (ACC_TRN_SEQ) USING INDEX;
+ALTER TABLE T_ACC_TRN 
+	ADD CONSTRAINT T_ACC_TRN PRIMARY KEY (ACC_TRN_SEQ) USING INDEX;
 
-	ALTER TABLE T_ACC_TRN
-		ADD (CONSTRAINT  FK_T_ACC_TRN_1 FOREIGN KEY (FR_ACC_NO) REFERENCES M_ACC(ACC_NO));
+ALTER TABLE T_ACC_TRN
+	ADD (CONSTRAINT  FK_T_ACC_TRN_1 FOREIGN KEY (FR_ACC_NO) REFERENCES M_ACC(ACC_NO));
 
-	ALTER TABLE T_ACC_TRN
-		ADD (CONSTRAINT  FK_T_ACC_TRN_2 FOREIGN KEY (TO_ACC_NO) REFERENCES M_ACC(ACC_NO));
+ALTER TABLE T_ACC_TRN
+	ADD (CONSTRAINT  FK_T_ACC_TRN_2 FOREIGN KEY (TO_ACC_NO) REFERENCES M_ACC(ACC_NO));
 
 
 
@@ -1079,14 +1106,14 @@
 -- PART III - 8.4.1 SQL2
 -- ************************************************
 
-	-- °èÁÂÀÌÃ¼ ½ÃÄö½º »ý¼º
-	CREATE SEQUENCE SQ_T_ACC_TRN
-	START WITH 1
-	INCREMENT BY 1
-	MAXVALUE 99999999999999999999999999
-	NOCYCLE
-	CACHE 20
-	NOORDER;
+-- ê³„ì¢Œì´ì²´ ì‹œí€€ìŠ¤ ìƒì„±
+CREATE SEQUENCE SQ_T_ACC_TRN
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 99999999999999999999999999
+NOCYCLE
+CACHE 20
+NOORDER;
 
 
 
@@ -1094,19 +1121,19 @@
 -- PART III - 8.4.1 SQL3
 -- ************************************************
 
-	-- ½ÃÄö½º¸¦ ÀÌ¿ëÇÑ °èÁÂÀÌÃ¼ Ã³¸®
-	DECLARE
-	  v_NEW_ACC_TRN_SEQ NUMBER(18);
-	BEGIN
-	  
-	  v_NEW_ACC_TRN_SEQ := SQ_T_ACC_TRN.NEXTVAL();
-	  
-	  INSERT INTO T_ACC_TRN
-			(ACC_TRN_SEQ ,FR_ACC_NO ,TO_ACC_NO ,TRN_AMT ,TRN_HND_ST ,TRN_ERR_CD ,TRN_REQ_DT ,TRN_CMP_DT)
-	  VALUES(v_NEW_ACC_TRN_SEQ ,'ACC1' ,'ACC3' ,500 ,'REQ' ,NULL ,SYSDATE ,NULL);
+-- ì‹œí€€ìŠ¤ë¥¼ ì´ìš©í•œ ê³„ì¢Œì´ì²´ ì²˜ë¦¬
+DECLARE
+	v_NEW_ACC_TRN_SEQ NUMBER(18);
+BEGIN
+	
+	v_NEW_ACC_TRN_SEQ := SQ_T_ACC_TRN.NEXTVAL();
+	
+	INSERT INTO T_ACC_TRN
+		(ACC_TRN_SEQ ,FR_ACC_NO ,TO_ACC_NO ,TRN_AMT ,TRN_HND_ST ,TRN_ERR_CD ,TRN_REQ_DT ,TRN_CMP_DT)
+	VALUES(v_NEW_ACC_TRN_SEQ ,'ACC1' ,'ACC3' ,500 ,'REQ' ,NULL ,SYSDATE ,NULL);
 
-	  COMMIT;
-	END;
+	COMMIT;
+END;
 
 
 
@@ -1114,21 +1141,21 @@
 -- PART III - 8.4.2 SQL1
 -- ************************************************
 
-	-- ½ÃÄö½º¸¦ ÀÌ¿ëÇÑ °èÁÂÀÌÃ¼ Ã³¸® ? Àß¸øµÈ ¹æ¹ý
-	DECLARE
-	  v_NEW_ACC_TRN_SEQ NUMBER(18);
-	BEGIN
-	  
-	  INSERT INTO T_ACC_TRN
-			(ACC_TRN_SEQ ,FR_ACC_NO ,TO_ACC_NO ,TRN_AMT ,TRN_HND_ST ,TRN_ERR_CD ,TRN_REQ_DT ,TRN_CMP_DT)
-	  VALUES(SQ_T_ACC_TRN.NEXTVAL ,'ACC1' ,'ACC3' ,500 ,'REQ' ,NULL ,SYSDATE ,NULL);
+-- ì‹œí€€ìŠ¤ë¥¼ ì´ìš©í•œ ê³„ì¢Œì´ì²´ ì²˜ë¦¬ - ìž˜ëª»ëœ ë°©ë²•
+DECLARE
+	v_NEW_ACC_TRN_SEQ NUMBER(18);
+BEGIN
+	
+	INSERT INTO T_ACC_TRN
+		(ACC_TRN_SEQ ,FR_ACC_NO ,TO_ACC_NO ,TRN_AMT ,TRN_HND_ST ,TRN_ERR_CD ,TRN_REQ_DT ,TRN_CMP_DT)
+	VALUES(SQ_T_ACC_TRN.NEXTVAL ,'ACC1' ,'ACC3' ,500 ,'REQ' ,NULL ,SYSDATE ,NULL);
 
-	  SELECT  MAX(ACC_TRN_SEQ)
-	  INTO    v_NEW_ACC_TRN_SEQ
-	  FROM    T_ACC_TRN;
-	  
-	  COMMIT;
-	END;
+	SELECT  MAX(ACC_TRN_SEQ)
+	INTO    v_NEW_ACC_TRN_SEQ
+	FROM    T_ACC_TRN;
+	
+	COMMIT;
+END;
 
 
 
@@ -1136,101 +1163,101 @@
 -- PART III - 8.4.2 SQL2
 -- ************************************************
 
-	-- ½ÃÄö½º¸¦ ÀÌ¿ëÇÑ °èÁÂÀÌÃ¼ Ã³¸® ? CURRVAL ÀÌ¿ë
-	DECLARE
-	  v_NEW_ACC_TRN_SEQ NUMBER(18);
-	BEGIN
-	  
-	  INSERT INTO T_ACC_TRN
-			(ACC_TRN_SEQ ,FR_ACC_NO ,TO_ACC_NO ,TRN_AMT ,TRN_HND_ST ,TRN_ERR_CD ,TRN_REQ_DT ,TRN_CMP_DT)
-	  VALUES(SQ_T_ACC_TRN.NEXTVAL ,'ACC1' ,'ACC3' ,500 ,'REQ' ,NULL ,SYSDATE ,NULL);
+-- ì‹œí€€ìŠ¤ë¥¼ ì´ìš©í•œ ê³„ì¢Œì´ì²´ ì²˜ë¦¬ - CURRVAL ì´ìš©
+DECLARE
+	v_NEW_ACC_TRN_SEQ NUMBER(18);
+BEGIN
+	
+	INSERT INTO T_ACC_TRN
+		(ACC_TRN_SEQ ,FR_ACC_NO ,TO_ACC_NO ,TRN_AMT ,TRN_HND_ST ,TRN_ERR_CD ,TRN_REQ_DT ,TRN_CMP_DT)
+	VALUES(SQ_T_ACC_TRN.NEXTVAL ,'ACC1' ,'ACC3' ,500 ,'REQ' ,NULL ,SYSDATE ,NULL);
 
-	  v_NEW_ACC_TRN_SEQ := SQ_T_ACC_TRN.CURRVAL();
-	  
-	  DBMS_OUTPUT.PUT_LINE('NEW SEQ:'||TO_CHAR(v_NEW_ACC_TRN_SEQ));
-	  
-	  COMMIT;
-	END;
+	v_NEW_ACC_TRN_SEQ := SQ_T_ACC_TRN.CURRVAL();
+	
+	DBMS_OUTPUT.PUT_LINE('NEW SEQ:'||TO_CHAR(v_NEW_ACC_TRN_SEQ));
+	
+	COMMIT;
+END;
 
 
 -- ************************************************
 -- PART III - 8.4.3 SQL1
 -- ************************************************
 
-	-- T_CUS_LGN Å×ÀÌºí »ý¼º ¹× Å×½ºÆ® µ¥ÀÌÅÍ ÀÔ·Â
-	CREATE TABLE T_CUS_LGN
-	(   
-		CUS_ID VARCHAR2(40) NOT NULL,
-		LGN_DT DATE NOT NULL,
-		SUC_YN VARCHAR2(40) NULL,
-		LGN_FAL_CD VARCHAR2(40) NULL
-	);
+-- T_CUS_LGN í…Œì´ë¸” ìƒì„± ë° í…ŒìŠ¤íŠ¸ ë°ì´í„° ìž…ë ¥
+CREATE TABLE T_CUS_LGN
+(   
+	CUS_ID VARCHAR2(40) NOT NULL,
+	LGN_DT DATE NOT NULL,
+	SUC_YN VARCHAR2(40) NULL,
+	LGN_FAL_CD VARCHAR2(40) NULL
+);
 
-	CREATE UNIQUE INDEX PK_T_CUS_LGN ON T_CUS_LGN(CUS_ID, LGN_DT);
+CREATE UNIQUE INDEX PK_T_CUS_LGN ON T_CUS_LGN(CUS_ID, LGN_DT);
 
-	ALTER TABLE T_CUS_LGN 
-		ADD CONSTRAINT PK_T_CUS_LGN PRIMARY KEY(CUS_ID, LGN_DT) USING INDEX;
+ALTER TABLE T_CUS_LGN 
+	ADD CONSTRAINT PK_T_CUS_LGN PRIMARY KEY(CUS_ID, LGN_DT) USING INDEX;
+
+
+INSERT INTO T_CUS_LGN (CUS_ID ,LGN_DT ,SUC_YN ,LGN_FAL_CD)
+SELECT  T1.CUS_ID ,T2.LGN_DT
+		,CASE WHEN T1.CUS_ID = 'CUS_0001' AND RNO >= 4998 THEN 'N' ELSE 'Y' END SUC_YN
+		,CASE WHEN T1.CUS_ID = 'CUS_0001' AND RNO >= 4998 THEN 'PW.WRONG' ELSE NULL END LGN_FAL_CD
+FROM    M_CUS T1
+		,(    SELECT TO_DATE('20170301','YYYYMMDD') + (ROWNUM / 24 / 60 / 30) LGN_DT
+					,ROWNUM  RNO
+				FROM  DUAL A CONNECT BY ROWNUM <= 5000
+		) T2;
+
 	
-	
-	INSERT INTO T_CUS_LGN (CUS_ID ,LGN_DT ,SUC_YN ,LGN_FAL_CD)
-	SELECT  T1.CUS_ID ,T2.LGN_DT
-			,CASE WHEN T1.CUS_ID = 'CUS_0001' AND RNO >= 4998 THEN 'N' ELSE 'Y' END SUC_YN
-			,CASE WHEN T1.CUS_ID = 'CUS_0001' AND RNO >= 4998 THEN 'PW.WRONG' ELSE NULL END LGN_FAL_CD
-	FROM    M_CUS T1
-			,(    SELECT TO_DATE('20170301','YYYYMMDD') + (ROWNUM / 24 / 60 / 30) LGN_DT
-						,ROWNUM  RNO
-				  FROM  DUAL A CONNECT BY ROWNUM <= 5000
-			) T2;
-
-		
 
 -- ************************************************
 -- PART III - 8.4.3 SQL2
 -- ************************************************
 
-	-- ·Î±×ÀÎ ¿¬¼Ó ½ÇÆÐ Ä«¿îÆ® ? ÁÁÁö ¸øÇÑ ¹æ¹ý
-	SELECT  COUNT(*)
-	FROM    T_CUS_LGN T1
-	WHERE   T1.LGN_DT > (
-					SELECT  MAX(T1.LGN_DT) LAST_SUC_DT
-					FROM    T_CUS_LGN T1
-					WHERE   T1.CUS_ID = 'CUS_0001'
-					AND     T1.SUC_YN = 'Y')
-	AND     T1.CUS_ID = 'CUS_0001'
-	AND     T1.SUC_YN = 'N';
+-- ë¡œê·¸ì¸ ì—°ì† ì‹¤íŒ¨ ì¹´ìš´íŠ¸ - ì¢‹ì§€ ëª»í•œ ë°©ë²•
+SELECT  COUNT(*)
+FROM    T_CUS_LGN T1
+WHERE   T1.LGN_DT > (
+				SELECT  MAX(T1.LGN_DT) LAST_SUC_DT
+				FROM    T_CUS_LGN T1
+				WHERE   T1.CUS_ID = 'CUS_0001'
+				AND     T1.SUC_YN = 'Y')
+AND     T1.CUS_ID = 'CUS_0001'
+AND     T1.SUC_YN = 'N';
 
 -- ************************************************
 -- PART III - 8.4.3 SQL3
 -- ************************************************
-			
-	-- ·Î±×ÀÎ ¿¬¼Ó ½ÇÆÐ Ä«¿îÆ® ? ROWNUM°ú ÀÎµ¦½º¸¦ È°¿ëÇÑ È¿À²ÀûÀÎ ¹æ¹ý
-	SELECT  COUNT(*)
-	FROM    (
-			SELECT  *
-			FROM    (
-					SELECT  *
-					FROM    T_CUS_LGN T1
-					WHERE   T1.CUS_ID = 'CUS_0001'
-					ORDER BY T1.LGN_DT DESC
-					) T2
-			WHERE   ROWNUM <= 3
-			) T3
-	WHERE   T3.SUC_YN = 'N';
+		
+-- ë¡œê·¸ì¸ ì—°ì† ì‹¤íŒ¨ ì¹´ìš´íŠ¸ - ROWNUMê³¼ ì¸ë±ìŠ¤ë¥¼ í™œìš©í•œ íš¨ìœ¨ì ì¸ ë°©ë²•
+SELECT  COUNT(*)
+FROM    (
+		SELECT  *
+		FROM    (
+				SELECT  *
+				FROM    T_CUS_LGN T1
+				WHERE   T1.CUS_ID = 'CUS_0001'
+				ORDER BY T1.LGN_DT DESC
+				) T2
+		WHERE   ROWNUM <= 3
+		) T3
+WHERE   T3.SUC_YN = 'N';
 
 
 -- ************************************************
 -- PART III - 8.4.3 SQL4
 -- ************************************************
-	-- ·Î±×ÀÎ ¿¬¼Ó ½ÇÆÐ Ä«¿îÆ® ? ROWNUM°ú ÀÎµ¦½º¸¦ Àß ¸ø »ç¿ëÇÑ °æ¿ì
-	SELECT  *
-	FROM    (
-			SELECT  *
-			FROM    T_CUS_LGN T1
-			WHERE   T1.CUS_ID = 'CUS_0001'
-			ORDER BY T1.LGN_DT DESC
-			) T2
-	WHERE   ROWNUM <= 3
-	AND     T2.SUC_YN = 'N'
+-- ë¡œê·¸ì¸ ì—°ì† ì‹¤íŒ¨ ì¹´ìš´íŠ¸ - ROWNUMê³¼ ì¸ë±ìŠ¤ë¥¼ ìž˜ ëª» ì‚¬ìš©í•œ ê²½ìš°
+SELECT  *
+FROM    (
+		SELECT  *
+		FROM    T_CUS_LGN T1
+		WHERE   T1.CUS_ID = 'CUS_0001'
+		ORDER BY T1.LGN_DT DESC
+		) T2
+WHERE   ROWNUM <= 3
+AND     T2.SUC_YN = 'N'
 
 
 
