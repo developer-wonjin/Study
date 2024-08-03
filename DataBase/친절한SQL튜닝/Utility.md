@@ -3,7 +3,7 @@
 /*+ gather_plan_statistics */
 select * from table(dbms_xplan.display_cursor(null, null, 'allstats last'));
 
--- 인덱스 힌트 적용방법
+-- ★★★인덱스 힌트 적용방법★★★
 /*+ index(테이블명 인덱스명)  */
 /*+ index(별칭     인덱스명)  */
 /*+ index(별칭     (c1,c2))   */

@@ -7,7 +7,8 @@
 -- ************************************************
 -- PART I - 1.1.2 SQL1, SYS USER 사용 - 사용자 생성
 -- ************************************************
-	CREATE USER ORA_SQL_TEST IDENTIFIED BY "1qaz2wsx" DEFAULT TABLESPACE ORA_SQL_TEST_TS;
+	ALTER SESSION SET "_ORACLE_SCRIPT"=true;
+	CREATE USER ORA_SQL_TEST IDENTIFIED BY "1234" DEFAULT TABLESPACE ORA_SQL_TEST_TS;
 
 
 
@@ -42,5 +43,5 @@
 -- ************************************************
 -- PART I - 1.1.2 SQL5, SYS USER 사용 - TEMP 크기 변경
 -- ************************************************
-	ALTER DATABASE TEMPFILE 'E:\ORACLEXE\APP\ORACLE\ORADATA\XE\TEMP.DBF' RESIZE 5000M;
+	ALTER DATABASE TEMPFILE 'C:\app\ora19c\oradata\ORCL\TEMP01.DBF' RESIZE 5000M;
 
