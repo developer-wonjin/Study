@@ -1,0 +1,35 @@
+alter table dept drop primary key;
+
+create index dept_deptno_idx on dept(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+# Sort Unique 오퍼레이션
+select * from emp
+where  deptno in (select deptno from dept);
+
+
+select b.*
+from  (select /*+ no_merge */ distinct deptno from dept order by deptno) a, emp b
+where  b.deptno = a.deptno ;
+
+
+-- 오라클 9i
+select /*+ ordered use_nl(emp) */ * from emp
+where  deptno in (select /*+ unnest */ deptno from dept);
+
+-- 오라클 10g 이후
+select /*+ leading(dept@qb1) use_nl(emp) */ * from emp 
+where deptno in (select /*+ unnest  qb_name(qb1) */ deptno from dept);
+
+
+# 세미 조인 
+select /*+ leading(emp) */ * from emp
+where  deptno in (select /*+ unnest nl_sj */ deptno from dept);
+
+select /*+ leading(emp) */ * from emp
+where  deptno in (select /*+ unnest hash_sj */ deptno from dept);
+
+select /*+ leading(emp) */ * from emp
+where  deptno in (select /*+ unnest merge_sj */ deptno from dept);
+

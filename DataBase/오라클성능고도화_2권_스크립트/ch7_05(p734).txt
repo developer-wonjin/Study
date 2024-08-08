@@ -1,0 +1,162 @@
+create or replace function getDname(p_deptno number)
+return varchar2
+parallel_enable
+is
+  l_dname dept.dname%type;
+begin
+  select dname into l_dname from dept where deptno = p_deptno;
+  return l_dname;
+end;
+/
+
+select /*+ parallel(emp 2) */ empno, ename, job, sal, getDname(deptno)
+from   emp;
+
+create or replace package call_counter
+as
+procedure initCount;
+procedure increaseCount;
+function  getCount return integer;
+end call_counter;
+/
+
+create or replace package body call_counter
+as
+  call_count number;
+procedure initCount is
+begin
+  call_count := 0;
+end initCount;
+
+procedure increaseCount is
+begin
+  call_count := call_count + 1;
+end increaseCount;
+
+function getCount return integer is
+begin
+  return call_count;
+end getCount;
+
+begin
+  call_count := 0;
+end call_counter;
+/
+
+create table big_table
+nologging
+as
+select rownum id, a.*
+from   all_objects a
+where  1 = 0
+/
+
+declare
+  l_cnt    number;
+  l_rows   number  := 1000000;
+begin
+  insert /*+ append */
+  into big_table 
+  select rownum, a.*
+  from   all_objects a;
+  
+  l_cnt := sql%rowcount;
+
+  commit;
+
+  while(l_cnt < l_rows)
+  loop
+    insert /*+ append */ into big_table
+    select rownum + l_cnt
+         , owner, object_name, subobject_name
+         , object_id, data_object_id
+         , object_type, created, last_ddl_time
+         , timestamp, status, temporary
+         , generated, secondary
+    from   big_table
+    where  rownum <= l_rows - l_cnt;
+    l_cnt := l_cnt + sql%rowcount;
+    
+    commit;
+  end loop;
+end;
+/
+
+
+create or replace function FuncCallCount return integer
+as
+  l_count integer;
+begin
+  call_counter.increaseCount;
+  return call_counter.getCount;
+end;
+/
+
+explain plan for
+create table t
+parallel 4
+as
+select /*+ parallel(t 4) */ t.*, FuncCallCount callcount
+from   big_table t ;
+
+
+select * from table(dbms_xplan.display(null, null,'basic parallel'));
+
+
+exec call_counter.initCount;
+
+create table t
+parallel 4
+as
+select /*+ parallel(t 4) */ t.*, FuncCallCount callcount
+from   big_table t ;
+
+select FuncCallCount from dual;
+
+select count(*) from (
+  select callcount, count(*) from t
+  group by callcount
+  having count(*) > 1
+) ;
+
+
+create or replace function FuncCallCount return integer
+parallel_enable
+as
+  l_count integer;
+begin
+  call_counter.increaseCount;
+  return call_counter.getCount;
+end;
+/
+
+
+explain plan for
+create table t
+parallel 4
+as
+select /*+ parallel(t 4) */ t.*, FuncCallCount callcount
+from   big_table t ;
+
+select * from table(dbms_xplan.display(null, null,'basic parallel'));
+
+
+drop table t purge;
+
+exec call_counter.initCount;
+
+create table t
+parallel 4
+as
+select /*+ parallel(t 4) */ t.*, FuncCallCount callcount
+from   big_table t ;
+
+select FuncCallCount from dual;
+
+select count(*) from (
+  select callcount, count(*) from t
+  group by callcount
+  having count(*) > 1
+);
+
+

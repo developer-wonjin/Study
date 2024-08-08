@@ -1,0 +1,20 @@
+alter session set session_cached_cursors = 10;
+
+alter system flush shared_pool;
+
+select * from emp where empno = 7788;
+
+select parse_calls, users_opening, users_executing from v$sql
+where  sql_text = 'select * from emp where empno = 7788';
+
+select * from emp where empno = 7788;
+
+select parse_calls, users_opening, users_executing from v$sql
+where  sql_text = 'select * from emp where empno = 7788';
+
+select * from emp where empno = 7788;
+
+select parse_calls, users_opening, users_executing from v$sql
+where  sql_text = 'select * from emp where empno = 7788';
+
+

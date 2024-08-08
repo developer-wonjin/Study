@@ -1,0 +1,95 @@
+create table ∞Ì∞¥
+as
+select 
+    rownum ∞Ì∞¥ID
+  , dbms_random.string('U', 10) ∞Ì∞¥∏Ì
+  , mod(rownum, 10) + 1 ∞Ì∞¥µÓ±ﬁ
+  , to_char(to_date('20090101','yyyymmdd') + (rownum-1), 'yyyymmdd') ∞°¿‘¿œ
+from   dual
+connect by level <= 1000;
+
+exec dbms_stats.gather_table_stats(user, '∞Ì∞¥');
+
+
+set autotrace traceonly exp;
+
+select /*+ full(∞Ì∞¥) parallel(∞Ì∞¥ 2) */
+       ∞Ì∞¥ID, ∞Ì∞¥∏Ì, ∞Ì∞¥µÓ±ﬁ
+from   ∞Ì∞¥
+order by ∞Ì∞¥∏Ì ;
+
+set autotrace off;
+
+select /*+ full(∞Ì∞¥) parallel(∞Ì∞¥ 2) */
+       ∞Ì∞¥ID, ∞Ì∞¥∏Ì, ∞Ì∞¥µÓ±ﬁ
+from   ∞Ì∞¥
+order by ∞Ì∞¥∏Ì ;
+
+break on dfo_no on tq_id on server_type;
+
+select tq_id, server_type, process, num_rows, bytes, waits
+from   v$pq_tqstat
+order by
+    dfo_number
+  , tq_id
+  , decode(substr(server_type, 1, 4),'Rang', 1, 'Prod', 2, 'Cons', 3)
+  , process;
+
+
+set autotrace traceonly exp;
+
+select /*+ full(∞Ì∞¥) parallel(∞Ì∞¥ 2) */
+       ∞Ì∞¥∏Ì, count(*)
+from   ∞Ì∞¥
+group by ∞Ì∞¥∏Ì ;
+
+
+set autotrace off;
+
+select /*+ full(∞Ì∞¥) parallel(∞Ì∞¥ 2) */
+       ∞Ì∞¥∏Ì, count(*)
+from   ∞Ì∞¥
+group by ∞Ì∞¥∏Ì ;
+
+select tq_id, server_type, process, num_rows, bytes, waits
+from   v$pq_tqstat
+order by
+    dfo_number
+  , tq_id
+  , decode(substr(server_type, 1, 4),'Rang', 1, 'Prod', 2, 'Cons', 3)
+  , process;
+
+set autotrace traceonly exp;
+
+select /*+ full(∞Ì∞¥) parallel(∞Ì∞¥ 2) */
+       ∞Ì∞¥µÓ±ﬁ, count(*)
+from   ∞Ì∞¥
+group by ∞Ì∞¥µÓ±ﬁ ;
+
+
+set autotrace off
+
+select column_name
+     , num_distinct
+     , num_nulls
+     , 1/num_distinct selectivity
+     , round(1/num_distinct * t.num_rows, 2) cardinality
+from   user_tables t, user_tab_columns c
+where  t.table_name = '∞Ì∞¥'
+and    c.table_name = t.table_name
+order by column_id ;
+
+
+select /*+ full(∞Ì∞¥) parallel(∞Ì∞¥ 2) */
+       ∞Ì∞¥µÓ±ﬁ, count(*)
+from   ∞Ì∞¥
+group by ∞Ì∞¥µÓ±ﬁ ;
+
+
+select tq_id, server_type, process, num_rows, bytes, waits
+from   v$pq_tqstat
+order by
+    dfo_number
+  , tq_id
+  , decode(substr(server_type, 1, 4),'Rang', 1, 'Prod', 2, 'Cons', 3)
+  , process;

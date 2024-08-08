@@ -1,0 +1,18 @@
+create table t
+as
+select rownum a, rownum b from dual
+connect by level <= 10000;
+
+create index t_x01 on t(a);
+
+create index t_x02 on t(b);
+
+exec dbms_stats.gather_table_stats(user, 't');
+
+set autotrace traceonly exp;
+
+select * from t where a = 1 and b = 1;
+
+alter index t_x01 rename to t_x03;
+
+select * from t where a = 1 and b = 1;

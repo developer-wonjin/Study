@@ -1,0 +1,65 @@
+create or replace function ACCUM (p_input number) return number
+as
+  rValue number := 0 ;
+  call_cnt number := 0;
+begin
+  dbms_application_info.read_client_info(call_cnt);
+  if call_cnt is null then
+    call_cnt := 0;
+  end if;
+
+  dbms_application_info.set_client_info(call_cnt + 1);
+
+  for i in 1..p_input loop
+    rValue := rValue + i ;
+  end loop;
+  return rValue ;
+end;
+/
+
+set timing on
+
+select sum(accum_num)
+from (
+  select accum(mod(rownum, 50)) accum_num
+  from dual
+  connect by level <= 1000000
+) ;
+
+select sys_context('userenv', 'client_info') from dual;
+
+
+create or replace function ACCUM (p_input number) return number
+DETERMINISTIC
+as
+  rValue number := 0 ;
+  call_cnt number := 0;
+begin
+  dbms_application_info.read_client_info(call_cnt);
+  if call_cnt is null then
+    call_cnt := 0;
+  end if;
+
+  dbms_application_info.set_client_info(call_cnt + 1);
+
+  for i in 1..p_input loop
+    rValue := rValue + i ;
+  end loop;
+  return rValue ;
+end;
+/
+
+
+exec dbms_application_info.set_client_info( NULL );
+
+select sum(accum_num)
+from (
+  select accum(mod(rownum, 50)) accum_num
+  from dual
+  connect by level <= 1000000
+) ;
+
+select client_info
+from   v$session
+where  sid = sys_context('userenv', 'sid');
+

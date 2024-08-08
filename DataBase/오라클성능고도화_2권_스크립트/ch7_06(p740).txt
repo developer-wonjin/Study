@@ -1,0 +1,21 @@
+create table t
+as
+select rownum no, lpad(rownum, 10, '0') no2 from dual
+connect by level <= 100000;
+
+set autotrace traceonly exp;
+
+select /*+ parallel(t) */ no, no2, rownum
+from   t
+order by no2;
+
+set autotrace off;
+
+commit;
+
+alter session enable parallel dml;
+
+explain plan for
+update /*+ parallel(t 4) */ t set no2 = lpad(rownum, 5, '0');
+
+@?/rdbms/admin/utlxplp

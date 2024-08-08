@@ -1,0 +1,43 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add
+constraint deptno_pk primary key(deptno);
+
+select e.empno, e.ename, e.deptno, e.sal, e.hiredate
+from   dept d, emp e
+where  d.deptno = e.deptno;
+
+alter table emp add
+constraint fk_deptno foreign key(deptno)
+references dept(deptno);
+
+
+select e.empno, e.ename, e.deptno, e.sal, e.hiredate
+from   dept d, emp e
+where  d.deptno = e.deptno;
+
+alter session set "_optimizer_join_elimination_enabled" = true ;
+
+-- 힌트를 이용한 제어 
+select /*+ eliminate_join(d) */ e.empno, e.ename, e.deptno, e.sal, e.hiredate
+from   dept d, emp e
+where  d.deptno = e.deptno;
+
+select /*+ no_eliminate_join(d) */ e.empno, e.ename, e.deptno, e.sal, e.hiredate
+from   dept d, emp e
+where  d.deptno = e.deptno;
+
+-- 10g에서 outer 조인에 대해서는 작동 안 하지만 11g에서는 잘 작동함
+select e.empno, e.ename, e.sal, e.hiredate
+from emp e, dept d
+where d.deptno(+) = e.deptno;
+
+
+select * from emp e
+where  deptno in (select /*+ eliminate_join(dept) */ deptno from dept);
+
+select * from emp e
+where  exists (select /*+ eliminate_join(dept) */ 'x' from dept where deptno = e.deptno);
+

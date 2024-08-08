@@ -1,0 +1,77 @@
+create table big_t
+as
+select 1 no from dual connect by level <= 1000;
+
+insert into big_t
+select 2 no from dual connect by level <= 1000;
+
+commit;
+
+create index big_t_no_idx on big_t(no);
+
+drop table LookupTable purge;
+
+create table LookupTable ( key number, value varchar2(100) ) ;
+
+insert into LookupTable (key, value) values ( 1, 'YAMAHA');
+
+insert into LookupTable (key, value) values ( 2, 'YAMAHA');
+
+commit;
+
+create or replace function lookup(l_input number) return varchar2
+DETERMINISTIC
+as
+  l_output LookupTable.value%TYPE;
+begin
+  select value into l_output from LookupTable where key = l_input;
+  return l_output;
+end;
+/
+
+-- 스칼라 서브쿼리로 덧입히더라도 읽기 일관성을 완전히 보장하지 않는다. 
+select /*+ index(t big_t_no_idx) */ (select lookup(t.no) from dual) 
+from    big_t t
+where   t.no > 0 ;
+
+
+update LookupTable set value = 'YAMAHA2';
+
+commit;
+
+
+-- 아래처럼 조인문을 써야만 해결됨
+select l.value
+from   big_t t, LookupTable l
+where  l.key(+) = t.no ;
+
+select (select value from LookupTable where key = t.no) 
+from   big_table t ;
+
+
+
+############################################################################
+
+delete from LookupTable;
+
+insert into LookupTable values( 1, 'YAMAHA' ); 
+
+commit;
+
+create table t
+as
+select 1 no from dual;
+
+select no, lookup(no) value from t;
+
+create index t_idx on t( lookup(no) );   --> FBI 인덱스 생성
+
+select no, lookup(no) value, lookup(1) value2 from t
+where  lookup(no) = 'YAMAHA';
+
+update LookupTable set value = 'YAMAHA2' where key = 1;
+
+commit;
+
+select no, lookup(no) value, lookup(1) value2 from t
+where  lookup(no) = 'YAMAHA';

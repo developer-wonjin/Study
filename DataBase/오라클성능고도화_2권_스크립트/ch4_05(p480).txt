@@ -1,0 +1,16 @@
+select * from dept d
+where  not exists 
+  (select /*+ no_unnest */'x' from emp where deptno = d.deptno);
+  
+select * from dept d
+where  not exists 
+  (select /*+ unnest nl_aj */'x' from emp where deptno = d.deptno);
+
+select * from dept d
+where  not exists 
+  (select /*+ unnest merge_aj */ 'x' from emp where deptno = d.deptno);
+
+select * from dept d
+where  not exists 
+  (select /*+ unnest hash_aj */ 'x' from emp where deptno = d.deptno);
+  

@@ -1,0 +1,29 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_idx on emp(deptno, job);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+select * from dept d, emp e
+where e.job = 'MANAGER'
+and   e.deptno = 10 
+and   d.deptno = e.deptno;
+
+
+select * from dept d, emp e
+where e.job = 'MANAGER'
+and   e.deptno = 10 
+and   d.deptno = 10;
+
+select * from dept d, emp e
+where e.job = 'MANAGER'
+and   e.deptno = 10 
+and   d.deptno = e.deptno + 0;
+
+

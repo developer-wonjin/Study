@@ -1,0 +1,65 @@
+create table ∞Ì∞¥
+partition by range(∞°¿‘¿œ)
+( partition m01 values less than('20090201')
+, partition m02 values less than('20090301')
+, partition m03 values less than('20090401')
+, partition m04 values less than('20090501')
+, partition m05 values less than('20090601')
+, partition m06 values less than('20090701')
+, partition m07 values less than('20090801')
+, partition m08 values less than('20090901')
+, partition m09 values less than('20091001')
+, partition m10 values less than('20091101')
+, partition m11 values less than('20091201')
+, partition m12 values less than('20100101'))
+as
+select rownum ∞Ì∞¥ID
+     , dbms_random.string('a', 20) ∞Ì∞¥∏Ì
+     , to_char(to_date('20090101', 'yyyymmdd') + (rownum - 1), 'yyyymmdd') ∞°¿‘¿œ
+from   dual
+connect by level <= 365;
+
+
+set autotrace traceonly exp;
+
+select * from ∞Ì∞¥
+where  ∞°¿‘¿œ like '200910%';
+
+select * from ∞Ì∞¥
+where  ∞°¿‘¿œ between '20091001' and '20091031';
+
+
+
+
+create table ∞Ì∞¥
+partition by range(∞°¿‘¿œ)
+( partition m01 values less than('200902')
+, partition m02 values less than('200903')
+, partition m03 values less than('200904')
+, partition m04 values less than('200905')
+, partition m05 values less than('200906')
+, partition m06 values less than('200907')
+, partition m07 values less than('200908')
+, partition m08 values less than('200909')
+, partition m09 values less than('200910')
+, partition m10 values less than('200911')
+, partition m11 values less than('200912')
+, partition m12 values less than('201001'))
+as
+select rownum ∞Ì∞¥ID
+     , dbms_random.string('a', 20) ∞Ì∞¥∏Ì
+     , to_char(to_date('20090101', 'yyyymmdd') + (rownum - 1), 'yyyymmdd') ∞°¿‘¿œ
+from   dual
+connect by level <= 365;
+
+
+set autotrace traceonly exp;
+
+select * from ∞Ì∞¥
+where  ∞°¿‘¿œ like '200910%';
+
+select * from ∞Ì∞¥
+where  ∞°¿‘¿œ between '20091001' and '20091031';
+
+
+

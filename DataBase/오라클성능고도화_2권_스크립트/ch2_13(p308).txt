@@ -1,0 +1,33 @@
+break on 부서번호
+column 부서번호 format 9999
+column 사원번호 format a10
+select deptno 부서번호
+     , decode(no, 1, to_char(empno), 2, '부서계') 사원번호
+     , sum(sal) 급여합, round(avg(sal)) 급여평균
+from   emp a, (select rownum no from dual connect by level <= 2)
+group by deptno, no, decode(no, 1, to_char(empno), 2, '부서계')
+order by 1, 2;
+
+
+column 부서번호 format a10
+select decode(no, 3, null, to_char(deptno)) 부서번호
+     , decode(no, 1, to_char(empno), 2, '부서계', 3, '총계') 사원번호
+     , sum(sal) 급여합, round(avg(sal)) 급여평균
+from   emp a, (select rownum no from dual connect by level <= 3)
+group by decode(no, 3, null, to_char(deptno))
+      , no, decode(no, 1, to_char(empno), 2, '부서계', 3, '총계')
+order by 1, 2;
+
+
+
+break on 부서번호
+column 부서번호 format 9999
+column 사원번호 format a10
+select deptno 부서번호
+     , case when grouping(empno) = 1 and grouping(deptno) = 1 then '총계'
+            when grouping(empno) = 1 then '부서계'
+            else to_char(empno) end  사원번호
+     , sum(sal) 급여합, round(avg(sal)) 급여평균
+from   emp
+group by rollup(deptno, empno)
+order by 1, 2;

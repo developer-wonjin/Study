@@ -1,0 +1,25 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_deptno_idx on emp (deptno);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+select * from emp
+where  deptno in (select /*+ no_unnest */ deptno from dept);
+
+select * 
+from  (select deptno from dept) a, emp b
+where  b.deptno = a.deptno;
+
+select emp.* from dept, emp
+where  emp.deptno = dept.deptno;
+
+
+select * from emp
+where  deptno in (select /*+ unnest */ deptno from dept);

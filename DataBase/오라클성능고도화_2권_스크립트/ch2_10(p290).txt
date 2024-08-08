@@ -1,0 +1,71 @@
+-- 수정 가능 조인 뷰 
+create table emp  as select * from scott.emp;
+create table dept as select * from scott.dept;
+
+create or replace view EMP_DEPT_VIEW as
+select e.rowid emp_rid, e.*, d.rowid dept_rid, d.dname, d.loc
+from emp e, dept d 
+where  e.deptno = d.deptno;
+
+update EMP_DEPT_VIEW set loc = 'SEOUL' where job = 'CLERK';
+
+select empno, ename, job, sal, deptno, dname, loc 
+from   EMP_DEPT_VIEW
+order by job, deptno;
+
+update EMP_DEPT_VIEW set comm = nvl(comm, 0) + (sal * 0.1) where sal <= 1500;
+
+delete from EMP_DEPT_VIEW where job = 'CLERK';
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+update EMP_DEPT_VIEW set comm = nvl(comm, 0) + (sal * 0.1) where sal <= 1500;
+
+commit;
+
+-- 키 보존 테이블이란? 
+select ROWID, emp_rid, dept_rid, empno, deptno from EMP_DEPT_VIEW;
+
+alter table dept drop primary key;
+
+select rowid, emp_rid, dept_rid, empno, deptno from EMP_DEPT_VIEW; 
+
+
+-- *_UPDATABLE_COLUMNS 뷰 참조 
+alter table dept add constraint dept_pk primary key(deptno);
+
+insert into EMP_DEPT_VIEW
+      (empno, ename, job, mgr, hiredate, sal, comm, deptno, loc)
+select empno, ename, job, mgr, hiredate, sal, comm, deptno, loc 
+from EMP_DEPT_VIEW;
+
+select column_name, insertable, updatable, deletable
+from   user_updatable_columns
+where  table_name = 'EMP_DEPT_VIEW';
+
+insert into EMP_DEPT_VIEW
+      (empno, ename, job, mgr, hiredate, sal, comm, deptno)
+select empno, ename, job, mgr, hiredate, sal, comm, deptno 
+from EMP_DEPT_VIEW;
+
+commit;
+
+alter table dept add avg_sal number(7,2);
+
+update
+(select d.deptno, d.avg_sal d_avg_sal, e.avg_sal e_avg_sal
+ from  (select deptno, round(avg(sal), 2) avg_sal from emp group by deptno) e
+      , dept d
+ where  d.deptno = e.deptno )
+set d_avg_sal = e_avg_sal ;
+
+
+update /*+ bypass_ujvc */
+(select d.deptno, d.avg_sal d_avg_sal, e.avg_sal e_avg_sal
+ from  (select deptno, round(avg(sal), 2) avg_sal from emp group by deptno) e
+      , dept d
+  where  d.deptno = e.deptno )
+set d_avg_sal = e_avg_sal ;
+
+select * from dept;
+

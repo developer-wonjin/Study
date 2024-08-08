@@ -1,0 +1,40 @@
+create table t
+as
+select * from all_objects
+order by object_type ;
+
+create index t_idx on t(object_type);
+
+exec dbms_stats.gather_table_stats(user, 't');  -- 통계정보 수집 
+
+select i.index_name
+     , i.clustering_factor cl_factor
+     , t.blocks   tab_blks
+     , t.num_rows tab_rows
+from   dba_indexes i, dba_tables t
+where  t.owner = USER
+and    t.table_name = 'EMP'
+and    i.table_owner = t.owner
+and    i.table_name  = t.table_name;
+
+select /*+ index(t t_idx) */ count(object_name), count(owner) from t
+where  object_type > ' ';
+
+drop index t_idx;
+
+create index t_idx on t(object_type, object_name);
+
+exec dbms_stats.gather_index_stats(user, 't_idx');
+
+select i.index_name
+     , i.clustering_factor cl_factor
+     , t.blocks   tab_blks
+     , t.num_rows tab_rows
+from   dba_indexes i, dba_tables t
+where  t.owner = USER
+and    t.table_name = 'EMP'
+and    i.table_owner = t.owner
+and    i.table_name  = t.table_name;
+
+select /*+ index(t t_idx) */ count(object_name), count(owner) from t
+where  object_type > ' ';

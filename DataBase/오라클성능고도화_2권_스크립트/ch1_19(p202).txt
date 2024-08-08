@@ -1,0 +1,20 @@
+show parameter block_size;
+
+create table t1 ( c )
+pctfree 0
+as
+select 'a' from dual connect by level <= 100000;
+
+select min(count(*)), max(count(*)), avg(count(*))
+from   t1
+group by dbms_rowid.rowid_block_number(rowid);
+
+create table t2 ( c )
+pctfree 0
+as
+select lpad('a', 5) from dual connect by level <= 100000;
+
+select min(count(*)), max(count(*)), avg(count(*))
+from   t2
+group by dbms_rowid.rowid_block_number(rowid);
+

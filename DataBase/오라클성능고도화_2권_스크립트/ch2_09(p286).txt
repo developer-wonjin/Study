@@ -1,0 +1,50 @@
+select d.deptno, d.dname, avg_sal, min_sal, max_sal
+from   dept d
+     ,(select deptno, avg(sal) avg_sal, min(sal) min_sal, max(sal) max_sal
+       from emp group by deptno) e
+where  e.deptno(+) = d.deptno
+and    d.loc = 'CHICAGO';
+
+select d.deptno, d.dname
+     ,(select avg(sal), min(sal), max(sal) from emp where deptno = d.deptno)
+from   dept d 
+where  d.loc = 'CHICAGO';
+
+select d.deptno, d.dname
+     ,(select avg(sal) from emp where deptno = d.deptno) avg_sal
+     ,(select min(sal) from emp where deptno = d.deptno) min_sal
+     ,(select max(sal) from emp where deptno = d.deptno) max_sal
+from   dept d 
+where  d.loc = 'CHICAGO';
+
+select deptno, dname
+     , to_number(substr(sal, 1, 7)) avg_sal
+     , to_number(substr(sal, 8, 7)) min_sal
+     , to_number(substr(sal, 15))   max_sal
+from (
+  select d.deptno, d.dname
+       ,(select lpad(avg(sal), 7) || lpad(min(sal), 7) || max(sal)
+         from emp where deptno = d.deptno) sal
+  from   dept d
+  where  d.loc = 'CHICAGO'
+);
+
+
+
+create or replace type sal_type as object 
+( avg_sal number, min_sal number, max_sal number ) 
+/
+
+select deptno, dname
+     , a.sal.avg_sal, a.sal.min_sal, a.sal.max_sal
+from (
+  select d.deptno, d.dname
+       ,(select sal_type( avg(sal), min(sal), max(sal) )
+         from emp where deptno = d.deptno) sal
+  from   dept d
+  where  d.loc = 'CHICAGO'
+) a
+/
+
+
+

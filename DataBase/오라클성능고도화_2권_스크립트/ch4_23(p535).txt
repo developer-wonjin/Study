@@ -1,0 +1,31 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+create index emp_job_idx on emp(job);
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+select * from emp e, dept d                                            
+where (e.deptno = d.deptno and e.job = 'CLERK' and d.loc = 'DALLAS')     
+       or                                                            
+      (e.deptno = d.deptno and e.job = 'CLERK' and e.sal >= 1000) ;
+
+alter session set "_eliminate_common_subexpr" = false;
+
+select /*+ USE_CONCAT */ * from emp e, dept d
+where (e.deptno = d.deptno and e.job = 'CLERK' and d.loc = 'DALLAS')
+       or
+      (e.deptno = d.deptno and e.job = 'CLERK' and e.sal >= 1000) ;
+
+
+select /*+ NO_EXPAND */ * from emp e, dept d
+where (e.deptno = d.deptno and e.job = 'CLERK' and d.loc = 'DALLAS')
+       or
+      (e.deptno = d.deptno and e.job = 'CLERK' and e.sal >= 1000) ;
+
+
+

@@ -1,0 +1,55 @@
+-- Range 파티셔닝
+create table 주문( 주문번호 number, 주문일자 varchar2(8), 고객id varchar2(5) )
+partition by range(주문일자) (
+  partition p2009_q1 values less than('20090401')
+, partition p2009_q2 values less than('20090701')
+, partition p2009_q3 values less than('20091001')
+, partition p2009_q4 values less than('20100101')
+, partition p2010_q1 values less than('20100401')
+, partition p9999_mx values less than( MAXVALUE )
+);
+
+
+-- 해시 파티셔닝
+create table 고객( 고객id varchar2(5), 고객명 varchar2(10) )
+partition by hash(고객id) partitions 4 ;
+
+
+-- 리스트 파티셔닝
+create table 인터넷매물( 물건코드 varchar2(5), 지역분류 varchar2(4) )
+partition by list(지역분류) (
+  partition p_지역1 values ('서울')
+, partition p_지역2 values ('경기', '인천')
+, partition p_지역3 values ('부산', '대구', '대전', '광주')
+, partition p_기타  values (DEFAULT)  
+) ;
+
+
+-- Range + 해시 파티셔닝
+create table 주문( 주문번호 number, 주문일자 varchar2(8), 고객id varchar2(5) )
+partition by range(주문일자) 
+subpartition by hash(고객id) subpartitions 8
+( partition p2009_q1 values less than('20090401')
+, partition p2009_q2 values less than('20090701')
+, partition p2009_q3 values less than('20091001')
+, partition p2009_q4 values less than('20100101')
+, partition p2010_q1 values less than('20100401')
+, partition p9999_mx values less than( MAXVALUE )
+);
+
+
+-- Range + 리스트 파티셔닝
+create table 판매 ( 판매점 varchar2(10), 판매일자 varchar2(8) )
+partition by range(판매일자)                     
+subpartition by list(판매점)
+subpartition template  
+( subpartition lst_01 values ('강남지점', '강북지점', '강서지점', '강동지점') 
+, subpartition lst_02 values ('부산지점', '대전지점')
+, subpartition lst_03 values ('인천지점', '제주지점', '의정부지점')
+, subpartition lst_99 values ( DEFAULT ) )                    
+( partition p2009_q1 values less than('20090401')
+, partition p2009_q2 values less than('20090701')
+, partition p2009_q3 values less than('20091001')
+, partition p2009_q4 values less than('20100101') );
+
+

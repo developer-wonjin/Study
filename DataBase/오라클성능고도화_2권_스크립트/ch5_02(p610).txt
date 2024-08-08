@@ -1,0 +1,26 @@
+create table t as select * from all_objects;
+
+alter session set workarea_size_policy = manual;
+
+alter session set sort_area_size = 524288;
+
+set autotrace traceonly statistics
+
+select count(*) from t;
+
+select *
+from (
+  select * from t
+  order by object_name
+)
+where rownum <= 10 ;
+
+
+select *
+from (
+  select a.*, rownum no
+  from (
+    select * from t order by object_name
+  ) a
+)
+where no <= 10 ;

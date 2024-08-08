@@ -1,0 +1,32 @@
+select /*+ ordered use_merge(d) */ d.deptno, d.dname, e.avg_sal
+from  (select deptno, avg(sal) avg_sal from emp group by deptno) e
+     , dept d
+where  e.deptno = d.deptno;
+
+
+select /*+ ordered use_merge(d) */ d.deptno, d.dname, e.avg_sal
+from   (select deptno, avg(sal) avg_sal from emp group by deptno order by deptno) e
+      , dept d
+where  e.deptno = d.deptno;
+
+
+select /*+ ordered use_merge(e) */ d.deptno, d.dname, e.avg_sal
+from   dept d
+    , (select deptno, avg(sal) avg_sal from emp group by deptno order by deptno) e
+where  e.deptno = d.deptno;
+
+
+
+select /*+ ordered use_merge(e) */ d.deptno, d.dname, e.empno, e.ename
+from   dept d, emp e
+where  d.deptno <= e.deptno;
+
+
+select /*+ ordered use_merge(e) */ d.deptno, d.dname, e.empno, e.ename
+from   dept d, emp e
+where  d.deptno >= e.deptno
+order by d.deptno asc ;
+
+
+
+

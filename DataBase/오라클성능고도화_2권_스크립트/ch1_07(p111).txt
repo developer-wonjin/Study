@@ -1,0 +1,41 @@
+create table t1(
+    c1 number not null
+  , c2 number
+  , c3 number
+  , c4 number
+  , constraint  t1_pk primary key (c1) )
+organization index ;               -- IOT 积己
+
+create index t1_x1 on t1 (c2) ;    -- Secondary 牢郸胶 积己
+
+insert into t1
+select rownum, rownum, rownum, rownum
+from all_objects
+where  rownum <= 1000;
+
+commit;
+
+select index_name, PCT_DIRECT_ACCESS
+from user_indexes
+where index_name = 'T1_X1';
+
+exec dbms_stats.gather_index_stats(user, 't1_x1');
+
+select index_name, PCT_DIRECT_ACCESS
+from user_indexes
+where index_name = 'T1_X1';
+
+alter index t1_x1 UPDATE BLOCK REFERENCES;
+
+select index_name, PCT_DIRECT_ACCESS
+from user_indexes
+where index_name = 'T1_X1';
+
+exec dbms_stats.gather_index_stats(user, 't1_x1');
+
+select index_name, blevel, PCT_DIRECT_ACCESS
+from user_indexes
+where index_name = 'T1_X1';
+
+exec dbms_stats.set_index_stats (user, 't1_x1', guessq => 100);
+

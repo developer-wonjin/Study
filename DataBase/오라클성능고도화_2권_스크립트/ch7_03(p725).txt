@@ -1,0 +1,24 @@
+create table t
+partition by range(no) (
+  partition p1 values less than(25000)
+, partition p2 values less than(50000)
+, partition p3 values less than(75000)
+, partition p4 values less than(maxvalue)
+)
+as
+select rownum no, lpad(rownum, 10, '0') no2 from dual
+connect by level <= 100000;
+
+explain plan for
+update /*+ parallel(t 4) */ t set no2 = lpad(no, 5, '0');
+
+@?/rdbms/admin/utlxplp
+
+commit;
+
+alter session enable parallel dml;
+
+explain plan for
+update /*+ parallel(t 4) */ t set no2 = lpad(no, 5, '0');
+
+@?/rdbms/admin/utlxplp

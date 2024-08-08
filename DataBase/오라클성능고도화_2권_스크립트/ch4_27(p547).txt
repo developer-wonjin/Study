@@ -1,0 +1,57 @@
+create table dept as select * from scott.dept;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create table t_emp
+as
+select * 
+from   scott.emp
+    , (select rownum no from dual connect by level <= 1000);
+
+
+-- CTAS 수행 결과, deptno가 not null일 때만 수행할 것
+alter table t_emp modify deptno null; 
+
+update t_emp set deptno = null;
+
+commit;
+
+create index t_emp_idx on t_emp(sal);
+
+select /*+ ordered use_nl(d) index(e t_emp_idx) index(d dept_pk) */ 
+       count(e.empno), count(d.dname)
+from   t_emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal <= 2900;
+
+select /*+ ordered use_nl(d) index(e t_emp_idx) full(d) */
+       count(e.empno), count(d.dname)
+from   t_emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal <= 2900;
+
+begin
+  dbms_stats.gather_table_stats(user, 't_emp'
+       , method_opt=>'for all columns', no_invalidate=>false);
+end;
+/
+
+select /*+ ordered use_nl(d) index(e t_emp_idx) full(d) */
+       count(e.empno), count(d.dname)
+from   t_emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal <= 2900;
+
+drop index t_emp_idx;
+
+create index t_emp_idx on t_emp(sal, deptno); 
+
+select /*+ ordered use_nl(d) index(e t_emp_idx) */ 
+       count(e.empno), count(d.dname)
+from   t_emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal <= 2900;
+
+
+
+

@@ -1,0 +1,24 @@
+create table LookupTable ( key number, value varchar2(100) ) ;
+
+insert into LookupTable values( 1, 'YAMAHA' ); 
+
+commit;
+
+
+create or replace function lookup(l_input number) return varchar2
+as
+  l_output LookupTable.value%TYPE;
+begin
+  select value into l_output from LookupTable where key = l_input;
+  return l_output;
+end;
+/
+
+
+select lookup(1) from all_objects;
+
+
+update LookupTable set value = 'YAMAHA2' where key = 1;
+
+commit;
+

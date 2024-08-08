@@ -1,0 +1,83 @@
+# 첫 번째 예제 
+
+create table t
+nologging
+as
+select 1 a, rownum b from dual connect by level <= 1000000 ;
+
+exec dbms_stats.gather_table_stats(user, 't', no_invalidate=>false);
+
+set autotrace traceonly exp;
+
+select * from t
+where  a = 1
+and    b = 1000 ;
+
+select * from t
+where  b = 1000
+and    a = 1 ;
+
+select /*+ ORDERED_PREDICATES */ * from t
+where  a = 1
+and    b = 1000 ;
+
+alter session set "_optimizer_cost_model" = io;
+exec dbms_stats.delete_system_stats;
+
+select * from t
+where  a = 1
+and    b = 1000 ;
+
+select * from t
+where  b = 1000
+and    a = 1 ;
+
+alter session set optimizer_mode = rule;
+
+select * from t
+where  a = 1
+and    b = 1000 ;
+
+select * from t
+where  b = 1000
+and    a = 1 ;
+
+
+
+# 두 번째 예제 
+
+create table emp as select * from scott.emp;
+
+create index emp_deptno_idx on emp(deptno);
+
+-- 테이블 통계 수집
+exec dbms_stats.gather_table_stats(user, 'emp', no_invalidate=>false);
+
+-- 9i에서 
+begin 
+  dbms_stats.set_system_stats('CPUSPEED',500); 
+  dbms_stats.set_system_stats('SREADTIM',5.0); 
+  dbms_stats.set_system_stats('MREADTIM',30.0); 
+  dbms_stats.set_system_stats('MBRC',12); 
+end; 
+/
+
+-- 10g에서 
+alter session set "_optimizer_cost_model" = cpu;  
+
+
+set autotrace traceonly exp;
+
+
+select /*+ use_concat(@subq 1) qb_name(subq) index(e) */ *
+from   emp e
+where  deptno in (10, 30)  ;
+
+
+select /*+ use_concat(@subq 1) qb_name(subq) index(e) ordered_predicates */ *
+from   emp e
+where  deptno in (10, 30)  ;
+
+select /*+ use_concat(@subq 1) qb_name(subq) index(e) no_cpu_costing */ *
+from   emp e
+where  deptno in (10, 30)  ;

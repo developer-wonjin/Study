@@ -1,0 +1,30 @@
+select d.deptno, d.dname, e.empno, e.ename, e.sal
+from   emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= (select avg(sal) from emp where deptno = d.deptno) 
+;
+
+select d.deptno, d.dname, e.empno, e.ename, e.sal
+from  (select deptno, avg(sal) avg_sal from emp group by deptno) x, emp e, dept d
+where  d.deptno = e.deptno
+and    e.deptno = x.deptno
+and    e.sal >= x.avg_sal
+;
+
+select deptno, dname, empno, ename, sal
+from (
+  select d.deptno, d.dname, e.empno, e.ename, e.sal
+       ,(case when e.sal >= avg(sal) over (partition by d.deptno) 
+         then e.rowid end) max_sal_rowid
+  from   emp e, dept d
+  where  d.deptno = e.deptno
+)
+where  max_sal_rowid is not null;
+
+alter session set "_remove_aggr_subquery" = false;
+
+select d.deptno, d.dname, e.empno, e.ename, e.sal
+from   dept d, emp e
+where  d.deptno = e.deptno
+and    e.sal = (select max(sal) from emp where deptno = d.deptno) ;
+

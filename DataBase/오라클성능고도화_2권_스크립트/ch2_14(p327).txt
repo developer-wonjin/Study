@@ -1,0 +1,141 @@
+create table 고객 
+as 
+select  empno 고객번호, ename 고객명, 'C70' 가입회사
+     , '서울' 거주지역, '...' 주소, '123-' || empno 연락처
+     , to_char(to_date('20050101','yyyymmdd')+rownum*20000,'yyyymmdd') 서비스만료일
+from    emp
+where   rownum <= 10;
+
+create index 고객_idx01 on 고객(가입회사);
+
+create table 고객별연체이력
+as
+select a.고객번호, b.변경일자, b.연체개월수, b.연체금액
+from  고객 a
+    ,(select to_char(to_date('20050101', 'yyyymmdd')+rownum*2, 'yyyymmdd') 변경일자
+           , round(dbms_random.value(1, 12)) 연체개월수
+           , round(dbms_random.value(100, 1000)) * 100 연체금액
+      from   dual
+      connect by level <= 100000) b;
+
+
+create index 고객별연체이력_idx01 on 고객별연체이력(고객번호, 변경일자);
+
+select a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액
+from   고객 a, 고객별연체이력 b
+where  a.가입회사 = 'C70'
+and    b.고객번호 = a.고객번호
+and    b.변경일자 = (select /*+ no_unnest */ max(변경일자)
+                     from   고객별연체이력  
+                     where  고객번호 = a.고객번호
+                     and    변경일자 <= a.서비스만료일);
+
+
+select a.고객명, a.거주지역, a.주소, a.연락처
+      ,(select /*+ index_desc(b 고객별연체이력_idx01) */ 연체금액
+        from   고객별연체이력 b
+        where  b.고객번호 = a.고객번호
+        and    b.변경일자 <= a.서비스만료일
+        and    rownum <= 1) 연체금액
+from   고객 a
+where  가입회사 = 'C70';
+
+
+select 고객명, 거주지역, 주소, 연락처
+     , to_number(substr(연체, 3)) 연체금액
+     , to_number(substr(연체, 1, 2)) 연체개월수
+from  (select a.고객명, a.거주지역, a.주소, a.연락처
+            ,(select /*+ index_desc(b 고객별연체이력_idx01) */ 
+                     lpad(연체개월수, 2) || 연체금액
+              from   고객별연체이력 
+              where  고객번호 = a.고객번호
+              and    변경일자 <= a.서비스만료일
+              and    rownum <= 1) 연체
+       from   고객 a
+       where  가입회사 = 'C70'
+);
+
+select 고객명, 거주지역, 주소, 연락처
+     , to_number(substr(연체, 11)) 연체금액
+     , to_number(substr(연체, 9, 2)) 연체개월수
+from  (select a.고객명, a.거주지역, a.주소, a.연락처
+            ,(select max(변경일자 || lpad(연체개월수, 2) || 연체금액)
+              from   고객별연체이력 
+              where  고객번호 = a.고객번호
+              and    변경일자 <= a.서비스만료일) AS 연체
+       from   고객 a
+       where  가입회사 = 'C70'
+);
+
+select /*+ ordered use_nl(b) rowid(b) */ a.*, b.연체금액, b.연체개월수
+from  (select a.고객명, a.거주지역, a.주소, a.연락처
+            ,(select /*+ index_desc(b 고객별연체이력_idx01) */ rowid rid
+              from   고객별연체이력 b
+              where  b.고객번호 = a.고객번호
+              and    b.변경일자 <= a.서비스만료일
+              and    rownum <= 1) rid
+       from   고객 a
+       where  가입회사 = 'C70') a, 고객별연체이력 b
+where  b.rowid = a.rid;
+
+
+select /*+ ordered use_nl(b) rowid(b) */
+       a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액, b.연체개월수
+from   고객 a, 고객별연체이력 b
+where  a.가입회사 = 'C70'
+and    b.rowid = (select /*+ index(c 고객별연체이력_idx01) */ rowid
+                  from   고객별연체이력 c
+                  where  c.고객번호 = a.고객번호
+                  and    c.변경일자 <= a.서비스만료일
+                  and    rownum <= 1);
+
+                  
+select /*+ full(a) full(b) full(c) use_hash(a b c) no_merge(b) */
+       a.고객명, a.거주지역, a.주소, a.연락처, c.연체금액, c.연체개월수
+from   고객 a
+     ,(select 고객번호, max(변경일자) 변경일자
+       from   고객별연체이력
+       where  변경일자 <= to_char(sysdate, 'yyyymmdd')
+       group by 고객번호) b, 고객별연체이력 c
+where  b.고객번호 = a.고객번호
+and    c.고객번호 = b.고객번호
+and    c.변경일자 = b.변경일자;
+
+
+select a.고객명, a.거주지역, a.주소, a.연락처
+     , to_number(substr(연체, 11)) 연체금액
+     , to_number(substr(연체, 9, 2)) 연체개월수
+from   고객 a
+     ,(select 고객번호, max(변경일자 || lpad(연체개월수, 2) || 연체금액 ) 연체
+       from   고객별연체이력
+       where  변경일자 <= to_char(sysdate, 'yyyymmdd')
+       group by 고객번호) b
+where  b.고객번호 = a.고객번호;
+
+select a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액, b.연체개월수
+from   고객 a
+     ,(select 고객번호, 연체금액, 연체개월수, 변경일자
+            , row_number() over (partition by 고객번호 order by 변경일자 desc) no
+       from   고객별연체이력
+       where  변경일자 <= to_char(sysdate, 'yyyymmdd')) b
+where  b.고객번호 = a.고객번호
+and    b.no = 1;
+
+select a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액, b.연체개월수
+from   고객 a
+     ,(select 고객번호, 연체금액, 연체개월수, 변경일자
+            , max(변경일자) over (partition by 고객번호) max_dt
+       from   고객별연체이력
+       where  변경일자 <= to_char(sysdate, 'yyyymmdd')) b
+where  b.고객번호 = a.고객번호
+and    b.변경일자 = b.max_dt;
+
+
+
+
+
+
+
+
+
+

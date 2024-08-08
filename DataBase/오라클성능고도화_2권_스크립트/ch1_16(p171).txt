@@ -1,0 +1,15 @@
+create index emp_x01 on emp(deptno, job, sal, ename, mgr, comm);
+
+set autotrace traceonly explain;
+
+select /*+ ordered use_nl(e) index(e emp_x01) */ *
+from   dept d, emp e
+where  d.loc = 'CHICAGO'
+and    e.deptno = d.deptno
+and    e.job like 'SALE%'
+and    e.job between 'A' and 'Z'
+and    e.sal >= 1000
+and    e.ename like '%A%'
+and    trim(e.ename) = 'ALLEN'
+and    e.comm >= 300
+and    to_char(e.hiredate, 'yyyymmdd') like '198102%' ;

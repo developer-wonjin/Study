@@ -1,0 +1,64 @@
+create table t_emp
+as
+select * from scott.emp, (select rownum no from dual connect by level <= 1000)
+order by dbms_random.value ;
+
+alter table t_emp add constraint t_emp_pk primary key(empno, no);
+
+begin
+  dbms_stats.gather_table_stats(
+    ownname => user
+  , tabname => 't_emp'
+  , method_opt => 'for columns sal');
+end;
+/
+
+set autotrace traceonly exp;
+
+select /*+ all_rows */ * from t_emp
+where  sal >= 5000
+order by empno, no ;
+
+select /*+ first_rows */ * from t_emp
+where  sal >= 5000
+order by empno, no ;
+
+set autotrace off;
+
+select count(*) all_emp
+     , count(case when sal >= 5000 then 1 end) over_5000
+     , round(count(case when sal >= 5000 then 1 end) / count(*) * 100) ratio
+from   t_emp ;
+
+set autotrace traceonly exp;
+
+select /*+ first_rows */ * from t_emp
+where  sal >= 5001
+order by empno, no ;
+
+
+select /*+ rule */ * from t_emp
+where  sal >= 5001
+order by empno, no ;
+
+
+-- first_rows_n
+
+set autotrace off;
+select count(*) all_emp
+     , count(case when sal >= 2000 then 1 end) over_2000
+     , round(count(case when sal >= 2000 then 1 end) / count(*) * 100) ratio
+from   t_emp ;
+
+set autotrace traceonly exp;
+
+select /*+ first_rows(10) */ * from t_emp
+where  sal >= 2000
+order by empno, no ;
+
+
+select /*+ first_rows(100) */ * from t_emp
+where  sal >= 2000
+order by empno, no ;
+
+

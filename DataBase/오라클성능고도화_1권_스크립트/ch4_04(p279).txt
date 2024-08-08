@@ -1,0 +1,35 @@
+create table t
+as
+select rownum no from dual connect by level <= 1000;
+
+analyze table t compute statistics for table for all columns;
+
+
+explain plan for select * from t where no <= :no ;
+
+
+select * from table(dbms_xplan.display(null, null, 'basic rows'))
+
+
+explain plan for select * from t where no between :no1 and :no2 ;
+
+
+select * from table(dbms_xplan.display(null, null, 'basic rows')) ;
+
+
+
+
+
+explain plan for select * from t where no <= 100;
+
+
+select * from table(dbms_xplan.display(null, null, 'basic rows'));
+
+
+explain plan for select * from t where no between 500 and 600 ;
+
+
+select * from table(dbms_xplan.display(null, null, 'basic rows'));
+
+
+

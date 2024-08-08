@@ -1,0 +1,28 @@
+show parameter block_size;
+
+drop cluster emp_cluster# including tables;
+
+create cluster emp_cluster# ( empno number(4) ) pctfree 0 size 2000 index ;
+
+create index emp_cluster_idx on cluster emp_cluster#;
+
+create table emp
+cluster emp_cluster# ( empno )
+as
+select * from scott.emp;
+
+select emp.empno, emp.ename, dbms_rowid.rowid_block_number(rowid) block_no
+from   emp ;
+
+drop table emp purge;
+
+create table emp
+cluster emp_cluster# ( empno )
+as
+select empno, ename, lpad('*', 970) data   -- 한 로우가 1000 바이트쯤 되도록
+from   scott.emp,(select rownum no from dual connect by level <= 10)
+where  empno = 7900;
+
+select empno, ename, dbms_rowid.rowid_block_number(rowid) block_no
+from   emp ;
+

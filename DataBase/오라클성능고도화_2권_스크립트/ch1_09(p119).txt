@@ -1,0 +1,27 @@
+create cluster c_deptno# ( deptno number(2) ) index ;
+
+create index i_deptno# on cluster c_deptno#;
+
+create table emp
+cluster c_deptno# (deptno)
+as
+select * from scott.emp;
+
+create table dept
+cluster c_deptno# (deptno)
+as
+select * from scott.dept;
+
+select owner, table_name from dba_tables where cluster_name = 'C_DEPTNO#';
+
+break on deptno skip 1;
+select d.deptno, e.empno, e.ename
+     , dbms_rowid.rowid_block_number(d.rowid) dept_block_no
+     , dbms_rowid.rowid_block_number(e.rowid) emp_block_no
+from   dept d, emp e
+where  e.deptno = d.deptno
+order by d.deptno;
+
+
+
+

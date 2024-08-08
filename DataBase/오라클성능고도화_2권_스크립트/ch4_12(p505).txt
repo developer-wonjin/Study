@@ -1,0 +1,28 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_deptno_idx on emp(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+select * from  
+  (select deptno, avg(sal) from emp where deptno = 10 group by deptno) e1
+ ,(select deptno, min(sal), max(sal) from emp group by deptno) e2
+where  e1.deptno = e2.deptno ;
+
+select * from  
+  (select deptno, avg(sal) from emp where deptno = 10 group by deptno) e1
+ ,(select deptno, min(sal), max(sal) from emp where deptno = 10 group by deptno) e2
+where  e1.deptno = e2.deptno ;
+
+select /*+ opt_param('_pred_move_around', 'false') */ * from  
+  (select deptno, avg(sal) from emp where deptno = 10 group by deptno) e1
+ ,(select deptno, min(sal), max(sal) avg_sal from emp group by deptno) e2
+where  e1.deptno = e2.deptno;
+
+

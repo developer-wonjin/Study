@@ -1,0 +1,44 @@
+# Implicit Cursor FOR Loop
+
+declare
+  l_object_name big_table.object_name%type;
+begin
+  for item in ( select object_name from big_table where rownum <= 1000 )
+  loop
+    l_object_name := item.object_name;
+    dbms_output.put_line(l_object_name);
+  end loop;
+end;  
+/
+
+# Explicit Cursor FOR Loop
+
+declare
+  l_object_name big_table.object_name%type;
+  cursor c is select object_name from big_table where rownum <= 1000;
+begin
+  for item in c
+  loop
+    l_object_name := item.object_name;
+    dbms_output.put_line(l_object_name);
+  end loop;
+end;  
+/
+
+
+
+declare
+cursor c is 
+  select object_name 
+  from big_table where rownum <= 1000;
+  l_object_name big_table.object_name%type;
+begin
+  open c;
+  loop
+    fetch c into l_object_name;
+    exit when c%notfound;
+    dbms_output.put_line(l_object_name);
+  end loop;
+  close c;
+end;
+/

@@ -1,0 +1,21 @@
+create table 월별지점매출
+as
+select deptno "지점"
+     , row_number() over (partition by deptno order by empno) "판매월"
+     , round(dbms_random.value(500, 1000)) "매출"
+from   emp
+order by deptno ;
+
+select 지점, 판매월, 매출
+     , sum(매출) over (partition by 지점 order by 판매월 
+             range between unbounded preceding and current row) 누적매출
+from   월별지점매출;
+
+select t1.지점, t1.판매월, min(t1.매출) 매출, sum(t2.매출) 누적매출
+from   월별지점매출 t1, 월별지점매출 t2
+where  t2.지점 = t1.지점
+and    t2.판매월 <= t1.판매월
+group by t1.지점, t1.판매월
+order by t1.지점, t1.판매월;
+
+

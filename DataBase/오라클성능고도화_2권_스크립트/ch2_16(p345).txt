@@ -1,0 +1,157 @@
+drop table 일별상품거래;
+
+create table 일별상품거래
+as
+select 'A' || lpad(b.no, 4, '0') 상품번호, a.거래일자, round(dbms_random.value(1, 100)) 거래수량
+from (select to_char(sysdate - rownum, 'yyyymmdd') 거래일자
+      from   dual
+      connect by level <= 3653) a
+    ,(select rownum no from dual connect by level <= 100) b
+;
+
+-- 상품개수와 총거래건수 확인 
+select count(distinct 상품번호) 상품수, count(*)
+from   일별상품거래;
+
+-- 상품별 거래건수 확인 
+select avg(cnt)
+from  (select 상품번호, count(*) cnt
+       from   일별상품거래
+       group by 상품번호);
+
+
+drop table 상품이력;
+
+create table 상품이력
+as
+select 상품번호
+     ,(case when 거래일자 = min(거래일자) over (partition by 상품번호) then 최소일자 else 거래일자 end) 시작일자
+     ,(case when 거래일자 = max(거래일자) over (partition by 상품번호) then '99991231' else to_char(to_date(거래일자, 'yyyymmdd') + 3, 'yyyymmdd') end) 종료일자
+     , round(dbms_random.value(100, 10000), -2) 판매가
+from (
+    select 상품번호, 거래일자, mod(rownum, 4) no
+    from (
+        select 상품번호, 거래일자
+        from   일별상품거래
+        order by 상품번호, 거래일자
+    )
+), (select min(거래일자) 최소일자 from 일별상품거래)
+where  no = 1
+;
+
+-- 상품별 이력건수 확인 
+select 상품번호, min(시작일자), max(시작일자), count(*)
+from   상품이력
+group by 상품번호
+order by 1, 2
+;
+
+-- 평균이력건수 확인 
+select avg(cnt)
+from (
+  select 상품번호, count(*) cnt
+  from   상품이력
+  group by 상품번호
+)
+;
+
+-- 인덱스 생성 
+create index 상품이력_idx on 상품이력(상품번호, 시작일자, 종료일자);
+
+-- 통계정보 수집
+exec dbms_stats.gather_table_stats(user, '일별상품거래');
+exec dbms_stats.gather_table_stats(user, '상품이력');
+
+-- 일반적인 선분이력 조회 (NL 조인 시)
+select /*+ leading(b) use_nl(a) index(a 상품이력_idx)*/ 
+       sum(b.거래수량) 총거래수량
+     , sum(b.거래수량 * a.판매가) 총판매금액
+     , round(avg(b.거래수량 * a.판매가)) 평균판매금액     
+from   상품이력 a, 일별상품거래 b
+where  b.상품번호 = a.상품번호
+and    b.거래일자 between a.시작일자 and a.종료일자
+;
+
+-- 튜닝한 선분이력 조회 (NL 조인 및 rowid 이용)
+-- (참고로, 아래 쿼리는 SQL 트레이스 걸면 매우 오래 걸리지만 그냥 수행하면 굉장히 빠르게 조회됩니다. 
+-- 9i, 10g, 11g에서 공통적으로 나타나는 현상이며, 버그라고 생각됩니다.)
+select /*+ ordered use_nl(b) rowid(b) */
+       sum(a.거래수량) 총거래수량
+     , sum(a.거래수량 * b.판매가) 총판매금액
+     , round(avg(a.거래수량 * b.판매가)) 평균판매금액
+from   일별상품거래 a, 상품이력 b
+where  b.rowid = (select /*+ index_desc(c 상품이력_idx)*/ rowid
+                  from   상품이력 c
+                  where  상품번호 = a.상품번호
+                  and    a.거래일자 between c.시작일자 and c.종료일자
+                  and    rownum <= 1)
+;
+
+-- 일반적인 선분이력 조회 (해시 조인 시)
+select /*+ leading(a) use_hash(b) */ 
+       sum(b.거래수량) 총거래수량
+     , sum(b.거래수량 * a.판매가) 총판매금액
+     , round(avg(b.거래수량 * a.판매가)) 평균판매금액     
+from   상품이력 a, 일별상품거래 b
+where  b.상품번호 = a.상품번호
+and    b.거래일자 between a.시작일자 and a.종료일자
+;
+
+drop table 상품이력2;
+
+create table 상품이력2
+as
+select 상품번호
+     ,(case when 거래일자 = min(거래일자) over (partition by 상품번호) then 최소일자 else to_char(거래일자, 'yyyymmdd') end) 시작일자
+     ,(case when 거래일자 = max(거래일자) over (partition by 상품번호) then '99991231' else to_char(lead(거래일자) over (partition by 상품번호 order by 거래일자)-1, 'yyyymmdd') end) 종료일자
+     , round(dbms_random.value(100, 10000), -2) 판매가
+from (
+    select 상품번호, to_date(거래일자, 'yyyymmdd') 거래일자, mod(rownum, 4) no
+    from (
+        select 상품번호, 거래일자
+        from   일별상품거래
+        order by 상품번호, 거래일자
+    )
+), (select min(거래일자) 최소일자 from 일별상품거래)
+where  no = 1 or to_char(거래일자, 'dd') = '01'
+;
+
+select /*+ leading(a) use_hash(b) */ 
+       sum(b.거래수량) 총거래수량
+     , sum(b.거래수량 * a.판매가) 총판매금액
+     , round(avg(b.거래수량 * a.판매가)) 평균판매금액     
+from   상품이력2 a, 일별상품거래 b
+where  b.상품번호 = a.상품번호
+and    b.거래일자 between a.시작일자 and a.종료일자
+and    trunc(to_date(b.거래일자, 'yyyymmdd'), 'mm') = trunc(to_date(a.시작일자, 'yyyymmdd'), 'mm')
+;
+
+drop table 월도;
+
+create table 월도
+as
+select to_char(sysdate, 'yyyymm') 기준월,  to_char(trunc(sysdate, 'mm'), 'yyyymmdd') 시작일자, '99991231' 종료일자 
+from   dual
+union all
+select to_char(add_months(trunc(sysdate, 'mm'), -rownum), 'yyyymm')
+     , to_char(add_months(trunc(sysdate, 'mm'), -rownum), 'yyyymmdd')
+     , to_char(add_months(last_day(sysdate), -rownum), 'yyyymmdd')
+from   dual
+connect by level <= 12*20
+;
+
+select * from 월도 order by 1;
+
+select /*+ ordered use_merge(b) use_hash(c) */ 
+       sum(c.거래수량) 총거래수량
+     , sum(c.거래수량 * b.판매가) 총판매금액
+     , round(avg(c.거래수량 * b.판매가)) 평균판매금액     
+from   월도 a, 상품이력 b, 일별상품거래 c
+where  b.시작일자 <= a.종료일자
+and    b.종료일자 >= a.시작일자
+and    c.상품번호 = b.상품번호
+and    c.거래일자 between b.시작일자 and b.종료일자
+and    trunc(to_date(c.거래일자, 'yyyymmdd'), 'mm') = trunc(to_date(a.시작일자, 'yyyymmdd'), 'mm')
+;
+
+

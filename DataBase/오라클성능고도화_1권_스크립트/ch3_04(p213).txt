@@ -1,0 +1,14 @@
+select to_char(min(s.begin_interval_time), 'hh24:mi') begin
+     , to_char(min(s.end_interval_time), 'hh24:mi') end
+     , sum(b.value-a.value) "execute count"
+from   dba_hist_sysstat a, dba_hist_sysstat b, dba_hist_snapshot s
+where  s.instance_number = &instance_number
+and    s.snap_id between &begin_snap and &end_snap
+and    a.stat_name = 'execute count'
+and    b.stat_id = a.stat_id
+and    b.snap_id = s.snap_id
+and    a.snap_id = b.snap_id - 1
+and    a.instance_number = s.instance_number
+and    b.instance_number = s.instance_number
+group by s.snap_id
+order by s.snap_id

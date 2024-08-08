@@ -1,0 +1,47 @@
+-- Index Skew
+create table t as select rownum no from dual connect by level <= 1000000 ;
+
+create index t_idx on t(no) pctfree 0;
+
+delete from t where no <= 500000 ;
+
+commit;
+
+set autotrace on statistics
+
+select * from t where no > 0 and rownum <= 1;
+
+
+
+
+-- Index Sparse
+drop table t;
+
+create table t as select rownum no from dual connect by level <= 1000000 ;
+  
+create index t_idx on t(no) pctfree 0 ;
+
+select /*+ index(t) */ count(*) from t where no > 0;
+
+delete from t where mod(no, 10) < 5 ;
+
+commit;
+
+select /*+ index(t) */ count(*) from t where no > 0;
+
+
+
+
+-- Index Rebuild
+alter index t_idx coalesce;
+
+select /*+ index(t) */ count(*) from t where no > 0;
+
+alter index t_idx shrink space;
+
+alter index t_idx shrink space compact;
+
+alter index t_idx rebuild;
+
+alter index t_idx rebuild online;
+

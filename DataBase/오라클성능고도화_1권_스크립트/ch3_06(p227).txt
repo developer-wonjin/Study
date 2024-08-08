@@ -1,0 +1,16 @@
+select parsing_schema_name 
+     , count(*) sql_cnt
+     , count(distinct substr(sql_text, 1, 100)) sql_cnt2
+     , sum(executions) executions
+     , round(avg(buffer_gets/executions)) buffer_gets
+     , round(avg(disk_reads/executions)) disk_reads
+     , round(avg(rows_processed/executions)) rows_processed
+     , round(avg(elapsed_time/executions/1000000),2) "ELAPSED_TIME(AVG)"
+     , count(case when elapsed_time/executions/1000000 >= 10 then 1 end) "BAD SQL"
+     , round(max(elapsed_time/executions/1000000),2) "ELAPSED_TIME(MAX)"
+from   v$sql
+where  last_active_time >= sysdate - 7
+and    executions > 0
+group by parsing_schema_name
+;
+

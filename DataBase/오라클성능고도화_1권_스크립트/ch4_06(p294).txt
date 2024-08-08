@@ -1,0 +1,55 @@
+create table t ( x number );
+
+select a.name, b.value
+from   v$statname a, v$mystat b
+where  a.name in ( 'session cursor cache hits', 'parse count (total)' )
+and    b.statistic# = a.statistic# ;
+
+alter session set session_cached_cursors = 0;
+
+
+declare
+  i number;
+begin
+	for i in 1..10000
+	loop
+	  execute immediate 'insert into t values(' || mod(i, 100) || ')';
+	end loop;
+
+	commit;
+end;
+/
+
+select a.name, b.value
+from   v$statname a, v$mystat b
+where  a.name in ( 'session cursor cache hits', 'parse count (total)' )
+and    b.statistic# = a.statistic#
+;
+
+alter session set session_cached_cursors = 100;
+
+declare
+  i number;
+begin
+	for i in 1..10000
+	loop
+	  execute immediate 'insert into t values(' || mod(i, 100) || ')';
+	end loop;
+
+	commit;
+end;
+/
+
+select a.name, b.value
+from   v$statname a, v$mystat b
+where  a.name in ( 'session cursor cache hits', 'parse count (total)' )
+and    b.statistic# = a.statistic# ;
+
+select a.value "session cursor cache hits"
+     , b.value "total parse call count"
+     , round(a.value/b.value*100, 2) "session cursor cache hits%"
+from   v$sysstat a, v$sysstat b
+where  a.name = 'session cursor cache hits'
+and    b.name = 'parse count (total)'
+/
+

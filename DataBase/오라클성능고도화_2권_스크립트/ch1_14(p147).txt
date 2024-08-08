@@ -1,0 +1,146 @@
+exec dbms_random.seed(0);
+
+create table 도서
+as
+select rownum 도서번호
+     , '오라클 ' || dbms_random.string('u', 8) 도서명
+     , round(dbms_random.value(1000, 100000), -3) 가격
+     , dbms_random.string('l', 10) 저자
+     , dbms_random.string('u', 10) 출판사
+     , lpad(mod(rownum, 10), 4, '0') || dbms_random.string('l', 4) ISBN
+from   dual
+connect by level <= 99989
+;
+
+insert into 도서
+select 99990 도서번호
+     , '오라클 성능 고도화 원리와 해법 01' 도서명
+     , round(dbms_random.value(1000, 100000), -3) 가격
+     , dbms_random.string('l', 10) 저자
+     , dbms_random.string('u', 10) 출판사
+     , lpad(mod(rownum, 10), 4, '0') || dbms_random.string('l', 4) ISBN
+from   dual
+;
+
+insert into 도서
+select 99990+rownum 도서번호
+     , '오라클 성능 고도화 원리와 해법 ' || lpad(rownum, 2, '0') 도서명
+     , round(dbms_random.value(1000, 100000), -3) 가격
+     , dbms_random.string('l', 10) 저자
+     , dbms_random.string('u', 10) 출판사
+     , lpad(mod(rownum, 10), 4, '0') || dbms_random.string('l', 4) ISBN
+from   dual
+connect by level <= 10
+;
+
+create index 도시명_idx on 도서(도서명);
+
+exec dbms_stats.gather_table_stats(user, '도서', no_invalidate=>false);
+
+column last_book_nm new_value last_book_nm;
+column last_rid  new_value    last_rid;
+
+select *
+from(
+  select 도서명 last_book_nm, rowid last_rid from 도서
+  order by 도서명 desc, rowid desc
+)  
+where rownum <= 11
+;
+
+
+variable book_nm varchar2(100);
+variable last_book_nm varchar2(100);
+variable last_rid varchar2(20);
+
+begin
+  :book_nm	:= '오라클';
+  :last_book_nm	:= '&last_book_nm';
+  :last_rid	:= '&last_rid';
+end;
+/
+
+print :last_book_nm;
+print :last_rid;
+
+select *
+from (
+  select rownum rnum, 도서번호, 도서명, 가격, 저자, 출판사, isbn
+  from (
+    select 도서번호, 도서명, 가격, 저자, 출판사, isbn
+    from   도서
+    where  도서명 like :book_nm || '%'
+    order by 도서명
+  )
+  where rownum <= 100
+)
+where rnum >= 91  --> 10 페이지만 출력
+;
+
+column 저자 format a10;
+column 출판사 format a10;
+column isbn format a10;
+column 도서명 format a40;
+
+select *
+from (
+    select /*+ index(도서 도시명_idx) */
+           rowid rid, 도서번호, 도서명, 가격, 저자, 출판사, isbn
+    from   도서
+    where  도서명 like :book_nm || '%'
+    and    도서명 = :last_book_nm    -- 이전 페이지에서 출력된 마지막 도서명
+    and    rowid  > :last_rid        -- 이전 페이지에서 출력된 마지막 도서의 rowid
+    union all
+    select /*+ index(도서 도시명_idx) */
+           rowid rid, 도서번호, 도서명, 가격, 저자, 출판사, isbn
+    from   도서
+    where  도서명 like :book_nm || '%'
+    and    도서명 > :last_book_nm    -- 이전 페이지에서 출력된 마지막 도서명
+)
+where   rownum <= 10
+;
+
+select *
+from (
+    select /*+ index(도서 도시명_idx) */
+           rowid rid, 도서번호, 도서명, 가격, 저자, 출판사, isbn
+    from   도서
+    where  도서명 like :book_nm || '%'
+    and    도서명 = :last_book_nm    -- 이전 페이지에서 출력된 마지막 도서명
+    and    rowid  > :last_rid        -- 이전 페이지에서 출력된 마지막 도서의 rowid
+    union all
+    select /*+ index(도서 도시명_idx) */
+           rowid rid, 도서번호, 도서명, 가격, 저자, 출판사, isbn
+    from   도서
+    where  rtrim(도서명) like :book_nm || '%'
+    and    도서명 > :last_book_nm    -- 이전 페이지에서 출력된 마지막 도서명
+)
+where   rownum <= 10
+;
+
+select /*+ index(도서 도시명_idx) use_concat ordered_predicates */
+       rowid rid, 도서번호, 도서명, 가격, 저자, 출판사, isbn
+from   도서
+where  도서명 like :book_nm || '%'
+and  ((도서명 > :last_book_nm) 
+       or
+      (도서명 = :last_book_nm and rowid > :last_rid) )
+and    rownum <= 10
+;
+
+select /*+ index(도서 도시명_idx) */   
+       rowid rid, 도서번호, 도서명, 가격, 저자, 출판사, isbn
+from   도서
+where  도서명 like :book_nm || '%'
+and    도서명 >= :last_book_nm
+and    lpad(도서명, 50) || rowid > lpad(:last_book_nm, 50) || :last_rid
+and    rownum <= 10
+;
+
+
+select greatest('AAAH+WAAJAAAHxTAA9', 'AAAH+WAAJAAAHxTAA+') from dual;
+
+select greatest( chartorowid('AAAH+WAAJAAAHxTAA9')
+               , chartorowid('AAAH+WAAJAAAHxTAA+') ) from dual;
+
+

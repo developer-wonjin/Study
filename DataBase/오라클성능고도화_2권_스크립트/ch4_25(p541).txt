@@ -1,0 +1,48 @@
+create table 상품
+as
+select rownum 상품ID, dbms_random.string('u', 10) 상품명
+from   dual connect by level <= 10;
+
+create table 고객
+as
+select rownum 고객ID, dbms_random.string('a', 10) 고객명
+from   dual connect by level <= 100;
+
+create table 판매
+as
+select 상품ID, 고객ID, 판매일련번호
+     , to_char(to_date('20081231', 'yyyymmdd')+ 상품ID, 'yyyymmdd') 판매일자
+     , round(dbms_random.value(1, 100)) 판매수량
+     , round(dbms_random.value(1000, 100000), -2) 판매금액
+from  상품, 고객, (select rownum 판매일련번호 from dual connect by level <= 100);
+
+create materialized view log on 판매 
+with sequence, rowid(상품ID, 고객ID, 판매일자, 판매수량, 판매금액) 
+including new values;
+
+create materialized view 월고객상품별_MV
+build immediate          -- 바로 MV 데이터 생성 
+refresh fast on commit   -- 커밋 시점에 MV에 실시간 반영
+enable query rewrite     -- query rewrite 활성화 
+as
+select 상품ID, 고객ID, substr(판매일자, 1, 6) 판매월
+     , sum(판매수량) 판매수량, sum(판매금액) 판매금액
+from   판매
+group by 상품ID, 고객ID, substr(판매일자, 1, 6);
+
+select p.상품명, c.고객명, substr(s.판매일자, 1, 6) 판매월
+     , sum(s.판매수량) 판매수량, sum(s.판매금액) 판매금액
+from   판매 s, 상품 p, 고객 c
+where  s.상품ID = p.상품ID
+and    s.고객ID = c.고객ID
+group by p.상품명, c.고객명, substr(s.판매일자, 1, 6);
+
+select /*+ no_rewrite */ p.상품명, c.고객명, substr(s.판매일자, 1, 6) 판매월
+     , sum(s.판매수량) 판매수량, sum(s.판매금액) 판매금액
+from   판매 s, 상품 p, 고객 c
+where  s.상품ID = p.상품ID
+and    s.고객ID = c.고객ID
+group by p.상품명, c.고객명, substr(s.판매일자, 1, 6);
+
+
+

@@ -1,0 +1,221 @@
+drop table emp purge;
+
+create table emp
+as
+select * from scott.emp;
+
+create index emp_empno_idx on emp(empno);
+
+
+analyze table emp compute statistics 
+for table for all indexes for columns empno size 1;
+
+show parameter cursor_sharing
+
+alter session set cursor_sharing = FORCE;
+
+alter system flush shared_pool;
+
+
+
+declare
+  l_condition varchar2(20);
+  l_ename emp.ename%type;
+begin
+  for c in (select empno from emp)
+  loop
+    l_condition := 'empno = ' || c.empno;
+    execute immediate
+        'select ename ' ||
+        'from emp where ' || l_condition
+    into l_ename;
+
+    dbms_output.put_line(l_condition || ' : ' || l_ename);
+  end loop;
+end;
+/
+
+select sql_id, sql_text, version_count
+from   v$sqlarea
+where  sql_text like 'select ename%'
+;
+
+select sql_id, child_number, plan_hash_value, loads, parse_calls, executions, fetches
+from   v$sql
+where  sql_text like 'select ename%'
+;
+
+
+alter system flush shared_pool;
+
+alter session set cursor_sharing = SIMILAR;
+
+
+declare
+  l_condition varchar2(20);
+  l_ename emp.ename%type;
+begin
+  for c in (select empno from emp)
+  loop
+    l_condition := 'empno = ' || c.empno;
+    execute immediate
+        'select ename ' ||
+        'from emp where ' || l_condition
+    into l_ename;
+
+    dbms_output.put_line(l_condition || ' : ' || l_ename);
+  end loop;
+end;
+/
+
+select sql_id, sql_text, version_count
+from   v$sqlarea
+where  sql_text like 'select ename%'
+;
+
+select sql_id, child_number, plan_hash_value, loads, parse_calls, executions, fetches
+from   v$sql
+where  sql_text like 'select ename%'
+;
+
+
+
+
+insert into emp(empno, ename, job, mgr, hiredate, sal, comm, deptno)
+select empno, ename, job, mgr, hiredate, sal, comm, deptno
+from   emp, (select * from dual connect by level <= 9999)
+where  emp.empno = 7788;
+
+commit;
+
+
+analyze table emp compute statistics
+for table for all indexes for columns empno size 8;
+
+set autotrace traceonly exp
+select ename from emp where empno = 7788;
+set autotrace off
+
+delete from emp where empno = 7788 and rownum <= 9999;
+
+commit;
+
+
+alter system flush shared_pool;
+
+
+declare
+  l_condition varchar2(20);
+  l_ename emp.ename%type;
+begin
+  for c in (select empno from emp)
+  loop
+    l_condition := 'empno = ' || c.empno;
+    execute immediate
+        'select ename ' ||
+        'from emp where ' || l_condition
+    into l_ename;
+
+    dbms_output.put_line(l_condition || ' : ' || l_ename);
+  end loop;
+end;
+/
+
+select sql_id, sql_text, version_count, loaded_versions
+from   v$sqlarea
+where  sql_text like 'select ename%'
+;
+
+select sql_id, child_number, plan_hash_value, loads, parse_calls, executions, fetches
+from   v$sql
+where  sql_text like 'select ename%'
+;
+
+
+/******************************************************************************************/
+
+drop table t purge;
+
+create table t
+nologging
+as
+select rownum no from all_objects
+where  rownum <= 10000
+;
+
+create index t_idx on t(no);
+
+
+analyze table t compute statistics
+for table for all indexes for all columns size 1;
+
+
+alter system flush shared_pool;
+
+alter session set cursor_sharing = SIMILAR;
+
+set timing on
+
+declare
+  l_cnt number;
+begin
+	for i in 1 .. 10000
+	loop
+	  execute immediate
+	     'select /* similar */ count(*) from t where no = ' || i
+	  into l_cnt
+	  ;
+	end loop;
+end;
+/
+
+
+analyze table t compute statistics
+for table for all indexes for all columns size 100;
+
+alter system flush shared_pool;
+
+declare
+  l_cnt number;
+begin
+	for i in 1 .. 10000
+	loop
+	  execute immediate
+	     'select /* similar */ count(*) from t where no = ' || i
+	  into l_cnt
+	  ;
+	end loop;
+end;
+/
+
+alter session set cursor_sharing = EXACT;
+
+
+declare
+  l_cnt number;
+begin
+	for i in 1 .. 10000
+	loop
+	  execute immediate
+	     'select /* exact */ count(*) from t where no = ' || i
+	  into l_cnt
+	  ;
+	end loop;
+end;
+/
+
+
+declare
+  l_cnt number;
+begin
+	for i in 1 .. 10000
+	loop
+	  execute immediate
+	     'select /* bind */ count(*) from t where no = :no'
+	  into l_cnt
+	  using i
+	  ;
+	end loop;
+end;
+/
+

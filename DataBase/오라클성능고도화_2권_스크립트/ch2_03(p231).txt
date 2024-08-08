@@ -1,0 +1,69 @@
+-- 드라이빙 테이블이 조인 컬럼 순으로 정렬돼 있을 때
+create table t_emp
+as
+select * from scott.emp, (select rownum no from dual connect by level <= 1000)
+order by no, deptno ;
+
+create table t_dept
+as
+select * from scott.dept, (select rownum no from dual connect by level <= 1000);
+
+alter table t_dept add constraint t_dept_pk primary key(no, deptno);
+
+select blevel from user_indexes where index_name  = 'T_DEPT_PK';
+
+select /*+ ordered use_nl_with_index(d) nlj_batching(d) */
+       count(e.ename), count(d.dname)
+from   t_emp e, t_dept d
+where  d.no = e.no
+and    d.deptno = e.deptno;
+
+
+select /*+ ordered use_nl_with_index(d) nlj_prefetch(d) */
+       count(e.ename), count(d.dname)
+from   t_emp e, t_dept d
+where  d.no = e.no
+and    d.deptno = e.deptno;
+
+
+
+-- 드라이빙 테이블이 무순위일 때
+drop table t_emp purge;
+
+create table t_emp
+as
+select * from scott.emp, (select rownum no from dual connect by level <= 1000)
+order by dbms_random.value ;
+
+
+select /*+ ordered use_nl_with_index(d) nlj_batching(d) */
+       count(e.ename), count(d.dname)
+from   t_emp e, t_dept d
+where  d.no = e.no
+and    d.deptno = e.deptno;
+
+
+select /*+ ordered use_nl_with_index(d) nlj_prefetch(d) */
+       count(e.ename), count(d.dname)
+from   t_emp e, t_dept d
+where  d.no = e.no
+and    d.deptno = e.deptno;
+
+
+-- 조인 컬럼 순 정렬 후 NL 조인
+select /*+ ordered use_nl_with_index(d) */ *
+from   (select /*+ no_merge */ * from t_emp order by no, deptno) e, t_dept d
+where  d.no = e.no
+and    d.deptno = e.deptno;
+
+
+-- 정렬된 인덱스 이용
+create index t_emp_idx on t_emp(no, deptno);
+
+
+select /*+ ordered use_nl_with_index(d) index(e t_emp_idx) */ *
+from   t_emp e, t_dept d
+where  d.no = e.no
+and    d.deptno = e.deptno
+
+

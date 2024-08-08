@@ -1,0 +1,39 @@
+create table emp as select * from scott.emp;
+
+create index emp_deptno_idx on emp(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+select  * from emp
+where  (deptno = 10 or deptno = 30)
+and    ename = :ename;
+
+select * from emp
+where  deptno in (10, 30) 
+and    ename = :ename;
+
+select * from emp
+where  deptno = 30 
+and    ename = :ename
+union all
+select * from emp     
+where  deptno = 10
+and    ename = :ename ;
+
+
+select /*+ QB_NAME(MAIN) use_concat(@MAIN 1) */  * from emp
+where  (deptno = 10 or deptno = 30)
+and    ename = :ename ;
+
+select /*+ QB_NAME(MAIN) use_concat(@MAIN 1) */  * from emp
+where  deptno in (10, 30) 
+and    ename = :ename ;
+
+select /*+ QB_NAME(MAIN) use_concat(@MAIN 1) ordered_predicates */  * from emp
+where  deptno in (10, 30) 
+and    ename = :ename ;
+
+select /*+ use_concat */ * from emp
+where  deptno = 10 or deptno >= 30;
+
+

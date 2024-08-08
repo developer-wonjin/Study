@@ -1,0 +1,6 @@
+select decode(a.qcserial#, null, 'PARENT', 'CHILD') ST_LVL
+     , a.server_set "SET", a.sid, a.serial#, status, event,wait_class
+from   v$px_session a, v$session b
+where  a.sid = b.sid
+and    a.qcsid = 5284
+order by a.qcsid, ST_LVL desc, a.server_group, a.server_set ;

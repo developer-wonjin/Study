@@ -1,0 +1,10 @@
+create index dept_idx on dept(loc, deptno);
+create index emp_idx on emp(job, deptno);
+
+select /*+ ordered use_merge(e) */ * from dept d, emp e
+where  d.deptno = e.deptno
+and    d.loc = 'CHICAGO'
+and    e.job = 'SALESMAN'
+order by e.deptno;
+
+

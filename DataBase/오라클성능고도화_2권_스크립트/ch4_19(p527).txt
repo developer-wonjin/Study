@@ -1,0 +1,24 @@
+create table emp as select * from scott.emp;
+
+create index emp_deptno_idx on emp(deptno);
+
+create index emp_job_idx on emp(job);
+
+alter session set "_b_tree_bitmap_plans" = false;
+
+select * from emp
+where  job = 'CLERK' or deptno = 20;
+
+select * from emp
+where  job = 'CLERK' 
+union all
+select * from emp
+where  deptno = 20
+and    LNNVL(job='CLERK');
+
+select /*+ USE_CONCAT */ * from emp
+where  job = 'CLERK' or deptno = 20;
+
+select /*+ NO_EXPAND */ * from emp
+where  job = 'CLERK' or deptno = 20;
+

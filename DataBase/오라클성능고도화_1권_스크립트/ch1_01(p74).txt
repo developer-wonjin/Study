@@ -1,0 +1,95 @@
+###################
+# Test 1         ##
+###################
+TX1> create table ฐ่มย1
+  2  nologging
+  3  as
+  4  select empno ฐ่มยน๘ศฃ, ename ฐ่มยธํ, 1000 ภÜฐํ from emp;
+
+
+TX1> create table ฐ่มย2
+  2  nologging
+  3  as
+  4  select empno ฐ่มยน๘ศฃ, ename ฐ่มยธํ, 1000 ภÜฐํ, 2000 รัภÜฐํ from emp;
+
+
+TX1> alter table ฐ่มย1 add constraint ฐ่มย1_pk primary key(ฐ่มยน๘ศฃ);
+
+TX1> alter table ฐ่มย2 add constraint ฐ่มย2_pk primary key(ฐ่มยน๘ศฃ);
+
+
+TX1> select ฐ่มย1.ภÜฐํ, ฐ่มย2.ภÜฐํ, ฐ่มย2.รัภÜฐํ
+  2       , ฐ่มย1.ภÜฐํ+ฐ่มย2.ภÜฐํ รัภÜฐํ2
+  3  from   ฐ่มย1, ฐ่มย2
+  4  where  ฐ่มย1.ฐ่มยน๘ศฃ = 7788
+  5  and    ฐ่มย2.ฐ่มยน๘ศฃ = ฐ่มย1.ฐ่มยน๘ศฃ ;
+
+
+TX1> update ฐ่มย1 set ภÜฐํ = ภÜฐํ + 100 where ฐ่มยน๘ศฃ = 7788;
+
+TX1> update ฐ่มย2 set ภÜฐํ = ภÜฐํ + 200 where ฐ่มยน๘ศฃ = 7788;
+
+
+             TX2> update ฐ่มย2 set รัภÜฐํ = ฐ่มย2.ภÜฐํ
+               2           + (select ภÜฐํ from ฐ่มย1 where ฐ่มยน๘ศฃ = ฐ่มย2.ฐ่มยน๘ศฃ)
+               3  where ฐ่มยน๘ศฃ = 7788;
+             
+TX1> commit;
+              
+             TX2> commit;
+             
+TX1> select ฐ่มย1.ภÜฐํ, ฐ่มย2.ภÜฐํ, ฐ่มย2.รัภÜฐํ                          
+  2       , ฐ่มย1.ภÜฐํ+ฐ่มย2.ภÜฐํ รัภÜฐํ2       
+  3  from   ฐ่มย1, ฐ่มย2                        
+  4  where  ฐ่มย1.ฐ่มยน๘ศฃ = 7788               
+  5  and    ฐ่มย2.ฐ่มยน๘ศฃ = ฐ่มย1.ฐ่มยน๘ศฃ ;   
+  
+  
+###################
+# Test 2         ##
+###################
+
+TX1> create table ฐ่มย1
+  2  nologging
+  3  as
+  4  select empno ฐ่มยน๘ศฃ, ename ฐ่มยธํ, 1000 ภÜฐํ from emp;
+
+
+TX1> create table ฐ่มย2
+  2  nologging
+  3  as
+  4  select empno ฐ่มยน๘ศฃ, ename ฐ่มยธํ, 1000 ภÜฐํ, 2000 รัภÜฐํ from emp;
+
+
+TX1> alter table ฐ่มย1 add constraint ฐ่มย1_pk primary key(ฐ่มยน๘ศฃ);
+
+TX1> alter table ฐ่มย2 add constraint ฐ่มย2_pk primary key(ฐ่มยน๘ศฃ);
+
+
+TX1> select ฐ่มย1.ภÜฐํ, ฐ่มย2.ภÜฐํ, ฐ่มย2.รัภÜฐํ
+  2       , ฐ่มย1.ภÜฐํ+ฐ่มย2.ภÜฐํ รัภÜฐํ2
+  3  from   ฐ่มย1, ฐ่มย2
+  4  where  ฐ่มย1.ฐ่มยน๘ศฃ = 7788
+  5  and    ฐ่มย2.ฐ่มยน๘ศฃ = ฐ่มย1.ฐ่มยน๘ศฃ ;
+
+
+TX1> update ฐ่มย1 set ภÜฐํ = ภÜฐํ + 100 where ฐ่มยน๘ศฃ = 7788;
+
+TX1> update ฐ่มย2 set ภÜฐํ = ภÜฐํ + 200 where ฐ่มยน๘ศฃ = 7788;
+
+
+             TX2> update ฐ่มย2 set รัภÜฐํ = 
+               2             (select ภÜฐํ ฐ่มย2.ภÜฐํ from ฐ่มย1 where ฐ่มยน๘ศฃ = ฐ่มย2.ฐ่มยน๘ศฃ)
+               3  where ฐ่มยน๘ศฃ = 7788;
+             
+TX1> commit;
+              
+             TX2> commit;
+             
+TX1> select ฐ่มย1.ภÜฐํ, ฐ่มย2.ภÜฐํ, ฐ่มย2.รัภÜฐํ                          
+  2       , ฐ่มย1.ภÜฐํ+ฐ่มย2.ภÜฐํ รัภÜฐํ2       
+  3  from   ฐ่มย1, ฐ่มย2                        
+  4  where  ฐ่มย1.ฐ่มยน๘ศฃ = 7788               
+  5  and    ฐ่มย2.ฐ่มยน๘ศฃ = ฐ่มย1.ฐ่มยน๘ศฃ ;     
+  
+  

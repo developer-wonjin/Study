@@ -1,0 +1,55 @@
+create table big_table
+nologging
+as
+select rownum id, a.*
+from   all_objects a
+where  1 = 0
+/
+
+set verify off
+
+declare
+  l_cnt    number;
+  l_rows   number  := 1000000;
+begin
+  insert /*+ append */
+  into big_table 
+  select rownum, a.*
+  from   all_objects a;
+  
+  l_cnt := sql%rowcount;
+
+  commit;
+
+  while(l_cnt < l_rows)
+  loop
+    insert /*+ append */ into big_table
+    select rownum + l_cnt
+         , owner, object_name, subobject_name
+         , object_id, data_object_id
+         , object_type, created, last_ddl_time
+         , timestamp, status, temporary
+         , generated, secondary
+    from   big_table
+    where  rownum <= l_rows - l_cnt;
+    l_cnt := l_cnt + sql%rowcount;
+    
+    commit;
+  end loop;
+end;
+/
+
+alter table big_table add constraint big_table_pk primary key(id);
+
+create index big_table_idx on big_table( object_name );
+
+alter system flush buffer_cache;
+
+show parameter multiblock;
+
+select /*+ index(b big_table_idx) */ count(object_name)
+from big_table b;
+
+elect /*+ index_ffs(b big_table_idx) */ count(object_name)
+from big_table b;
+

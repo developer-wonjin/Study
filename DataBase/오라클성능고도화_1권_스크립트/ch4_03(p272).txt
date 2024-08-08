@@ -1,0 +1,70 @@
+create table t
+as
+select * from all_objects;
+
+update t set object_id = rownum;
+
+create unique index t_idx on t(object_id);
+
+analyze table t compute statistics;
+
+set autotrace traceonly explain
+
+select object_name from t where object_id = 1000;
+
+set autotrace off
+
+alter system flush shared_pool;
+
+set timing on
+
+declare
+  type rc is ref cursor;
+  l_rc rc;
+  l_object_name t.object_name%type;
+begin
+  for i in 1..20000
+  loop
+    open l_rc for
+      'select /* test1 */ object_name
+       from   t
+       where  object_id = :x' using i;
+    fetch l_rc into l_object_name;
+    close l_rc;
+  end loop;
+end;
+/
+
+select sql_text, loads, parse_calls, executions, fetches from v$sql
+where  sql_text like '%test1%'
+and    sql_text not like '%v$sql%'
+and    sql_text not like 'declare%' ;
+
+
+
+
+declare
+  type rc is ref cursor;
+  l_rc rc;
+  l_object_name t.object_name%type;
+begin
+  for i in 1..20000
+  loop
+    open l_rc for
+      'select /* test2 */ object_name
+       from   t
+       where  object_id = ' || i;
+    fetch l_rc into l_object_name;
+    close l_rc;
+  end loop;
+end;
+/
+
+select substr(sql_text, 61), loads, parse_calls, executions, fetches
+from   v$sql
+where  sql_text like '%test2%'
+and    sql_text not like '%v$sql%'
+and    sql_text not like 'declare%'
+order by 1 ;
+
+

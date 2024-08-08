@@ -1,0 +1,12 @@
+select 
+    sample_id, sample_time
+  , session_id, session_serial#, user_id, xid	
+  , sql_id, sql_child_number, sql_plan_hash_value
+  , session_state 
+  , qc_instance_id , qc_session_id
+  , blocking_session, blocking_session_serial#, blocking_session_status
+  , event, event#, seq#, wait_class, wait_time, time_waited
+  , p1text, p1, p2text, p2, p3text, p3 
+  , current_obj#, current_file#, current_block# 
+  , program, module, action, client_id 
+from V$ACTIVE_SESSION_HISTORY

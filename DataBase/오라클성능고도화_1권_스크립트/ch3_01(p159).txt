@@ -1,0 +1,19 @@
+SELECT lpad(id, 4, ' ') || nvl(lpad(parent_id, 6, ' '), '      ')    
+    || '  ' || lpad(' ', (level-1)*2, ' ')                           
+    || operation || nvl2(options, ' (' || options || ')', '')        
+    || nvl2(object_name, ' OF '''                                    
+    || object_owner || '.' || object_name, NULL)                     
+    || nvl2(object_name, '''', '')                                   
+    || decode(parent_id, null, ' Optimizer=' || optimizer)           
+    || (case                                                         
+        when cost is null and cardinality is null and bytes is null  
+        then ''                                                      
+        else  ' (' || nvl2(cost, 'Cost=' || cost, '')                
+                   || nvl2(cardinality, ' Card=' || cardinality, '') 
+                   || nvl2(bytes, ' Bytes=' || bytes, '')            
+                   || ')' end) "Execution Plan"                      
+FROM   plan_table p                                                  
+START WITH statement_id = 'query1' AND id = 0                        
+CONNECT BY prior id = parent_id AND prior statement_id = statement_id
+ORDER BY id ;                                                        
+

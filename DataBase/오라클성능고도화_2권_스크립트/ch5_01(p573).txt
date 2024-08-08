@@ -1,0 +1,19 @@
+create table t_emp
+as
+select *
+from  emp, (select rownum no from dual connect by level <= 100000);
+
+alter session set workarea_size_policy = manual;
+
+alter session set sort_area_size = 1048576;
+
+set autotrace on
+
+select *
+from (
+  select no, empno, ename, job, mgr, sal
+       , avg(sal) over (partition by to_char(no), deptno) avg_sal
+  from   t_emp
+)
+where  no = 1
+order by sal desc ;

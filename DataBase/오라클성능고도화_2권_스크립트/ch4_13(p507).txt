@@ -1,0 +1,17 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_deptno_idx on emp(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+select /*+ no_merge(e) push_pred(e) */ *
+from  dept d, (select empno, ename, deptno from emp) e
+where e.deptno(+) = d.deptno
+and   d.loc = 'CHICAGO';
+

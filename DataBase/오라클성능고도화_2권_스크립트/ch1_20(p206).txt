@@ -1,0 +1,26 @@
+create table t ( x number, y char(1) ) pctfree 99 pctused 1;
+
+insert into t
+select mod(rownum,3), 'x' from dual connect by level <= 1000000;
+
+commit;
+
+select min(count(*)), max(count(*)), avg(count(*))
+from   t
+group by dbms_rowid.rowid_block_number(rowid);
+
+
+create bitmap index t_idx on t(x);
+
+select extents, blocks, bytes/1024 "SIZE(KB)"
+from   user_segments
+where  segment_name = 'T_IDX';
+
+drop index t_idx;
+alter table t minimize records_per_block;
+
+create bitmap index t_idx on t(x);
+
+select extents, blocks, bytes/1024 "SIZE(KB)"
+from   user_segments
+where  segment_name = 'T_IDX';

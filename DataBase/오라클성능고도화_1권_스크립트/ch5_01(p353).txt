@@ -1,0 +1,119 @@
+DROP TABLE 월요금납부실적 PURGE;
+
+CREATE TABLE 월요금납부실적
+AS
+SELECT TO_CHAR(OBJECT_ID) 고객번호
+     , '200903' 납입월
+     , round(dbms_random.value(1000, 10000), -2) 지로
+     , round(dbms_random.value(1000, 10000), -2) 자동이체
+     , round(dbms_random.value(1000, 10000), -2) 신용카드
+     , round(dbms_random.value(1000, 10000), -2) 핸드폰
+     , round(dbms_random.value(1000, 10000), -2) 인터넷
+FROM   ALL_OBJECTS 
+WHERE ROWNUM <= 30000;
+
+DROP TABLE 납입방법별_월요금집계 PURGE;
+
+CREATE TABLE 납입방법별_월요금집계 (
+  고객번호      NUMBER
+, 납입월        VARCHAR2(6)
+, 납입방법코드  VARCHAR2(1)
+, 납입금액       NUMBER
+) ;
+
+
+set timing on
+
+DECLARE
+  CURSOR C(INPUT_MONTH VARCHAR2) IS
+    SELECT 고객번호, 납입월, 지로, 자동이체, 신용카드, 핸드폰, 인터넷
+    FROM   월요금납부실적 
+    WHERE 납입월 = INPUT_MONTH;
+
+  REC C%ROWTYPE;
+  LTYPE VARCHAR2(1);
+BEGIN
+  OPEN C('200903');
+
+  LOOP
+    FETCH C INTO REC;
+    EXIT WHEN C%NOTFOUND;
+
+    IF REC.지로 > 0 THEN
+      LTYPE := 'A';
+      INSERT INTO 납입방법별_월요금집계
+            (고객번호, 납입월, 납입방법코드, 납입금액) 
+      VALUES(REC.고객번호, REC.납입월, LTYPE, REC.지로);
+    END IF;
+
+    IF REC.자동이체 > 0 THEN
+      LTYPE := 'B';
+      INSERT INTO 납입방법별_월요금집계
+            (고객번호, 납입월, 납입방법코드, 납입금액) 
+      VALUES(REC.고객번호, REC.납입월, LTYPE, REC.자동이체);
+    END IF;
+
+    IF REC.신용카드 > 0 THEN
+      LTYPE := 'C';
+      INSERT INTO 납입방법별_월요금집계
+            (고객번호, 납입월, 납입방법코드, 납입금액) 
+      VALUES(REC.고객번호, REC.납입월, LTYPE, REC.신용카드);
+    END IF;
+
+    IF REC.핸드폰 > 0 THEN
+      LTYPE := 'D';
+      INSERT INTO 납입방법별_월요금집계
+            (고객번호, 납입월, 납입방법코드, 납입금액) 
+      VALUES(REC.고객번호, REC.납입월, LTYPE, REC.핸드폰);
+    END IF;
+
+    IF REC.인터넷 > 0 THEN
+      LTYPE := 'E';
+      INSERT INTO 납입방법별_월요금집계
+            (고객번호, 납입월, 납입방법코드, 납입금액) 
+      VALUES(REC.고객번호, REC.납입월, LTYPE, REC.인터넷);
+    END IF;
+
+  END LOOP;
+
+  CLOSE C;
+
+END;
+
+
+
+
+INSERT INTO 납입방법별_월요금집계(납입월,고객번호,납입방법코드,납입금액)
+SELECT x.납입월, x.고객번호
+     , CHR(64 + Y.NO) 납입방법코드
+     , DECODE(Y.NO, 1, 지로, 2, 자동이체, 3, 신용카드, 4, 핸드폰, 5, 인터넷)
+FROM   월요금납부실적 x
+     ,(SELECT LEVEL NO FROM DUAL CONNECT BY LEVEL <= 5) y
+WHERE x.납입월 = '200903'
+AND   y.NO IN ( 
+        DECODE(지로, 0, NULL, 1)
+      , DECODE(자동이체, 0, NULL, 2)
+      , DECODE(신용카드, 0, NULL, 3) 
+      , DECODE(핸드폰, 0, NULL, 4) 
+      , DECODE(인터넷, 0, NULL, 5) 
+) ;
+
+
+
+INSERT INTO 납입방법별_월요금집계(납입월,고객번호,납입방법코드,납입금액)
+SELECT /*+ USE_MERGE(X Y) NO_EXPAND NO_MERGE(X) */ x.납입월, x.고객번호
+     , CHR(64 + Y.NO) 납입방법코드
+     , DECODE(Y.NO, 1, 지로, 2, 자동이체, 3, 신용카드, 4, 핸드폰, 5, 인터넷)
+FROM  (SELECT 1 DUMMY,납입월,고객번호,지로,자동이체,신용카드,핸드폰,인터넷 
+       FROM   월요금납부실적
+       WHERE  납입월 = '200903') x
+     ,(SELECT 1 DUMMY, LEVEL NO FROM DUAL CONNECT BY LEVEL <= 5) y
+WHERE x.DUMMY = y.DUMMY
+AND   y.NO IN ( 
+        DECODE(지로, 0, NULL, 1)
+      , DECODE(자동이체, 0, NULL, 2)
+      , DECODE(신용카드, 0, NULL, 3) 
+      , DECODE(핸드폰, 0, NULL, 4) 
+      , DECODE(인터넷, 0, NULL, 5) 
+) ;
+

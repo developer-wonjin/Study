@@ -1,0 +1,32 @@
+DROP TABLE T1 PURGE;
+DROP TABLE T2 PURGE;
+
+CREATE TABLE T1 (C1 NUMBER, C2 NUMBER, C3 NUMBER);
+CREATE TABLE T2 (C1 NUMBER, C2 NUMBER, C3 NUMBER);
+
+INSERT INTO T1 VALUES (1, 1, 1);
+INSERT INTO T2 VALUES (2, 3, 4);
+
+COMMIT;
+
+UPDATE T1 A
+   SET (A.C2, A.C3) = (SELECT X.C2, X.C3
+                         FROM T2 X
+                        WHERE X.C1 = A.C1);
+
+SELECT * FROM T1;
+
+UPDATE T1 A
+   SET (A.C2, A.C3) = (SELECT X.C2, X.C3
+                         FROM T2 X
+                        WHERE X.C1 = A.C1)
+ WHERE EXISTS (SELECT 1
+                 FROM T2 X
+                WHERE X.C1 = A.C1);
+
+MERGE
+ INTO T1 T
+USING T2 S
+   ON (T.C1 = S.C1)
+ WHEN MATCHED THEN
+      UPDATE SET T.C2 = S.C2, T.C3 = S.C3;

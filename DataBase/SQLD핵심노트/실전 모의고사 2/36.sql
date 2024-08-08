@@ -1,0 +1,1 @@
+SELECT REGEXP_COUNT ('1,2,3,A,B,C', '[^,]+') AS C1 FROM DUAL;

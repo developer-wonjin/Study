@@ -1,0 +1,35 @@
+create table t
+as
+select 1 id, rownum seq, owner, object_name, object_type, created, status 
+from   all_objects ;
+
+begin 
+  for i in 1..9
+  loop
+    insert into t
+    select i+1 id, rownum seq
+         , owner, object_name, object_type, created, status 
+    from   t
+    where id  = 1;
+    commit;
+  end loop;
+end;
+/
+
+alter session set workarea_size_policy = manual;
+alter session set sort_area_size = 1048576;
+
+select id, seq, owner, object_name, object_type, created, status 
+from  (select id, seq
+            , max(seq) over (partition by id) last_seq
+            , owner, object_name, object_type, created, status 
+       from t)
+where  seq = last_seq;
+
+select id, seq, owner, object_name, object_type, created, status 
+from  (select id, seq
+            , rank() over (partition by id order by seq desc) rnum
+            , owner, object_name, object_type, created, status 
+       from   t)
+where rnum = 1;
+

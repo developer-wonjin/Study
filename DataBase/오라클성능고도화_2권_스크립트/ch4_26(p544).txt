@@ -1,0 +1,25 @@
+create table emp as select * from scott.emp;
+
+set autotrace traceonly exp;
+
+select job, mgr from emp
+minus
+select job, mgr from emp
+where  deptno = 10 ;
+
+
+alter session set "_convert_set_to_join" = true;
+
+select job, mgr from emp
+minus
+select job, mgr from emp
+where  deptno = 10 ;
+
+select distinct job, mgr from emp e
+where  not exists (
+  select 'x' from emp
+  where  deptno = 10
+  and    sys_op_map_nonnull(job) = sys_op_map_nonnull(e.job)
+  and    sys_op_map_nonnull(mgr) = sys_op_map_nonnull(e.mgr) 
+) ;
+

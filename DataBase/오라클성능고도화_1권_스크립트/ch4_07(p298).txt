@@ -1,0 +1,142 @@
+public class ParseCall
+{
+  public static void NoBinding(Connection conn, int count) 
+  throws Exception{
+    PreparedStatement stmt;
+    ResultSet rs;
+
+    for (int i = 1; i <= count; i++) {
+
+       stmt= conn.prepareStatement(
+         "SELECT /* no_binding */ " + i + "," + i + ",'test', a.* " +
+         "FROM emp a WHERE a.ename LIKE 'W%'");
+       rs=stmt.executeQuery();
+
+       rs.close();
+       stmt.close();
+     }
+  }
+
+  public static void NoCaching(Connection conn, int count) 
+  throws Exception{
+    PreparedStatement stmt;
+    ResultSet rs;
+
+    for (int i = 1; i <= count; i++) {
+
+       stmt= conn.prepareStatement(
+         "SELECT /* no_caching */ ?,?,?,a.* " +
+         "FROM emp a WHERE a.ename LIKE 'W%'");
+       stmt.setInt(1,i);
+       stmt.setInt(2,i);
+       stmt.setString(3,"test");
+       rs=stmt.executeQuery();
+
+       rs.close();
+       stmt.close();
+     }
+  }
+
+  public static void CursorHolding(Connection conn, int count) 
+  throws Exception{
+
+    // PreparedStatement를 루프문 바깥에 선언
+    PreparedStatement stmt = conn.prepareStatement(
+      "SELECT /* cursor_holding */ ?,?,?,a.* " +
+      "FROM emp a WHERE a.ename LIKE 'W%'");
+    ResultSet rs;
+
+    for (int i = 1; i <= count; i++) {
+
+       stmt.setInt(1,i);
+       stmt.setInt(2,i);
+       stmt.setString(3,"test");
+       rs=stmt.executeQuery();
+       rs.close();
+
+     }
+
+     // 루프를 빠져 나왔을 때 커서를 닫는다. 
+     stmt.close();
+  }
+
+  public static void CursorCaching(Connection conn, int count) 
+  throws Exception{
+
+    // 캐시 사이즈를 1으로 지정
+    ((OracleConnection)conn).setStatementCacheSize(1);
+
+    // 묵시적 캐싱 기능을 활성화
+    ((OracleConnection)conn).setImplicitCachingEnabled(true);
+
+    for (int i = 1; i <= count; i++) {
+
+       // PreparedStatement를 루프문 안쪽에 선언
+       PreparedStatement stmt = conn.prepareStatement(
+         "SELECT /* implicit_caching */ ?,?,?,a.* " +
+         "FROM emp a WHERE a.ename LIKE 'W%'");
+       stmt.setInt(1,i);
+       stmt.setInt(2,i);
+       stmt.setString(3,"test");
+       ResultSet rs=stmt.executeQuery();
+
+       rs.close();
+
+       // 커서를 닫지만 내부적으로는 닫히지 않은 채 캐시에 보관 
+       stmt.close();
+     }
+  }
+
+  public static void main(String[] args) throws Exception{
+    String DB_CON     = "jdbc:oracle:thin:@localhost:1521:ora10g";
+    String DB_USER    = "scott";
+    String DB_PASS    = "tiger";
+
+    DriverManager.registerDriver(new OracleDriver());
+    Connection conn = DriverManager.getConnection(DB_CON,DB_USER,DB_PASS);
+    conn.setAutoCommit(false);
+    
+    long btm = System.currentTimeMillis();
+
+    // Bind 변수를 사용하지 않았을 경우
+    NoBindingCase(conn, 5000);
+
+    System.out.println("runBatch time : " + (System.currentTimeMillis() - btm));
+    System.out.println("Enter To Continue...");
+    java.io.BufferedReader in = new BufferedReader(new java.io.InputStreamReader(System.in));
+    in.readLine();
+
+    btm = System.currentTimeMillis();
+		
+		// Bind 변수를 사용하지만 Caching 옵션을 사용하지 않을 경우
+    NoCachingCase(conn, 5000);
+
+    System.out.println("runBatch time : " + (System.currentTimeMillis() - btm));
+
+    System.out.println("Enter To Continue...");
+    in.readLine();
+
+    btm = System.currentTimeMillis();
+
+		// Bind 변수를 사용하면서 Caching 옵션도 함께 사용할 경우
+    CachingCase(conn, 5000);
+
+    System.out.println("runBatch time : " + (System.currentTimeMillis() - btm));
+
+    System.out.println("Enter To Continue...");
+    in.readLine();
+
+    btm = System.currentTimeMillis();
+
+		// Cursor를 닫지 않고 반복적으로 재사용할 경우
+    CursorHoldingCase(conn, 5000);
+
+    System.out.println("runBatch time : " + (System.currentTimeMillis() - btm));
+
+    conn.commit();
+    conn.close();
+
+  }
+
+}
+

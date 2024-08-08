@@ -1,0 +1,66 @@
+alter session set session_cached_cursors = 100;
+
+create table t ( x number );
+
+alter system flush shared_pool;
+
+declare
+  i number;
+begin
+   for i in 1..100
+   loop
+     execute immediate 'insert into t values(' || mod(i, 10) || ')';
+   end loop;
+
+   commit;
+end;
+/
+
+select count(distinct sql_text) sql_cnt
+     , sum(parse_calls) parse_calls
+     , sum(executions) executions
+from   v$sql
+where  sql_text like 'insert into t values%' ;
+
+alter system flush shared_pool;
+
+declare
+  i number;
+begin
+   for i in 1..100
+   loop
+     execute immediate 'insert into t values(' || ceil(i/10) || ')';
+   end loop;
+
+   commit;
+end;
+/
+
+select count(distinct sql_text) sql_cnt
+     , sum(parse_calls) parse_calls
+     , sum(executions) executions
+from   v$sql
+where  sql_text like 'insert into t values%' ;
+
+alter session set session_cached_cursors = 0;
+
+alter system flush shared_pool;
+
+declare
+  i number;
+begin
+   for i in 1..100
+   loop
+     execute immediate 'insert into t values(' || ceil(i/10) || ')';
+   end loop;
+
+   commit;
+end;
+/
+
+select count(distinct sql_text) sql_cnt
+     , sum(parse_calls) parse_calls
+     , sum(executions) executions
+from   v$sql
+where  sql_text like 'insert into t values%' ;
+

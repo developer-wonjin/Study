@@ -1,0 +1,63 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_deptno_idx on emp(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+-- 10g
+select /*+ leading(d) use_nl(e) no_merge(e) push_pred(e) index(e (deptno)) */ 
+       d.deptno, d.dname, e.avg_sal 
+from   dept d
+     , (select deptno, avg(sal) avg_sal from emp group by deptno) e
+where  e.deptno(+) = d.deptno;
+
+-- 11g
+select /*+ leading(d) use_nl(e) no_merge(e) push_pred(e) index(e (deptno)) */ 
+       d.deptno, d.dname, e.avg_sal 
+from   dept d
+     , (select deptno, avg(sal) avg_sal from emp group by deptno) e
+where  e.deptno(+) = d.deptno;
+
+
+select d.deptno, d.dname
+     ,(select avg(sal) from emp where deptno = d.deptno)
+from   dept d;
+
+-- 집계함수가 두 개 이상일 때(2장 6절 참조)
+select deptno, dname
+     , to_number(substr(sal, 1, 7)) avg_sal
+     , to_number(substr(sal, 8, 7)) min_sal
+     , to_number(substr(sal, 15))   max_sal
+from (
+  select d.deptno, d.dname
+       ,(select lpad(avg(sal), 7) || lpad(min(sal), 7) || max(sal)
+         from emp where deptno = d.deptno) sal
+  from   dept d
+);
+
+
+create or replace type sal_type as object 
+( avg_sal number, min_sal number, max_sal number ) 
+/
+
+select deptno, dname
+     , a.sal.avg_sal, a.sal.min_sal, a.sal.max_sal
+from (
+  select d.deptno, d.dname
+       ,(select sal_type( avg(sal), min(sal), max(sal) )
+         from emp where deptno = d.deptno) sal
+  from   dept d
+) a
+/
+
+
+
+
+
+

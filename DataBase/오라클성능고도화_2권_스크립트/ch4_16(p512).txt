@@ -1,0 +1,26 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+alter table emp add constraint emp_pk primary key(empno);
+
+create index emp_hiredate_idx on emp(hiredate);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+
+select /*+ push_pred(b) */ 
+       a.empno, a.ename, a.sal, a.hiredate, b.deptno, b.dname, b.loc, a.job
+from   emp a
+     ,(select e.empno, d.deptno, d.dname, d.loc
+       from   emp e, dept d 
+       where  d.deptno = e.deptno 
+       and    e.sal >= 1000 
+       and    d.loc in ( 'CHICAGO', 'NEW YORK' ) ) b
+where  b.empno(+) = a.empno
+and    a.hiredate >= to_date('19810901', 'yyyymmdd');
+

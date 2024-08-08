@@ -1,0 +1,27 @@
+create table dept as select * from scott.dept;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create table t_emp
+as
+select *
+from   scott.emp
+     ,(select rownum no from dual connect by level <= 100);
+
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+select count(*) from t_emp t
+where exists (select /*+ no_unnest */ 'x' from dept
+              where deptno = t.deptno and loc is not null);
+              
+
+select count(*) from t_emp t
+where exists (select /*+ unnest nl_sj */ 'x' from dept
+              where deptno = t.deptno and loc is not null);
+
+
+
+              

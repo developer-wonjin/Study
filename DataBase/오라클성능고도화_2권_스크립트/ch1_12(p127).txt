@@ -1,0 +1,31 @@
+create cluster username_cluster# ( username varchar2(30) ) 
+hashkeys 100 size 50;
+
+create table user_cluster
+cluster username_cluster# ( username )
+as
+select * from all_users;
+
+create table user_regular as select * from all_users;
+
+create unique index user_regular_idx on user_regular(username);
+
+alter table user_regular modify user_id null;
+alter table user_cluster modify user_id null;
+
+alter session set sql_trace = true;
+
+declare
+  l_user_id user_regular.user_id%type;
+begin
+  for c in (select owner from objs_regular where owner <> 'PUBLIC')
+  loop
+    select user_id into l_user_id from user_regular where username = c.owner;
+    select user_id into l_user_id from user_cluster where username = c.owner;
+  end loop;
+end;
+/
+
+alter session set sql_trace = false;
+
+

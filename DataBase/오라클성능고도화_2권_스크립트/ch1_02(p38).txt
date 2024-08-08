@@ -1,0 +1,19 @@
+create table emp as select * from scott.emp;
+
+alter table emp add v_deptno varchar2(2);
+
+update emp set v_deptno = deptno;
+
+create index emp_x01 on emp(v_deptno);
+
+set autotrace traceonly exp;
+
+select * from emp where v_deptno = 20;
+
+drop index emp_x01;
+
+create index emp_x01 on emp( to_number(v_deptno) ) ;
+
+select * from emp where v_deptno = 20;
+
+

@@ -1,0 +1,44 @@
+create table t1 ( a number, b varchar2(100) );
+create table t2 ( a number, b varchar2(100) );
+create table t3 ( a number, b varchar2(100) );
+create table t4 ( a number, b varchar2(100) );
+create table t5 ( a number, b varchar2(100) );
+
+set timing on
+
+alter system flush shared_pool;
+
+declare
+  l_cnt number;
+begin
+  for i in 1..10000
+  loop
+    execute immediate ' select /*+ ordered */ count(*)' ||
+                      ' from t1, t2, t3, t4, t5 ' ||
+                      ' where  t1.a = ' || i ||
+                      ' and    t2.a = ' || i ||
+                      ' and    t3.a = ' || i ||
+                      ' and    t4.a = ' || i ||
+                      ' and    t5.a = ' || I into l_cnt;
+  end loop;
+end;
+/
+
+alter system flush shared_pool;
+
+declare
+  l_cnt number;
+begin
+  for i in 1..10000
+  loop
+    execute immediate ' select count(*)' ||
+                      ' from t1, t2, t3, t4, t5 ' ||
+                      ' where  t1.a = ' || i ||
+                      ' and    t2.a = ' || i ||
+                      ' and    t3.a = ' || i ||
+                      ' and    t4.a = ' || i ||
+                      ' and    t5.a = ' || I into l_cnt;
+  end loop;
+end;
+/
+

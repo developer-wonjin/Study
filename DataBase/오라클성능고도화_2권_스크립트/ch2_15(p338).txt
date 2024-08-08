@@ -1,0 +1,117 @@
+create table 고객 
+as 
+select  empno 고객번호, ename 고객명, 'C70' 가입회사
+     , '서울' 거주지역, '...' 주소, '123-' || empno 연락처
+     , to_char(to_date('20050101','yyyymmdd')+rownum*20000,'yyyymmdd') 서비스만료일
+from    emp
+where   rownum <= 10;
+
+create index 고객_idx01 on 고객(가입회사);
+
+
+create table 고객별연체이력
+as
+select a.고객번호, b.시작일, b.종료일, b.연체개월수, b.연체금액
+from  고객 a
+    ,(select to_char(to_date('20050101', 'yyyymmdd')+rownum*2, 'yyyymmdd') 시작일
+           , to_char(to_date('20050102', 'yyyymmdd')+rownum*2, 'yyyymmdd') 종료일
+           , round(dbms_random.value(1, 12)) 연체개월수
+           , round(dbms_random.value(100, 1000)) * 100 연체금액
+      from   dual
+      connect by level <= 100000) b;
+
+
+exec dbms_stats.gather_table_stats(user, '고객');
+
+exec dbms_stats.gather_table_stats(user, '고객별연체이력');
+
+
+select min(시작일) MN_시작일, max(시작일) MX_시작일 from 고객별연체이력;
+
+create index 고객별연체이력_idx01 on 고객별연체이력(고객번호, 종료일, 시작일);
+
+select /*+ ordered use_nl(b) */ a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액
+from   고객 a, 고객별연체이력 b
+where  a.가입회사 = 'C70'
+and    b.고객번호 = a.고객번호
+and    '20050131' between b.시작일 and b.종료일;
+
+
+drop index 고객별연체이력_idx01;
+
+create index 고객별연체이력_idx01 on 고객별연체이력(고객번호, 시작일, 종료일);
+
+select /*+ ordered use_nl(b) */ a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액
+from   고객 a, 고객별연체이력 b
+where  a.가입회사 = 'C70'
+and    b.고객번호 = a.고객번호
+and    '20050131' between b.시작일 and b.종료일;
+
+
+
+select /*+ ordered use_hash(b) */ 
+       a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액
+from   고객 a, 고객별연체이력 b
+where   b.고객번호 = a.고객번호
+and    '20050131' between b.시작일 and b.종료일;
+
+
+select /*+ ordered use_nl(b) */ a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액
+from   고객 a, 고객별연체이력 b
+where  a.가입회사 = 'C70'
+and    b.고객번호 = a.고객번호
+and    a.서비스만료일 between b.시작일 and b.종료일;
+
+
+select min(서비스만료일) 최소만료일, max(서비스만료일) 최대만료일 from 고객;
+
+
+
+select a.고객명, a.거주지역, a.주소, a.연락처
+     ,(select /*+ index_desc(b 고객별연체이력_idx01) */ 연체금액 
+       from   고객별연체이력 b
+       where  b.고객번호 = a.고객번호
+       and    a.서비스만료일 between 시작일 and 종료일
+       and    rownum <= 1) 연체금액
+from   고객 a
+where  가입회사 = 'C70';
+
+
+
+select /*+ ordered use_nl(b) rowid(b) */ a.*, b.연체금액, b.연체개월수
+from  (select a.고객명, a.거주지역, a.주소, a.연락처
+            ,(select /*+ index_desc(b 고객별연체이력_idx01) */ rowid rid
+              from   고객별연체이력 b
+              where  b.고객번호 = a.고객번호
+              and    a.서비스만료일 between 시작일 and 종료일
+              and    rownum <= 1) rid
+       from   고객 a
+       where  가입회사 = 'C70') a, 고객별연체이력 b
+where  b.rowid = a.rid;
+
+
+
+select /*+ ordered use_nl(b) rowid(b) */ 
+       a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액, b.연체개월수
+from   고객 A, 고객별연체이력 B
+where  a.가입회사 = 'C70'
+and    b.rowid = (select /*+ index_desc(c 고객별연체이력_idx01) */ rowid
+                  from   고객별연체이력 c
+                  where  c.고객번호 = a.고객번호
+                  and    a.서비스만료일 between 시작일 and 종료일
+                  and    rownum <= 1);
+
+
+
+select /*+ ordered use_hash(b) */ 
+       a.고객명, a.거주지역, a.주소, a.연락처, b.연체금액, b.연체개월수
+from   고객 a, 고객별연체이력 b
+where b.고객번호 = a.고객번호
+and    a.서비스만료일 between b.시작일 and b.종료일;
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+create table emp_iot
+( empno, ename, job, mgr, hiredate, sal, comm, deptno
+, constraint pk_emp_iot primary key ( empno ) )
+organization index
+as
+select * from scott.emp;
+
+create index iot_secondary_index on emp_iot( ename );
+
+set autotrace traceonly explain;
+
+select /*+ index(emp_iot iot_secondary_index) */ * from emp_iot where ename = 'SMITH';
+
+select /*+ index(emp_iot iot_secondary_index) */ empno from emp_iot where ename = 'SMITH';

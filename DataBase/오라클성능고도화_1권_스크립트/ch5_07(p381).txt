@@ -1,0 +1,40 @@
+create table t as select * from all_objects;
+
+set autotrace traceonly statistics;
+
+set timing on
+
+set arraysize 2
+select * from t;
+
+set arraysize 5
+select * from t;
+
+set arraysize 10
+select * from t;
+
+set arraysize 20
+select * from t;
+
+set arraysize 50
+select * from t;
+
+set arraysize 100
+select * from t;
+
+set arraysize 200
+select * from t;
+
+set arraysize 500
+select * from t;
+
+set arraysize 1000
+select * from t;
+
+set arraysize 2000
+select * from t;
+
+set arraysize 5000
+select * from t;
+
+

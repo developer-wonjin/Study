@@ -1,0 +1,27 @@
+create table t
+as
+select * from all_objects
+order by object_id;  --> 테이블 레코드가 object_id 순으로 입력되도록 함
+
+create index t_object_id_idx on t(object_id);
+
+create index t_object_name_idx on t(object_name);
+
+exec dbms_stats.gather_table_stats(user, 'T');   -- 통계정보 수집
+
+select i.index_name, t.blocks table_blocks, i.num_rows, i.clustering_factor
+from   user_tables t, user_indexes i
+where  t.table_name = 'T'
+and    i.table_name = t.table_name;
+
+select /*+ index(t t_object_id_idx) */ count(*) from t
+where  object_name >= ' '
+and    object_id >= 0;
+
+select /*+ index(t t_object_name_idx ) */ count(*) from t
+where  object_name >= ' '
+and    object_id >= 0;
+
+
+
+

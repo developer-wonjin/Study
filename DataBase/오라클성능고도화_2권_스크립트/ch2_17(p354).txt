@@ -1,0 +1,122 @@
+-- CDR 과금
+create table cdr_rating (
+  국가코드 varchar2(2)
+, 지역     varchar2(10)
+, 요금     number
+);
+
+insert into cdr_rating
+select '82', 'A', 100 from dual union all
+select '82', 'B', 200 from dual union all
+select '82', 'C', 500 from dual union all
+select '82', 'D', 300 from dual union all
+select '82', 'E', 100 from dual
+union all
+select '84', 'A', 300 from dual union all
+select '84', 'B', 500 from dual union all
+select '84', 'C', 400 from dual union all
+select '84', ' ', 800 from dual
+union all
+select '86', 'A', 500 from dual union all
+select '86', 'B', 200 from dual union all
+select '86', ' ', 700 from dual ;
+
+alter table cdr_rating add
+constraint pk_cdr_rating primary key(국가코드, 지역);
+
+-- CDR : 통화내역
+create table cdr (
+  통화시간 varchar2(15)
+, 국가코드 varchar2(2)
+, 지역     varchar2(10)
+);
+
+insert into cdr
+select '20050315 010101', '82', 'A' from dual union all
+select '20050315 020101', '82', 'B' from dual union all
+select '20050315 030101', '82', 'C' from dual union all
+select '20050315 040101', '84', 'A' from dual union all
+select '20050315 050101', '84', 'B' from dual union all
+select '20050315 060101', '84', 'C' from dual union all
+select '20050315 070101', '84', 'D' from dual union all
+select '20050315 080101', '84', 'E' from dual union all
+select '20050315 090101', '86', 'A' from dual union all
+select '20050315 100101', '86', 'B' from dual union all
+select '20050315 110101', '86', 'C' from dual union all
+select '20050315 120101', '86', 'D' from dual union all
+select '20050315 130101', '86', 'E' from dual union all
+select '20050315 140101', '86', 'F' from dual ;
+
+alter table cdr add
+constraint pk_cdr primary key(통화시간, 국가코드, 지역);
+
+
+select 국가코드, '''' || 지역 || '''', 요금 from cdr_rating ;
+
+select * from cdr;
+
+
+select /*+ ordered use_nl(r) */
+       c.통화시간, c.국가코드, c.지역, r.요금
+from   cdr c, cdr_rating r
+where  c.통화시간 like '20050315%'
+and    c.국가코드 = r.국가코드
+and    c.지역     = r.지역 ;
+
+
+select /*+ ordered use_nl(r) */
+       c.통화시간, c.국가코드, c.지역, r.요금
+from   cdr c, cdr_rating r
+where  c.통화시간 like '20050315%'
+and    c.국가코드 = r.국가코드(+)
+and    c.지역     = r.지역(+) ;
+
+select /*+ ordered use_nl(r) */
+       c.통화시간, c.국가코드, c.지역, r.요금
+from   cdr c, cdr_rating r
+where  c.통화시간 like '20050315%'
+and    (r.국가코드, r.지역) =
+       (select c.국가코드, max(지역)
+        from   cdr_rating
+        where  국가코드 = c.국가코드
+        and    지역  in (' ', c.지역) ) ;
+
+
+-- 9i
+select /*+ ordered use_nl(r) index(r pk_cdr_rating) */ 
+       c.통화시간, c.국가코드, c.지역, r.요금
+from   cdr c, cdr_rating r
+where  c.통화시간 like '20050315%'
+and    (r.국가코드, r.지역) = 
+       (select /*+ use_concat */ c.국가코드, 지역 
+        from   cdr_rating
+        where  국가코드 = c.국가코드
+        and    지역  in (' ', c.지역)
+        and    rownum <= 1) ;
+
+-- 10g 
+select /*+ ordered use_nl(r) index(r pk_cdr_rating) */ 
+       c.통화시간, c.국가코드, c.지역, r.요금
+from   cdr c, cdr_rating r
+where  c.통화시간 like '20050315%'
+and    (r.국가코드, r.지역) = 
+       (select /*+ use_concat(@subq 1) qb_name(subq) ordered_predicates */ c.국가코드, 지역 
+        from   cdr_rating
+        where  국가코드 = c.국가코드
+        and    지역  in (' ', c.지역)
+        and    rownum <= 1) ;
+
+-- 10g 
+select /*+ ordered use_nl(r) rowid(r) */ 
+       c.통화시간, c.국가코드, c.지역, r.요금
+from   cdr c, cdr_rating r
+where  c.통화시간 like '20050315%'
+and    r.rowid = 
+     (select /*+ use_concat(@subq 1) qb_name(subq) ordered_predicates */ rowid 
+      from   cdr_rating
+      where  국가코드 = c.국가코드
+      and    지역     in (' ', c.지역)
+      and    rownum <= 1
+     ) ; 
+
+

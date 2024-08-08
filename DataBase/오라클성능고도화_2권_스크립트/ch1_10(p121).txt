@@ -1,0 +1,29 @@
+create cluster objs_cluster# ( object_type VARCHAR2(19) ) index ;
+
+create index objs_cluster_idx on cluster objs_cluster#;
+
+create table objs_cluster   -- 클러스터 테이블
+cluster objs_cluster# ( object_type )
+as
+select * from all_objects
+order by dbms_random.value ;
+
+create table objs_regular   -- 일반 테이블
+as
+select * from objs_cluster
+order by dbms_random.value;
+
+create index objs_regular_idx on objs_regular(object_type);
+
+alter table objs_regular modify object_name null;  -- 테이블을 액세스하도록
+
+alter table objs_cluster modify object_name null;  -- 테이블을 액세스하도록 
+
+select /*+ index(t objs_regular_idx) */ count(object_name)
+from   objs_regular t
+where  object_type = 'TABLE';
+
+select count(object_name)
+from   objs_cluster t
+where  object_type = 'TABLE';
+

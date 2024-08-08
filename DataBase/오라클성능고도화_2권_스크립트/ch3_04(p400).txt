@@ -1,0 +1,61 @@
+1. 시스템 통계를 담을 테이블 생성 
+
+begin
+  dbms_stats.create_stat_table(
+          ownname => USER
+        , stattab => 'mystats'
+        , tblspace => 'USERS'
+        , global_temporary => FALSE
+  );
+end;
+/
+
+
+2. 시스템 통계 수집
+
+# 방법1
+begin
+  dbms_stats.gather_system_stats(
+             gathering_mode => 'interval',
+             interval => 720,
+             stattab => 'mystats',
+             statid => 'OLTP');
+end;
+/
+
+# 방법2
+begin
+  dbms_stats.gather_system_stats(
+          gathering_mode => 'start'
+        , stattab => 'mystats'
+        , statid => 'OLTP');
+end;
+/
+
+begin
+  dbms_stats.gather_system_stats(
+        gathering_mode => 'stop', 
+        stattab => 'mystats', 
+        statid =>'OLTP');
+end;
+/
+
+begin
+  dbms_stats.export_system_stats('mystats', 'OLTP', USER);
+end;
+/
+
+3. 테스트 서버로 복제
+
+
+4. 복제한 통계 데이터를 테스트 서버에 적용
+
+begin
+  dbms_stats.import_system_stats('mystats', 'OLTP', USER);
+end;
+/
+
+
+5. Shared Pool을 비우기
+
+alter system flush shared_pool;

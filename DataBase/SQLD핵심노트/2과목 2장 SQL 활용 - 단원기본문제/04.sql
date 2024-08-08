@@ -1,0 +1,7 @@
+SELECT TO_NUMBER (SUBSTR (SAL_ENAME, 1, 4)) AS SAL
+     , SUBSTR (SAL_ENAME, 5) AS ENAME
+  FROM (SELECT (SELECT MAX (LPAD (SAL, 4, '0') || ENAME)
+                  FROM EMP X
+                 WHERE X.DEPTNO = A.DEPTNO) AS SAL_ENAME
+          FROM DEPT A
+         WHERE A.DEPTNO = 20);

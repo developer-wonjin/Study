@@ -1,0 +1,59 @@
+drop table 입금 purge;
+drop table 출금 purge;
+
+exec dbms_random.seed(150);
+
+create table 입금
+as
+select rownum 일련번호
+     , round(dbms_random.value(1, 20)) 고객ID
+     , round(dbms_random.value(1000, 100000),-2) 입금액
+from dual connect by level <= 10;
+
+create table 출금
+as
+select rownum 일련번호
+     , round(dbms_random.value(1, 20)) 고객ID
+     , round(dbms_random.value(1000, 10000),-2) 출금액
+from dual connect by level <= 10;
+
+exec dbms_stats.gather_table_stats(user, '입금');
+exec dbms_stats.gather_table_stats(user, '출금');
+
+set autotrace on exp;
+
+select a.고객ID, a.입금액, b.출금액
+from  (select 고객ID, sum(입금액) 입금액 from 입금 group by 고객ID) a
+     ,(select 고객ID, sum(출금액) 출금액 from 출금 group by 고객ID) b
+where  b.고객ID(+) = a.고객ID
+union all
+select 고객ID, null, 출금액
+from  (select 고객ID, sum(출금액) 출금액 from 출금 group by 고객ID) a
+where not exists (select 'x' from 입금 where 고객ID = a.고객ID) ;
+
+
+select nvl(a.고객ID, b.고객ID) 고객ID, a.입금액, b.출금액
+from  (select 고객ID, sum(입금액) 입금액 from 입금 group by 고객ID) a 
+       full outer join
+      (select 고객ID, sum(출금액) 출금액 from 출금 group by 고객ID) b 
+    on a.고객ID = b.고객ID ;
+
+
+select /*+ opt_param('_optimizer_native_full_outer_join', 'force') */ 
+       nvl(a.고객ID, b.고객ID) 고객ID, a.입금액, b.출금액
+from  (select 고객ID, sum(입금액) 입금액 from 입금 group by 고객ID) a 
+       full outer join
+      (select 고객ID, sum(출금액) 출금액 from 출금 group by 고객ID) b 
+    on a.고객ID = b.고객ID ;
+
+
+select 고객ID, sum(입금액) 입금액, sum(출금액) 출금액
+from (
+  select 고객ID, 입금액, to_number(null) 출금액
+  from   입금
+  union all
+  select 고객ID, to_number(null) 입금액, 출금액
+  from   출금
+)
+group by 고객ID ;
+

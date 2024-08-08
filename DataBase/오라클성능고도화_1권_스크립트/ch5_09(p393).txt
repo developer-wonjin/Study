@@ -1,0 +1,51 @@
+create or replace function date_to_char(p_dt date) return varchar2
+as
+begin
+  return to_char(p_dt, 'yyyy/mm/dd hh24:mi:ss');
+end;
+/
+
+create table t ( no number, char_time varchar2(21) ) ;
+
+set timing on
+
+insert into t
+select rownum no
+     , to_char(sysdate + rownum, 'yyyy/mm/dd hh24:mi:ss') char_time
+from   dual
+connect by level <= 1000000 ;
+
+commit;
+
+
+insert into t
+select rownum no
+     , date_to_char(sysdate + rownum) char_time
+from   dual
+connect by level <= 1000000 ;
+
+commit;
+
+
+
+
+create or replace function date_to_char(p_dt date) return varchar2
+as
+  l_empno number;
+begin
+
+  select 1 into n from dual;
+
+  return to_char(p_dt, 'yyyy/mm/dd hh24:mi:ss');
+
+end;
+/
+
+insert into t
+select rownum no
+     , date_to_char(sysdate + rownum) char_time
+from   dual
+connect by level <= 1000000
+/
+
+

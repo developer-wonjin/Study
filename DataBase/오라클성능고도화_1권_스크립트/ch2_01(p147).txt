@@ -1,0 +1,20 @@
+select l.session_id SID
+     ,(case when lock_type = 'Transaction' then 'TX' 
+            when lock_type = 'DML' then 'TM' end) TYPE
+     , mode_held
+     , mode_requested mode_reqd
+     ,(case when lock_type = 'Transaction' then 
+                 to_char(trunc(lock_id1/power(2,16)))
+            when lock_type = 'DML' then 
+                (select object_name from dba_objects 
+                 where object_id = l.lock_id1)
+       end) "USN/Table"
+     ,(case when lock_type = 'Transaction' then 
+                 bitand(lock_id1, to_number('ffff', 'xxxx')) + 0
+       end) "SLOT"
+     ,(case when lock_type = 'Transaction' then 
+                to_number(lock_id2) end) "SQN"
+     ,(case when blocking_others = 'Blocking' then ' <<<<<' end) Blocking
+from   dba_lock l
+where  lock_type in ('Transaction', 'DML' )
+order by session_id, lock_type, lock_id1, lock_id2

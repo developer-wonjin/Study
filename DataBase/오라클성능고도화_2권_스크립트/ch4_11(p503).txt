@@ -1,0 +1,34 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_x1 on emp(deptno, job);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+
+select *
+from  (select deptno, empno, ename, job, sal, sal * 1.1 sal2, hiredate 
+       from emp
+       where  job = 'CLERK'
+       union all
+       select deptno, empno, ename, job, sal, sal * 1.2 sal2, hiredate 
+       from emp
+       where  job = 'SALESMAN' ) v
+where  v.deptno = 30;
+
+select /*+ ordered use_nl(e) */ d.dname, e.*
+from   dept d
+     ,(select deptno, empno, ename, job, sal, sal * 1.1 sal2, hiredate from emp
+       where  job = 'CLERK'
+       union all
+       select deptno, empno, ename, job, sal, sal * 1.2 sal2, hiredate from emp
+       where  job = 'SALESMAN' ) e
+where  e.deptno = d.deptno
+and    d.deptno = 30;
+
+

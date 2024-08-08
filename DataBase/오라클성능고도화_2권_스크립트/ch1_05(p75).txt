@@ -1,0 +1,204 @@
+create table t
+as
+select rownum id, a.*
+from   all_objects a
+where  1 = 0
+/
+
+alter table t nologging;
+
+set verify off
+
+declare
+  l_cnt    number;
+  l_rows   number  := 100000;
+begin
+  insert /*+ append */
+  into t 
+  select rownum, a.*
+  from   all_objects a;
+  
+  l_cnt := sql%rowcount;
+
+  commit;
+
+  while(l_cnt < l_rows)
+  loop
+    insert /*+ append */ into t
+    select rownum + l_cnt
+         , owner, object_name, subobject_name
+         , object_id, data_object_id
+         , object_type, created, last_ddl_time
+         , timestamp, status, temporary
+         , generated, secondary
+    from   t
+    where  rownum <= l_rows - l_cnt;
+    l_cnt := l_cnt + sql%rowcount;
+    
+    commit;
+  end loop;
+end;
+/
+
+update t set object_id = rownum;
+
+commit;
+
+show parameter block_size -- 한 블럭에 10개 정도만 들어가도록 하려고 함
+
+drop table good_cl_factor purge;
+
+create table good_cl_factor
+pctfree 0
+as
+select t.*, lpad('x', 630) x from t
+order by object_id;
+
+alter table good_cl_factor add
+constraint good_cl_factor_pk primary key(object_id);
+
+alter table good_cl_factor modify object_name null;    
+exec dbms_stats.gather_table_stats(user, 'good_cl_factor');
+
+drop table bad_cl_factor purge;
+
+create table bad_cl_factor
+pctfree 0
+as
+select t.*, lpad('x', 630) x from t
+order by dbms_random.value;
+
+alter table bad_cl_factor add
+constraint bad_cl_factor_pk primary key(object_id);
+
+alter table bad_cl_factor modify object_name null;
+
+exec dbms_stats.gather_table_stats(user, 'bad_cl_factor');
+
+select table_name, num_rows, blocks, avg_row_len, num_rows/blocks rows_per_block 
+from   user_tables
+where  table_name in ('GOOD_CL_FACTOR', 'BAD_CL_FACTOR');
+
+
+select i.index_name
+     , i.clustering_factor cl_factor
+     , t.blocks   tab_blks
+     , t.num_rows tab_rows
+     , i.num_rows ind_rows
+     , round((1-i.clustering_factor/t.num_rows)*100, 2) ratio
+from  user_indexes i, user_tables t
+where t.table_name in ('GOOD_CL_FACTOR', 'BAD_CL_FACTOR')
+and   i.table_name  = t.table_name
+order by i.index_name desc
+;
+
+create table elpsd_time ( test_seq number, cl_factor varchar2(4), method varchar2(5), target_rows number, minute number, second number );
+
+
+-- NoCaching 
+-- insert range : 1 ~ 990
+declare
+  l_cnt number;
+  l_b_time timestamp;
+  l_e_time timestamp;
+begin
+  
+  delete from elpsd_time test_seq = 1;
+  commit;
+  
+  for rows in 1..99
+  loop
+    execute immediate 'alter system flush buffer_cache';
+    l_b_time := systimestamp;
+    select /*+ index(t) */ count(object_name) into l_cnt
+    from   good_cl_factor t
+    where  object_id between 1 and rows*10;
+    l_e_time := systimestamp;
+
+    insert into elpsd_time values(1, 'good', 'index', rows*10, extract(minute from (l_e_time-l_b_time)), extract(second from (l_e_time-l_b_time)));
+    
+    l_b_time := systimestamp;
+    select /*+ index(t) */ count(object_name) into l_cnt
+    from   bad_cl_factor t
+    where  object_id between 1 and rows*10;
+    l_e_time := systimestamp;
+
+    insert into elpsd_time values(1, 'bad', 'index', rows*10, extract(minute from (l_e_time-l_b_time)), extract(second from (l_e_time-l_b_time)));
+
+    execute immediate 'alter system flush buffer_cache';
+    
+    l_b_time := systimestamp;
+    select /*+ full(t) */ count(object_name) into l_cnt 
+    from   bad_cl_factor t
+    where  object_id between 1 and rows*10;
+    l_e_time := systimestamp;
+    
+    insert into elpsd_time values(1, 'bad', 'full', rows*10, extract(minute from (l_e_time-l_b_time)), extract(second from (l_e_time-l_b_time)));
+
+    commit;
+	end loop;
+end;
+/
+
+select target_rows
+     , min(case when cl_factor = 'good' and method = 'index' then (minute * 60 + second) end) good_index
+     , min(case when cl_factor = 'bad'  and method = 'index' then (minute * 60 + second) end) bad_index
+     , min(case when cl_factor = 'bad'  and method = 'full'  then (minute * 60 + second) end) full
+from   elpsd_time
+where  test_seq = 1
+group by target_rows
+order by target_rows
+;
+
+
+-- insert range : 1,000 ~ 100,000
+declare
+  l_cnt number;
+  l_b_time timestamp;
+  l_e_time timestamp;
+begin
+
+  for rows in 1..100
+  loop
+    execute immediate 'alter system flush buffer_cache';
+    l_b_time := systimestamp;
+    select /*+ index(t) */ count(object_name) into l_cnt
+    from   good_cl_factor t
+    where  object_id between 1 and rows*1000;
+    l_e_time := systimestamp;
+
+    insert into elpsd_time values(2, 'good', 'index', rows*1000, extract(minute from (l_e_time-l_b_time)), extract(second from (l_e_time-l_b_time)));
+    
+    l_b_time := systimestamp;
+    select /*+ index(t) */ count(object_name) into l_cnt
+    from   bad_cl_factor t
+    where  object_id between 1 and rows*1000;
+    l_e_time := systimestamp;
+
+    insert into elpsd_time values(2, 'bad', 'index', rows*1000, extract(minute from (l_e_time-l_b_time)), extract(second from (l_e_time-l_b_time)));
+
+    execute immediate 'alter system flush buffer_cache';
+    
+    l_b_time := systimestamp;
+    select /*+ full(t) */ count(object_name) into l_cnt 
+    from   bad_cl_factor t
+    where  object_id between 1 and rows*1000;
+    l_e_time := systimestamp;
+    
+    insert into elpsd_time values(2, 'bad', 'full', rows*1000, extract(minute from (l_e_time-l_b_time)), extract(second from (l_e_time-l_b_time)));
+
+    commit;
+	end loop;
+end;
+/
+
+select target_rows
+     , min(case when cl_factor = 'good' and method = 'index' then (minute * 60 + second) end) good_index
+     , min(case when cl_factor = 'bad'  and method = 'index' then (minute * 60 + second) end) bad_index
+     , min(case when cl_factor = 'bad'  and method = 'full'  then (minute * 60 + second) end) full
+from   elpsd_time
+where  test_seq = 2
+group by target_rows
+order by target_rows
+;
+

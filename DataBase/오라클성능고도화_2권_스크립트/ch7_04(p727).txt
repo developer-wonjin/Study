@@ -1,0 +1,28 @@
+create table emp
+partition by range(sal) (
+  partition p1 values less than(1000)
+, partition p2 values less than(2000)
+, partition p3 values less than(3000)
+, partition p4 values less than(MAXVALUE) )
+as
+select * from scott.emp ;
+
+create index emp_sal_idx on emp(sal) local;
+
+create table dept as select * from scott.dept;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+set autotrace traceonly exp;
+
+select /*+ ordered use_nl(d) full(e) parallel(e 2) */ *
+from   emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= 1000 ;
+
+
+select /*+ ordered use_nl(d) index(e emp_sal_idx) 
+           parallel_index(e emp_sal_idx 3) */ *
+from   emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= 1000 ;

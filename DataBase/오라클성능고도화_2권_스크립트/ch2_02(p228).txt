@@ -1,0 +1,19 @@
+create table dept as select * from scott.dept;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create table t_emp
+as
+select * from scott.emp, (select rownum no from dual connect by level <= 100000)
+order by dbms_random.value ;
+
+select /*+ ordered use_nl(d) */ count(e.ename), count(d.dname)
+from   t_emp e, dept d
+where  d.deptno = e.deptno;
+
+
+select /*+ ordered use_nl(d) */ count(e.ename), count(d.dname)
+from   t_emp e, dept d
+where  d.deptno between e.deptno and e.deptno + 1;
+
+

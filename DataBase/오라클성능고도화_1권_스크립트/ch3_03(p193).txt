@@ -1,0 +1,27 @@
+create table sess_stat
+as
+select 1 no, statistic#, value
+from   v$sesstat
+where  sid = &SID;
+
+insert into sess_stat
+select 2 no, statistic#, value
+from   v$sesstat
+where  sid = &SID;
+
+commit;
+
+
+select b.statistic# stat#, b.name, (b.value - a.value) delta_value
+from (
+        select n.statistic#, n.name, b.value
+        from   v$statname n, sess_stat b
+        where  b.statistic# = n.statistic#
+        and    b.value > 0
+        and    b.no = 2
+     ) b, sess_stat a 
+where  a.no = 1
+and    a.statistic# = b.statistic#
+and   (b.value - a.value) > 0
+order by delta_value desc
+

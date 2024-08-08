@@ -1,0 +1,35 @@
+create table dept as select * from scott.dept;
+
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_deptno_idx on emp(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+
+alter session set "_complex_view_merging"= false;
+
+select deptno, avg_sal  
+from  (select deptno, avg(sal) avg_sal from emp group by deptno) a
+where  deptno = 30;
+
+select /*+ no_merge(a) */ 
+       b.deptno, b.dname, a.avg_sal  
+from  (select deptno, avg(sal) avg_sal from emp group by deptno) a
+     , dept b
+where  a.deptno = b.deptno             
+and    b.deptno = 30;
+
+select /*+ no_merge(a) */ 
+       b.deptno, b.dname, a.avg_sal  
+from  (select deptno, avg(sal) avg_sal from emp group by deptno) a
+     , dept b
+where  a.deptno = b.deptno             
+and    b.deptno = 30                   
+and    a.deptno = 30;
+
+

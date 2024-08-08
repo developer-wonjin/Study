@@ -1,0 +1,52 @@
+select /*+ leading(r, c, l, d, e)
+           use_hash(c) use_hash(l) use_hash(d) use_hash(e) */
+       e.first_name, e.last_name, d.department_name
+     , l.street_address, l.city, c.country_name, r.region_name
+from   hr.regions r
+     , hr.countries c
+     , hr.locations l
+     , hr.departments d
+     , hr.employees e
+where  d.department_id = e.department_id
+and    l.location_id = d.location_id
+and    c.country_id = l.country_id
+and    r.region_id = c.region_id;
+
+
+select /*+ leading(r, c, l, d, e)
+           use_hash(c) use_hash(l) use_hash(d) use_hash(e)
+           swap_join_inputs(l)
+           swap_join_inputs(d)
+           swap_join_inputs(e) */
+       e.first_name, e.last_name, d.department_name
+     , l.street_address, l.city, c.country_name, r.region_name
+from   hr.regions r
+     , hr.countries c
+     , hr.locations l
+     , hr.departments d
+     , hr.employees e
+where  d.department_id = e.department_id
+and    l.location_id = d.location_id
+and    c.country_id = l.country_id
+and    r.region_id = c.region_id;
+
+
+select /*+ leading(d, e, l, c, r)
+           use_hash(e) use_hash(l) use_hash(c) use_hash(r)
+           swap_join_inputs(l)
+           swap_join_inputs(c)
+           swap_join_inputs(r) */
+       e.first_name, e.last_name, d.department_name
+     , l.street_address, l.city, c.country_name, r.region_name
+from   hr.regions r
+     , hr.countries c
+     , hr.locations l
+     , hr.departments d
+     , hr.employees e
+where  d.department_id = e.department_id
+and    l.location_id = d.location_id
+and    c.country_id = l.country_id
+and    r.region_id = c.region_id;
+
+
+

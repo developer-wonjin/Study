@@ -1,0 +1,60 @@
+create table 일별계좌별거래 (
+  계좌번호 number
+, 거래일자 date
+, 거래량   number
+, 거래금액 number
+)
+partition by range(거래일자)(
+  partition p01 values less than(to_date('20090201', 'yyyymmdd'))
+, partition p02 values less than(to_date('20090301', 'yyyymmdd'))
+, partition p03 values less than(to_date('20090401', 'yyyymmdd'))
+, partition p04 values less than(to_date('20090501', 'yyyymmdd'))
+, partition p05 values less than(to_date('20090601', 'yyyymmdd'))
+, partition p06 values less than(to_date('20090701', 'yyyymmdd'))
+, partition p07 values less than(to_date('20090801', 'yyyymmdd'))
+, partition p08 values less than(to_date('20090901', 'yyyymmdd'))
+, partition p09 values less than(to_date('20091001', 'yyyymmdd'))
+, partition p10 values less than(to_date('20091101', 'yyyymmdd'))
+, partition p11 values less than(to_date('20091201', 'yyyymmdd'))
+, partition p12 values less than(maxvalue)
+) ;
+
+declare
+ l_first_date date;
+ l_last_day number;
+begin
+  for i in 1..12
+  loop
+    l_first_date := to_date('2009' || lpad(i, 2, '0') || '01', 'yyyymmdd');
+    l_last_day := to_number(to_char(last_day(l_first_date), 'dd'));
+    insert into 일별계좌별거래
+    select rownum 계좌번호
+         , l_first_date + mod(rownum, l_last_day) 거래일자
+         , round(dbms_random.value(100, 10000)) 거래량
+         , round(dbms_random.value(10000, 1000000)) 거래금액
+    from   dual
+    connect by level <= 10000;
+  end loop;
+end;
+/
+
+create index local_prefix_index on 일별계좌별거래(거래일자, 계좌번호) local;
+
+create index local_nonprefix_index on 일별계좌별거래(계좌번호, 거래일자) local;
+
+
+
+select /*+ index(t local_prefix_index) */ sum(거래량), sum(거래금액)
+from   일별계좌별거래 t
+where  계좌번호 = 100
+and    거래일자 between to_date('20090115', 'yyyymmdd')
+                and     to_date('20091215', 'yyyymmdd')
+;
+
+select /*+ index(t local_nonprefix_index) */ sum(거래량), sum(거래금액)
+from   일별계좌별거래 t
+where  계좌번호 = 100
+and    거래일자 between to_date('20090115', 'yyyymmdd')
+                and     to_date('20091215', 'yyyymmdd')
+;
+

@@ -1,0 +1,84 @@
+create table t ( gubun
+   , seq, seq_name, seq_cls
+   , seq2, seq2_name, seq2_cls
+)
+partition by range(seq) (
+  partition p1 values less than(100)
+, partition p2 values less than(200)
+, partition p3 values less than(300)
+, partition p4 values less than(maxvalue)
+)
+as
+select 1
+     , rownum, dbms_random.string('u', 10), 'A'
+     , rownum, dbms_random.string('l', 10), 'B'
+from   dual
+connect by level <= 400 ;
+
+
+create unique index t_idx1 on t(gubun, seq2) LOCAL ;
+
+create unique index t_idx1 on t(gubun, seq2) ;
+
+create unique index t_idx2 on t(gubun, seq) LOCAL ;
+
+create index t_idx3 on t(seq, gubun) LOCAL ;
+
+create index t_idx4 on t(seq_name, seq) LOCAL ;
+
+create index t_idx5 on t(seq_cls, seq) GLOBAL
+partition by range(seq) (
+  partition p1 values less than(100)
+, partition p2 values less than(200)
+, partition p3 values less than(300)
+, partition p4 values less than(maxvalue)
+)
+;
+
+create index t_idx5 on t(seq, seq_cls) GLOBAL
+partition by range(seq) (
+  partition p1 values less than(100)
+, partition p2 values less than(200)
+, partition p3 values less than(300)
+, partition p4 values less than(maxvalue)
+) ;
+
+
+create index t_idx6 on t(seq, seq_name) GLOBAL
+partition by range(seq) (
+  partition p1 values less than(200)
+, partition p2 values less than(maxvalue)
+) ;
+
+
+create index t_idx7 on t(seq, seq_name, seq_cls) GLOBAL
+partition by range(seq) (
+  partition p1 values less than(50)
+, partition p2 values less than(100)
+, partition p3 values less than(150)
+, partition p4 values less than(200)
+, partition p5 values less than(250)
+, partition p6 values less than(300)
+, partition p7 values less than(350)
+, partition p8 values less than(maxvalue)
+) ;
+
+
+create index t_idx8 on t(seq2) GLOBAL
+partition by range(seq2) (
+  partition p1 values less than(100)
+, partition p2 values less than(200)
+, partition p3 values less than(300)
+, partition p4 values less than(maxvalue)
+) ;
+
+
+select i.index_name, i.uniqueness, p.locality
+     , p.alignment, i.partitioned, p.partition_count
+from   user_indexes i, user_part_indexes p
+where  i.table_name = 'T'
+and    p.table_name(+) = i.table_name
+and    p.index_name(+) = i.index_name
+order by 1 ;
+
+

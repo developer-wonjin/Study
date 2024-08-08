@@ -1,0 +1,12 @@
+select /*+ leading(emp) */ * from emp 
+where deptno in (select /*+ unnest */ deptno from dept);
+
+select /*+ leading(dept) */ * from emp 
+where deptno in (select /*+ unnest */ deptno from dept);
+
+select /*+ ordered */ * from emp 
+where deptno in (select /*+ unnest */ deptno from dept);
+
+select /*+ leading(dept@qb1) */ * from emp 
+where deptno in (select /*+ unnest qb_name(qb1) */ deptno from dept);
+

@@ -6,7 +6,7 @@ CREATE TABLESPACE ORA_SQL_TEST_TS DATAFILE 'C:\ORA_SQL_TEST\ORA_SQL_TEST.DBA' SI
 -- ************************************************
 -- PART I - 1.1.2 SQL1, SYS USER 사용 - 사용자 생성
 -- ************************************************
-ALTER SESSION SET "_ORACLE_SCRIPT"=true;
+ALTER SESSION SET "_ORACLE_SCRIPT"=true; -- c## 없이 user등록을 하고 싶다면
 CREATE USER ORA_SQL_TEST IDENTIFIED BY "1234" DEFAULT TABLESPACE ORA_SQL_TEST_TS;
 
 

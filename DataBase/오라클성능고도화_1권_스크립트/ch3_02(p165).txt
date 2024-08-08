@@ -1,0 +1,7 @@
+select r.value || '/' || lower(t.instance_name) || '_ora_'  
+    || ltrim(to_char(p.spid)) || '.trc' trace_file          
+from   v$process p, v$session s, v$parameter r, v$instance t
+where  p.addr = s.paddr                                     
+and    r.name = 'user_dump_dest'                            
+and    s.sid = (select sid from v$mystat where rownum = 1) ;
+

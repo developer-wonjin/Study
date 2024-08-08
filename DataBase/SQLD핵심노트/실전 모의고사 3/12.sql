@@ -1,0 +1,1 @@
+SELECT '1000' || (40 - NULL) || '0' - 100 AS R1 FROM DUAL;

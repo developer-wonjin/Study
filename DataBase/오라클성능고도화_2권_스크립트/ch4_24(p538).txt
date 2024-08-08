@@ -1,0 +1,29 @@
+create table dept as select * from scott.dept;
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+create index dept_loc_idx on dept(loc);
+create index emp_deptno_idx on emp(deptno);
+create index emp_sal_idx on emp(sal);
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+select * 
+from   emp e, dept d
+where  d.deptno(+) = e.deptno
+and    d.loc = 'DALLAS'
+and    e.sal >= 1000;
+
+select *
+from  dept d left outer join emp e on d.deptno = e.deptno
+where e.sal > 1000 ;
+
+select *
+from  dept d left outer join emp e on d.deptno = e.deptno and e.sal > 1000;
+
+select *
+from  dept d left outer join emp e on d.deptno = e.deptno
+where e.empno is null;
+
+

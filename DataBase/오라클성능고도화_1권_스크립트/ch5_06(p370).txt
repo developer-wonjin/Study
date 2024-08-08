@@ -1,0 +1,41 @@
+create table t (
+  x NUMBER   not null
+, y NUMBER   not null ) ;
+
+insert into t
+select *
+from (
+	select rownum x, rownum y
+	from   dual
+	connect by level <= 5000000
+)
+order by dbms_random.value  
+;
+
+alter table t add
+constraint t_pk primary key (x);
+
+alter system flush buffer_cache;
+
+set arraysize 5
+set timing on
+
+select /*+ index(t t_pk) */ x, y
+from   t
+where  x >  0
+and    y <= 6 ;
+
+
+select /*+ index(t t_pk) */ x, y
+from   t
+where  x >  0
+and    y <= 1 ;
+
+
+select /*+ index(t t_pk) */ * from t where x > 0 and mod(y, 50) = 0
+
+select /*+ index(t t_pk) */ * from t where x > 0 and mod(y, 50000) = 0
+
+
+
+

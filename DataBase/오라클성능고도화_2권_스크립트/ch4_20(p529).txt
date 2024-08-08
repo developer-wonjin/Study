@@ -1,0 +1,37 @@
+create table dept as select * from scott.dept;
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+create index dept_loc_idx on dept(loc);
+
+create index emp_sal_idx on emp(sal);
+create index emp_job_idx on emp(job);
+create index emp_deptno_idx on emp(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+exec dbms_stats.gather_table_stats(user, 'dept');
+
+select /*+ NO_EXPAND */ * from emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= 2000
+and   (e.job = 'SALESMAN' or d.loc = 'CHICAGO');
+
+
+select /*+ USE_CONCAT */ * from emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= 2000
+and   (e.job = 'SALESMAN'or d.loc = 'CHICAGO');
+
+select /*+ use_concat 
+           leading(@sel$1_1 d@sel$1 e@sel$1)
+           use_nl(@sel$1_1 e@sel$1)
+           index(@sel$1_1 d@sel$1 dept_loc_idx)
+           index(@sel$1_1 e@sel$1 emp_deptno_idx)
+           leading(@sel$1_2 e@sel$1_2 d@sel$1_2)
+           use_nl(@sel$1_2 d@sel$1_2)
+           index(@sel$1_2 e@sel$1_2 emp_job_idx)
+           index(@sel$1_2 d@sel$1_2 dept_pk) */ * 
+from emp e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= 2000
+and   (e.job = 'SALESMAN'or d.loc = 'CHICAGO');

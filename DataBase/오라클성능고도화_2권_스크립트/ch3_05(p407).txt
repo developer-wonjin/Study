@@ -1,0 +1,146 @@
+-- (2) 카디널리티 
+
+create table t_emp
+as
+select b.no, a.*
+from  (select * from scott.emp where rownum <= 10) a
+     ,(select rownum no from dual connect by level <= 100) b ;
+
+begin
+  dbms_stats.gather_table_stats( user, 't_emp'
+        , method_opt => 'for all columns size 1');
+end;
+/
+
+select job, count(*) from t_emp group by job order by job  ;
+
+explain plan for
+select * from t_emp where job = 'CLERK';
+
+@?/rdbms/admin/utlxpls
+
+
+explain plan for
+select * from t_emp where job = 'SALESMAN' ;
+
+@?/rdbms/admin/utlxpls
+
+select t.num_rows, c.num_nulls, c.num_distinct
+     , 1/c.num_distinct selectivity
+     , num_rows/c.num_distinct cardinality
+from   user_tables t, user_tab_columns c
+where  t.table_name = 'T_EMP'
+and    c.table_name = t.table_name
+and    c.column_name = 'JOB' ;
+
+-- 히스토그램이 있을 때 
+begin
+  dbms_stats.gather_table_stats( user, 't_emp'
+        , method_opt => 'for all columns size 5');
+end;
+/
+
+explain plan for
+select * from t_emp where job = 'CLERK';
+
+@?/rdbms/admin/utlxpls
+
+explain plan for
+select * from t_emp where job = 'SALESMAN' ;
+
+@?/rdbms/admin/utlxpls
+
+-- 히스토그램이 있더라도 바인드 변수를 사용하면 평균적인 분포를 가정 
+explain plan for
+select * from t_emp where job = :job ;
+
+@?/rdbms/admin/utlxpls
+
+
+-- (3) NULL 값을 포함할 때
+update t_emp set job = NULL where no <= 50;
+
+commit;
+
+begin
+  dbms_stats.gather_table_stats( user, 't_emp'
+        , method_opt => 'for all columns size 1');
+end;
+/
+
+select num_nulls, num_distinct from user_tab_columns
+where table_name = 'T_EMP' and column_name = 'JOB';
+
+explain plan for
+select * from t_emp where job = :job ;
+
+@?/rdbms/admin/utlxpls
+
+
+-- (4) 조건절이 두 개 이상일 때
+select c.column_name, t.num_rows, c.num_nulls, c.num_distinct
+      ,(1-c.num_nulls/t.num_rows)/c.num_distinct selectivity
+from   user_tables t, user_tab_columns c
+where  t.table_name = 'T_EMP'
+and    c.table_name = t.table_name
+and    c.column_name in ('DEPTNO', 'JOB') ;
+
+
+explain plan for
+select * from t_emp where job = :job and deptno = :deptno;
+
+@?/rdbms/admin/utlxpls
+
+
+
+-- (5) 범위검색 조건에 대한 카디널리티 게산식 테스트 
+create table t
+as
+select rownum no1
+     , case when rownum <= 1000 or rownum > 9000 then rownum else 5000 end no2
+from   dual 
+connect by level <= 10000 ;
+
+begin
+  dbms_stats.gather_table_stats(user, 't', method_opt => 'for all columns size 1');
+end;
+/
+
+set autotrace traceonly exp
+
+select * from t where no1 > 1000;
+select * from t where no2 > 1000;
+
+select * from t where no1 > 3000;
+select * from t where no2 > 3000;
+
+select * from t where no1 > 5000;
+select * from t where no2 > 5000;
+
+select * from t where no1 > 7000;
+select * from t where no2 > 7000;
+
+select * from t where no2 between 3000 and 4000;
+
+begin
+  dbms_stats.gather_table_stats(user, 't'
+    , method_opt => 'for all columns size 254');
+end;
+/
+
+
+select * from t where no1 > 1000;
+select * from t where no2 > 1000;
+
+select * from t where no1 > 3000;
+select * from t where no2 > 3000;
+
+select * from t where no1 > 5000;
+select * from t where no2 > 5000;
+
+select * from t where no1 > 7000;
+select * from t where no2 > 7000;
+
+select * from t where no2 between 3000 and 4000;
+
+

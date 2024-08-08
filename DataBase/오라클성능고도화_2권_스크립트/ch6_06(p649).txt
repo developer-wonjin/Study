@@ -1,0 +1,37 @@
+create or replace function h1(e number) return number
+as
+begin
+  return mod(e, 10);
+end;
+/
+
+create or replace function h2(e number) return number
+as
+begin
+  return mod(ceil(e/10), 10);
+end;
+/
+
+select rownum no, h1(rownum) r1, h2(rownum) r2
+from dual
+connect by level <= 100;
+
+
+create or replace function h1(e number) return number
+as
+begin
+  return mod(e, 100);
+end;
+/
+
+create or replace function h2(e number) return number
+as
+begin
+  return mod(ceil(e/10), 100);
+end;
+/
+
+
+select rownum no, h1(rownum) r1, h2(rownum) r2
+from dual
+connect by level <= 100;

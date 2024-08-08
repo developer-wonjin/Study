@@ -1,0 +1,44 @@
+create table t ( c varchar2(4000) );
+
+alter system flush shared_pool;
+
+declare
+  l_cnt number;
+  l_child_cnt number;
+  l_prev_child_cnt number;
+  l_bind_value varchar2(4000);
+  l_sql_id varchar2(13);
+begin
+
+  l_prev_child_cnt := 0;
+
+  for c in 1..4000
+  loop
+    l_bind_value := lpad('A', c, '0');
+    select count(*) into l_cnt from t where c = l_bind_value;
+
+    if c = 1 then
+      select prev_sql_id into l_sql_id  -- sql_id를 찾는다. 
+      from   v$session
+      where  sid=userenv('sid')
+      and    username is not null
+      and    prev_hash_value <> 0;
+      dbms_output.put_line('sql_id --> ' || l_sql_id);
+    end if;
+
+    select count(*) into l_child_cnt from v$sql where sql_id = l_sql_id;
+
+    if l_prev_child_cnt < l_child_cnt then  -- 새 Child 커서가 생길 때마다
+      dbms_output.put_line(c);
+      l_prev_child_cnt := l_child_cnt;
+    end if;
+
+  end loop;
+end;
+/
+
+select child_number, bind_mismatch
+from   v$sql_shared_cursor
+where  sql_id = '&sql_id'
+order by child_number ;
+

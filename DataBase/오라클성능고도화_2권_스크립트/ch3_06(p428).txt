@@ -1,0 +1,177 @@
+(1) 히스토그램 유형
+create sequence seq ;
+
+create table member( memb_id number, age number(2) );
+
+exec dbms_random.seed(0);
+
+insert into member(memb_id, age)
+select seq.nextval, dbms_random.value( 1,19) from dual connect by level <= 50;
+insert into member(memb_id, age)
+select seq.nextval, dbms_random.value(20,29) from dual connect by level <= 270;
+insert into member(memb_id, age)
+select seq.nextval, dbms_random.value(30,39) from dual connect by level <= 330;
+insert into member(memb_id, age)
+select seq.nextval, 40 from dual connect by level <= 1000;   
+insert into member(memb_id, age)
+select seq.nextval, dbms_random.value(41,49) from dual connect by level <= 200;
+insert into member(memb_id, age)
+select seq.nextval, dbms_random.value(50,59) from dual connect by level <= 100;
+insert into member(memb_id, age)
+select seq.nextval, dbms_random.value(60,99) from dual connect by level <= 50 ;
+
+select case when age between 1 and 19 then '10대 이하'
+              when age >= 60 then '60대 이상'
+              else floor(age/10)*10 || '대' end "연령대"
+     , count(*) 인원수
+from   member
+group by case when age between 1 and 19 then '10대 이하'
+              when age >= 60 then '60대 이상'
+              else floor(age/10)*10 || '대' end
+order by 1 ;
+
+
+(2) 도수분포 히스토그램
+
+select count(*), count(distinct age) from member;
+
+begin
+  dbms_stats.gather_table_stats(user, 'member'
+    , method_opt=>'for all columns size 100');
+end;
+/
+
+select num_distinct, num_buckets, histogram
+from   user_tab_col_statistics
+where  table_name = 'MEMBER'
+and    column_name = 'AGE';
+
+select t.age "연령", t.cnt "인원수(명)"
+     , nvl2(h.prev, h.running_total-h.prev, h.running_total) frequency
+     , h.running_total
+from   (select age, count(*) cnt from member group by age) t
+     , (select endpoint_value age, endpoint_number running_total
+             , lag(endpoint_number) over (order by endpoint_value) prev
+        from   user_histograms
+        where  table_name = 'MEMBER'
+        and    column_name = 'AGE') h
+where  h.age = t.age ;
+
+
+
+(3) 높이균형 히스토그램
+
+begin
+  dbms_stats.gather_table_stats(user, 'member'
+    , method_opt=>'for all columns size 20');
+end;
+/
+
+select num_distinct, num_buckets, histogram
+from   user_tab_col_statistics
+where  table_name = 'MEMBER'
+and    column_name = 'AGE';
+
+column column_name format a6;
+column endpoint_actual_value format a20;
+
+select endpoint_number, endpoint_value
+from   user_histograms
+where  table_name = 'MEMBER'
+and    column_name = 'AGE'
+order by 1;
+
+
+select '~' || age "연령대", endpoint_number, diff
+     , round( 100 * diff / sum(diff) over()) "RATIO(%)"
+     , round(t.num_rows * diff / sum(diff) over()) "인원수(명)"
+from (select table_name
+           , endpoint_value age, endpoint_number
+         , endpoint_number-lag(endpoint_number) over 
+                                     (order by endpoint_value) diff
+           , lag(endpoint_number) over (order by endpoint_value) prev
+      from   user_histograms
+      where  table_name = 'MEMBER'
+      and    column_name = 'AGE') h, user_tables t
+where  h.endpoint_number > 0
+and    t.table_name = h.table_name
+order by 1 ;
+
+
+-- popular value에 대한 선택도/카디널리티 계산
+set autotrace traceonly exp;
+
+select * from member where age = 40;
+
+set autotrace off;
+
+
+-- non-popular value에 대한 선택도/카디널리티 계산 
+select 1/num_distinct, density, round(density*2000) cardinality
+from   user_tab_col_statistics
+where  table_name = 'MEMBER'
+and    column_name = 'AGE' ;
+
+set autotrace traceonly exp;
+
+select * from member where age = 39;
+
+set autotrace off;
+
+
+(4) 바인드 변수 사용 시 카디널리티 계산
+create table t
+as
+select rownum no from dual connect by level <= 1000;
+
+begin
+  dbms_stats.gather_table_stats(user, 't'
+    , method_opt=>'for all columns size 254');
+end;
+/
+
+
+explain plan for select * from t where no <= :no ;
+
+select * from table(dbms_xplan.display(null, null, 'basic rows')) ;
+
+explain plan for select * from t where no between :no1 and :no2 ;
+
+select * from table(dbms_xplan.display(null, null, 'basic rows')) ;
+
+
+
+explain plan for select * from t where no <= 100 ;
+
+select * from table(dbms_xplan.display(null, null, 'basic rows'));
+
+explain plan for select * from t where no between 500 and 600 ;
+
+select * from table(dbms_xplan.display(null, null, 'basic rows'));
+
+
+
+(5) 결합 선택도
+
+create table 사원
+as
+select empno 사원번호, ename 사원명, sal 급여, sal*0.1 상여 from emp;
+
+begin
+  dbms_stats.gather_table_stats(
+     user, '사원'
+   , method_opt=>'for columns 급여 size 254 상여 size 254' );
+end;
+/
+
+set autotrace on explain;
+
+select * from 사원
+where  급여 >= 2000
+and    상여 >= 200 ;
+
+
+select /*+ dynamic_sampling(4) */ * from 사원
+where  급여 >= 2000
+and    상여 >= 200 ;
+

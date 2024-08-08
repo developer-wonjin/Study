@@ -1,0 +1,94 @@
+drop table dept;
+
+drop table emp;
+
+create table dept as select * from scott.dept;
+
+create table emp 
+partition by range (deptno)
+(partition p1 values less than (10),
+ partition p2 values less than (20), 
+ partition p3 values less than (30),
+ partition p4 values less than (MAXVALUE))
+as
+select * from scott.emp ; 
+
+
+
+# 서브쿼리 Pruning이 작동하지 않는 경우
+alter session set "_subquery_pruning_cost_factor" = 20;  -- default
+alter session set "_subquery_pruning_reduction" = 50;    -- default
+
+
+set autotrace traceonly exp;
+
+select /*+ leading(d) use_hash(e) */ *
+from   dept d, emp e
+where  d.deptno = e.deptno
+and    d.loc = 'DALLAS';
+
+---------------------------------------------------------------------------------------------
+| Id  | Operation            | Name | Rows  | Bytes | Cost (%CPU)| Time     | Pstart| Pstop |
+---------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT     |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|*  1 |  HASH JOIN           |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|*  2 |   TABLE ACCESS FULL  | DEPT |     1 |    30 |     3   (0)| 00:00:01 |       |       |
+|   3 |   PARTITION RANGE ALL|      |    14 |  1218 |     4   (0)| 00:00:01 |     1 |     4 |
+|   4 |    TABLE ACCESS FULL | EMP  |    14 |  1218 |     4   (0)| 00:00:01 |     1 |     4 |
+---------------------------------------------------------------------------------------------
+
+select /*+ leading(e) use_hash(d) */ *
+from   dept d, emp e
+where  d.deptno = e.deptno
+and    d.loc = 'DALLAS';
+
+---------------------------------------------------------------------------------------------
+| Id  | Operation            | Name | Rows  | Bytes | Cost (%CPU)| Time     | Pstart| Pstop |
+---------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT     |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|*  1 |  HASH JOIN           |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|   2 |   PARTITION RANGE ALL|      |    14 |  1218 |     4   (0)| 00:00:01 |     1 |     4 |
+|   3 |    TABLE ACCESS FULL | EMP  |    14 |  1218 |     4   (0)| 00:00:01 |     1 |     4 |
+|*  4 |   TABLE ACCESS FULL  | DEPT |     1 |    30 |     3   (0)| 00:00:01 |       |       |
+---------------------------------------------------------------------------------------------
+
+
+# 서브쿼리 Pruning이 작동하는 경우
+
+alter session set "_subquery_pruning_cost_factor" = 1;
+alter session set "_subquery_pruning_reduction" = 100;
+
+
+select /*+ leading(d) use_hash(e) */ *
+from   dept d, emp e
+where  d.deptno = e.deptno
+and    d.loc = 'DALLAS';
+
+--------------------------------------------------------------------------------------------------
+| Id  | Operation                 | Name | Rows  | Bytes | Cost (%CPU)| Time     | Pstart| Pstop |
+--------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT          |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|*  1 |  HASH JOIN                |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|*  2 |   TABLE ACCESS FULL       | DEPT |     1 |    30 |     3   (0)| 00:00:01 |       |       |
+|   3 |   PARTITION RANGE SUBQUERY|      |    14 |  1218 |     4   (0)| 00:00:01 |KEY(SQ)|KEY(SQ)|
+|   4 |    TABLE ACCESS FULL      | EMP  |    14 |  1218 |     4   (0)| 00:00:01 |KEY(SQ)|KEY(SQ)|
+--------------------------------------------------------------------------------------------------
+
+
+select /*+ leading(e) use_hash(d) */ *
+from   dept d, emp e
+where  d.deptno = e.deptno
+and    d.loc = 'DALLAS';
+
+--------------------------------------------------------------------------------------------------
+| Id  | Operation                 | Name | Rows  | Bytes | Cost (%CPU)| Time     | Pstart| Pstop |
+--------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT          |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|*  1 |  HASH JOIN                |      |     5 |   585 |     8  (13)| 00:00:01 |       |       |
+|   2 |   PARTITION RANGE SUBQUERY|      |    14 |  1218 |     4   (0)| 00:00:01 |KEY(SQ)|KEY(SQ)|
+|   3 |    TABLE ACCESS FULL      | EMP  |    14 |  1218 |     4   (0)| 00:00:01 |KEY(SQ)|KEY(SQ)|
+|*  4 |   TABLE ACCESS FULL       | DEPT |     1 |    30 |     3   (0)| 00:00:01 |       |       |
+--------------------------------------------------------------------------------------------------
+
+
+

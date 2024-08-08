@@ -1,0 +1,51 @@
+create table t
+as
+select rownum a, rownum b, rownum c, rownum d, rownum e
+from   dual
+connect by level <= 100000;
+
+create index t_idx on t(a, b, c, d);
+
+select * from t where  a = 1 order by a, b, c;
+
+select * from t where a = 1 and b = 1 order by c, d;
+
+select * from t where a = 1 and c = 1 order by b, d;
+
+select * from t where a = 1 and b = 1 order by a, c, b, d;
+
+
+select * from t
+where a between 1 and 2 
+and   b not in (1, 2)
+and   c between 2 and 3
+order by a, b, c, d;
+
+select * from t
+where a between 1 and 2 
+and   c between 2 and 3
+order by a, b, c;
+
+select * from t
+where a between 1 and 2 
+and   b <> 3
+order by a, b, c;
+
+-- Index Full Scan 방식으로 처리
+select /*+ index(t) */ * from t
+where b between 2 and 3
+order by a, b, c, d;
+
+-- 인덱스를 이용한 소트 오퍼레이션 대체가 불가능
+select * from t where a = 1 order by c;
+
+select * from t
+where a = 1 
+and   b between 1 and 2
+order by c, d;
+
+select * from t
+where a = 1
+and   b between 1 and 2
+order by a, c, b;
+

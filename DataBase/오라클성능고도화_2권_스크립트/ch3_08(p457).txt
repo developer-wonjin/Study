@@ -1,0 +1,16 @@
+select schedule_name, j.program_owner, j.program_name
+     , p.program_action, p.number_of_arguments
+     , cast(j.last_start_date as timestamp with local time zone) last_start_date
+     , last_run_duration, stop_on_window_close 
+from   dba_scheduler_jobs j, dba_scheduler_programs p
+where  j.job_name = 'GATHER_STATS_JOB'
+and    p.program_name = j.program_name ;
+
+
+select w.window_name, w.repeat_interval, w.duration
+     , cast(w.last_start_date as timestamp with local time zone) last_start_date
+     , cast(w.next_start_date as timestamp with local time zone) next_start_date from   dba_scheduler_wingroup_members m
+     , dba_scheduler_windows w
+where  m.window_group_name = 'MAINTENANCE_WINDOW_GROUP'
+and    w.window_name = m.window_name;
+

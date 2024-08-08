@@ -1,0 +1,75 @@
+-- 인덱스를 경유한 테이블 액세스 비용
+create table t
+as
+select * from all_objects;
+
+create index t_owner_idx on t(owner);
+
+begin
+  dbms_stats.gather_table_stats(user, 'T'
+    , method_opt=>'for all columns size 1');
+end;
+/
+
+alter session set "_optimizer_cost_model" = io;
+
+set autotrace traceonly exp;
+
+select /*+ index(t) */ * from t where owner = 'SYS';
+
+set autotrace off;
+
+column index_name format a12
+column clustering_factor format 999999 heading "CLUSTERING|_FACTOR   "
+column "인덱스 스캔 비용" format 9999.99999 heading "인덱스  |스캔비용"
+column "총 테이블 액세스 비용" format 9999.99999 heading "총 테이블  |액세스 비용"
+select i.blevel, i.leaf_blocks, c.num_distinct, i.clustering_factor
+     , 1 + (i.leaf_blocks * 1/c.num_distinct) "인덱스 스캔 비용"
+     , 1 + (i.leaf_blocks * 1/c.num_distinct)
+         + (i.clustering_factor * 1/c.num_distinct) "총 테이블 액세스 비용"
+from   user_indexes i, user_tab_col_statistics c
+where  i.index_name = 'T_OWNER_IDX'
+and    c.table_name = i.table_name
+and    c.column_name = 'OWNER';
+
+
+
+-- Full Scan에 의한 테이블 액세스 비용  
+select blocks from user_tables where table_name = 'T';
+
+set autotrace traceonly exp;
+
+alter session set db_file_multiblock_read_count = 2;
+
+select /*+ full(t) */ * from t where owner = 'SYS';
+
+
+alter session set db_file_multiblock_read_count = 4;
+
+select /*+ full(t) */ * from t where owner = 'SYS';
+
+
+alter session set db_file_multiblock_read_count = 8;
+
+select /*+ full(t) */ * from t where owner = 'SYS';
+
+
+alter session set db_file_multiblock_read_count = 16;
+
+select /*+ full(t) */ * from t where owner = 'SYS';
+
+
+alter session set db_file_multiblock_read_count = 32;
+
+select /*+ full(t) */ * from t where owner = 'SYS';
+
+
+alter session set db_file_multiblock_read_count = 64;
+
+
+select /*+ full(t) */ * from t where owner = 'SYS';
+
+alter session set db_file_multiblock_read_count = 128;
+
+
+select /*+ full(t) */ * from t where owner = 'SYS';

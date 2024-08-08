@@ -1,0 +1,92 @@
+SQL> set feedback off
+
+SQL> create table t as select * from all_objects ;
+
+SQL> insert into t select * from t;
+SQL> insert into t select * from t;
+SQL> insert into t select * from t;
+SQL> insert into t select * from t;
+
+SQL> select count(*) from t;
+
+  COUNT(*)
+----------
+    797728
+    
+SQL> update t set object_id = rownum;
+
+-- 이하는 rowid를 이용하는 경우에 대한 테스트임
+SQL> create index t_owner_idx on t(owner);
+
+SQL> column rid new_value rid
+SQL> select * from (
+  2    select rowid rid from t where owner = 'SYS' order by rowid desc
+  3  ) where rownum <= 5 ;
+
+RID
+------------------
+AAANTpAAEAAALr9ABR
+AAANTpAAEAAALr9AAy
+AAANTpAAEAAALr9AAr
+AAANTpAAEAAALruAAE
+AAANTpAAEAAALruAAD    -- 이 값이 rid 변수에 담긴다.
+
+SQL> set autotrace on statistics
+SQL> select /*+ index(t t_owner_idx) */ rowid
+  2  from   t
+  3  where  owner = 'SYS'
+  4  and    rowid >= chartorowid('&rid')
+  5  and    rownum <= 5 ;
+
+ROWID
+------------------
+AAANTpAAEAAALruAAD
+AAANTpAAEAAALruAAE
+AAANTpAAEAAALr9AAr
+AAANTpAAEAAALr9AAy
+AAANTpAAEAAALr9ABR
+
+Statistics
+----------------------------------------------------------
+        …
+        769  consistent gets   -- 다섯 레코드를 스캔하는데 769 블록 I/O 
+        … 
+
+SQL> set autotrace off
+
+-- 이하는 PK 같은 Unique 속성을 이용하는 경우에 대한 테스트임
+SQL> create index t_owner_idx2 on t(owner, object_id);
+
+SQL> column oid new_value oid
+SQL> select * from (
+  2    select object_id oid from t where owner = 'SYS' order by rowid desc
+  3  ) where rownum <= 5 ;
+
+       OID
+----------
+    797649
+    797618
+    797611
+    797428
+    797427    -- 이 값이 oid 변수에 담긴다.
+
+SQL> set autotrace on statistics
+SQL> select /*+ index(t t_owner_idx2) */ object_id
+  2  from   t
+  3  where  owner = 'SYS'
+  4  and    object_id >= &oid
+  5  and    rownum <= 5 ;
+
+ OBJECT_ID
+----------
+    797427
+    797428
+    797611
+    797618
+    797649
+
+Statistics
+----------------------------------------------------------
+          …
+          4  consistent gets   -- 다섯 레코드를 스캔하는데 단 4 블록 I/O 
+          … 

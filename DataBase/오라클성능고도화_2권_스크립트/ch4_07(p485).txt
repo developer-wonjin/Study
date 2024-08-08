@@ -1,0 +1,33 @@
+create table dept as select * from scott.dept;
+
+create table emp1 as
+select * from scott.emp, (select rownum no from dual connect by level <= 1000);
+
+create table emp2 as select * from emp1;
+
+alter table emp1 add constraint emp1_pk primary key(no, empno);
+
+alter table emp2 add constraint emp2_pk primary key(no, empno);
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+exec dbms_stats.gather_table_stats(user, 'emp1');
+exec dbms_stats.gather_table_stats(user, 'emp2');
+
+
+select /*+ leading(e1) use_nl(e2) */ sum(e1.sal), sum(e2.sal)
+from   emp1 e1, emp2 e2
+where  e1.no = e2.no
+and    e1.empno = e2.empno
+and    exists (select /*+ NO_UNNEST NO_PUSH_SUBQ */ 'x'
+          from dept where deptno = e1.deptno
+          and  loc = 'NEW YORK');
+
+
+select /*+ leading(e1) use_nl(e2) */ sum(e1.sal), sum(e2.sal)
+from   emp1 e1, emp2 e2
+where  e1.no = e2.no
+and    e1.empno = e2.empno
+and    exists (select /*+ NO_UNNEST PUSH_SUBQ */ 'x'
+          from dept where deptno = e1.deptno
+          and  loc = 'NEW YORK');
+          

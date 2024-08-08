@@ -1,0 +1,30 @@
+create table emp as select * from scott.emp;
+
+create index emp_deptno_idx on emp(deptno);
+create index emp_ename_idx on emp(ename);
+
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+select * from emp
+where  deptno = nvl(:deptno, deptno)
+and    ename  like :ename || '%' ;
+
+select * from emp
+where  :deptno is null
+and    deptno is not null
+and    ename  like :ename || '%' 
+union all
+select * from emp
+where  :deptno is not null
+and    deptno = :deptno
+and    ename  like :ename || '%' ;
+
+select * from emp
+where  deptno = decode(:deptno, null, deptno, :deptno)
+and    ename  like :ename || '%' ;
+
+
+
+
+
+

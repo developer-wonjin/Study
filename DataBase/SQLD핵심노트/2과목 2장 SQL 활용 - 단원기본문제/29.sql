@@ -1,0 +1,3 @@
+SELECT REGEXP_SUBSTR ('ABC', 'A.+' ) AS C1
+     , REGEXP_SUBSTR ('ABC', 'A.+?') AS C2
+  FROM DUAL;

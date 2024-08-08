@@ -1,0 +1,15 @@
+alter system flush shared_pool;
+
+
+select /* cursor_test */ empno, ename, job, sal, deptno
+from   emp
+where  empno = 7788 ;
+
+
+select sql_id, parse_calls, loads, executions, invalidations
+, decode(sign(invalidations), 1, (loads-invalidations), 0) reloads
+from   v$sql
+where  sql_text like '%cursor_test%'
+and    sql_text not like '%v$sql%' ;
+
+

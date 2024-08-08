@@ -1,0 +1,32 @@
+create table dept
+as
+select * from scott.dept;
+
+create table t_emp
+as
+select * from scott.emp, (select rownum no from dual connect by level <= 100000);
+
+create index t_emp_idx on t_emp(deptno);
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+exec dbms_stats.gather_table_stats(user, 't_emp', no_invalidate=>false);
+
+
+-- Toad, Orange, PL/SQL Developer 같은 쿼리 툴에서 일부만 Fetch 하고 멈추어야 함
+
+alter session set sql_trace = true;
+
+select /*+ leading(d) use_merge(e) full(d) full(e) */ *
+from   t_emp e, dept d
+where  d.deptno = e.deptno;
+
+
+
+select /*+ ordered use_merge(d) full(d) index(e t_emp_idx) */ *
+from   t_emp e, dept d
+where  d.deptno = e.deptno;
+
+
+select * from dual;
+
+alter session set sql_trace = false;

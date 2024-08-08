@@ -1,0 +1,162 @@
+drop table dept purge;
+drop table emp purge;
+
+create table dept as select * from scott.dept;
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+alter table emp add constraint emp_pk primary key(empno);
+
+set autotrace traceonly exp
+
+-- 1.
+create index dept_x01 on dept(dname, deptno);
+create index emp_x01 on emp(deptno, job);
+
+select /*+ index(d dept_x01) */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest no_push_subq */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN'
+   and    sal > 1000)
+;
+
+-- 2.
+select /*+ index(d dept_x01) */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest no_push_subq */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN')
+;
+
+
+-- 3.
+select /*+ index(d dept_x01) */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest push_subq */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN'
+   and    sal >= 1000)
+;
+
+-- 4.
+select /*+ index(d dept_x01) */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest push_subq */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN')
+;
+
+-- 5.
+drop index dept_x01; 
+create index dept_x01 on dept(dname);
+
+-- 9i 버전
+select /*+ index(d dept_x01) push_subq */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest   */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN'
+   and    sal > 1000)
+;
+
+-- 10g 버전
+select /*+ index(d dept_x01) */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest push_subq  */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN'
+   and    sal > 1000)
+;
+
+-- 6.
+-- 9i 버전
+select /*+ index(d dept_x01) push_subq */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest   */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN')
+;
+
+-- 10g 버전
+select /*+ index(d dept_x01) */ * from dept d
+where  dname = 'SALES'
+and    exists (
+   select /*+ no_unnest push_subq  */ 'x'
+   from   emp
+   where  deptno = d.deptno
+   and    job = 'SALESMAN')
+;
+
+-- 7.
+drop index emp_x01 ;
+create index emp_x01 on emp(sal, deptno);
+
+select  * from dept d
+where  deptno = (
+   select /*+ index(e emp_x01) */ deptno 
+   from  emp e 
+   where sal >= 5000 
+   and   job = 'PRESIDENT')
+;   
+
+select  * from dept d
+where  deptno = (
+   select /*+ index(e emp_x01) */ deptno 
+   from  emp e 
+   where sal >= 5000 
+   and   job = 'PRESIDENT'
+   and   rownum <= 1)
+;   
+
+
+-- 8.
+select  * from dept d
+where  deptno = (
+   select /*+ index(e emp_x01) */ deptno 
+   from   emp e 
+   where  sal >= 5000  )
+;   
+
+select  * from dept d
+where  deptno = (
+   select /*+ index(e emp_x01) */ deptno 
+   from   emp e 
+   where  sal >= 5000  
+   and    rownum <= 1)
+;
+   
+-- 9.
+select  * from dept d
+where  deptno = (
+   select /*+ index(e emp_x01) */ max(deptno) 
+   from   emp e 
+   where  sal >= 5000 
+   and    job = 'PRESIDENT')
+;
+
+
+-- 10.
+select  * from dept d
+where  deptno = (
+   select /*+ index(e emp_x01) */ max(deptno) 
+   from   emp e 
+   where  sal >= 5000 )
+;
+
+

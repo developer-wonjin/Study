@@ -1,0 +1,31 @@
+create table dept as select * from scott.dept;
+create table emp as select * from scott.emp;
+
+alter table dept add constraint dept_pk primary key(deptno);
+
+create index emp_sal_idx on emp(sal);
+
+exec dbms_stats.gather_table_stats(user, 'dept');
+exec dbms_stats.gather_table_stats(user, 'emp');
+
+create or replace view emp_salesman
+as
+select empno, ename, job, mgr, hiredate, sal, comm, deptno
+from   emp
+where  job = 'SALESMAN' ;
+
+select /*+ no_merge(e) */ e.empno, e.ename, e.job, e.mgr, e.sal, d.dname
+from   emp_salesman e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= 1500 ;
+
+select /*+ merge(e) */ e.empno, e.ename, e.job, e.mgr, e.sal, d.dname
+from   emp_salesman e, dept d
+where  d.deptno = e.deptno
+and    e.sal >= 1500 ;
+
+select e.empno, e.ename, e.job, e.mgr, e.sal, d.dname
+from   emp e, dept d
+where  d.deptno = e.deptno
+and    e.job = 'SALESMAN'
+and    e.sal >= 1500;

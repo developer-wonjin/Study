@@ -1,0 +1,36 @@
+drop table emp ;
+
+create table emp as select * from scott.emp;
+
+variable mn number;
+variable mx number;
+
+begin
+  :mn := 500;
+  :mn := 100;
+end;
+/  
+
+set autotrace traceonly;
+
+select * from emp                 
+where  sal between :mn and :mx;
+
+alter session set optimizer_features_enable = '9.0.1';
+
+select * from emp                 
+where  sal between :mn and :mx;
+
+analyze table emp compute statistics;
+
+select * from emp                 
+where  sal between :mn and :mx;
+
+alter session set optimizer_features_enable = '8.1.7';
+
+select * from emp                 
+where  sal between :mn and :mx;
+
+
+
+

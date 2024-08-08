@@ -1,0 +1,27 @@
+DROP TABLE T1 PURGE;
+
+CREATE TABLE T1 (C1 NUMBER, C2 NUMBER, C3 NUMBER);
+
+INSERT INTO T1 VALUES (1, 1, 1);
+INSERT INTO T1 VALUES (1, 1, 1);
+INSERT INTO T1 VALUES (1, 2, 1);
+INSERT INTO T1 VALUES (1, 2, 2);
+INSERT INTO T1 VALUES (1, 1, 3);
+INSERT INTO T1 VALUES (1, 1, 3);
+
+COMMIT;
+
+DELETE
+  FROM T1
+ WHERE ROWID IN (SELECT ROWID
+                   FROM (SELECT ROWID
+                              , ROW_NUMBER () OVER (PARTITION BY C1, C2, C3
+                                                        ORDER BY ROWID) AS RN
+                           FROM T1)
+                  WHERE RN > 1);
+
+COMMIT;
+
+SELECT COUNT(*) FROM T1;
+
+SELECT C1, C2, C3 FROM T1;

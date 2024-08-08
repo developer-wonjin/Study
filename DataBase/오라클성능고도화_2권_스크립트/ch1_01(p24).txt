@@ -1,0 +1,21 @@
+select rowid extended_format
+     , dbms_rowid.rowid_to_restricted(rowid, 0) restricted_format
+     , dbms_rowid.rowid_object(rowid) object
+     , dbms_rowid.rowid_relative_fno(rowid) file_no
+     , dbms_rowid.rowid_block_number(rowid) block_no
+     , dbms_rowid.rowid_row_number(rowid) row_number
+from   emp e
+where  empno = 7369;
+
+select dbms_rowid.rowid_type('AAAM6PAAEAAAE2cAAA') extended_format
+     , dbms_rowid.rowid_type('00004D9C.0000.0004') restricted_format
+from   dual;
+
+select object_id, owner, object_name, subobject_name
+from   dba_objects
+where  data_object_id = 52879;
+
+select file_id, file_name, tablespace_name
+from   dba_data_files
+where  relative_fno = 4;
+

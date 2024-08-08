@@ -1,0 +1,65 @@
+-- NL 조인
+begin
+  for outer in (select deptno, empno, rpad(ename, 10) ename from emp)  
+  loop    -- outer 루프
+    for inner in (select dname from dept where deptno = outer.deptno) 
+    loop  -- inner 루프
+      dbms_output.put_line(outer.empno||' : '||outer.ename||' : '||inner.dname);
+    end loop;
+  end loop;
+end;
+/
+
+
+-- 소트 머지 조인
+create table sorted_dept ( deptno primary key, dname  )
+organization index
+as 
+select deptno, dname from dept order by deptno ;
+
+create table sorted_emp( empno , ename , deptno
+  , constraint sorted_emp_pk primary key(deptno, empno) 
+)
+organization index
+as 
+select empno, ename, deptno from emp order by deptno ;
+;
+
+begin
+  for outer in (select deptno, empno, rpad(ename, 10) ename from sorted_emp)
+  loop    -- outer 루프
+    for inner in (select dname from sorted_dept where deptno = outer.deptno)
+    loop  -- inner 루프
+      dbms_output.put_line(outer.empno||' : '||outer.ename||' : '||inner.dname);
+    end loop;
+  end loop;
+end;
+/
+
+
+-- 해시 조인
+create cluster h# ( bucket number ) hashkeys 16 
+hash is mod(bucket, 16);
+
+create table dept_hashtable (bucket number, deptno number(2), dname varchar2(14) )
+cluster h# (bucket);
+
+insert into dept_hashtable
+select mod(deptno, 16) bucket, deptno, dname from dept;
+
+declare
+  l_bucket number;
+begin
+  for outer in (select deptno, empno, rpad(ename, 10) ename from emp)   
+  loop    -- outer 루프
+    l_bucket := mod(outer.deptno, 16);
+    for inner in (select deptno, dname from dept_hashtable 
+                  where  bucket = l_bucket
+                  and    deptno = outer.deptno) 
+    loop  -- inner 루프
+      dbms_output.put_line(outer.empno||' : '||outer.ename||' : '||inner.dname);
+    end loop;
+  end loop;
+end;
+/
+
