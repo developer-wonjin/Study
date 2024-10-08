@@ -1,24 +1,15 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-int n, a[1004], cnt;
-int go(int s, int e) {
-
-    cout << "go(" << s << ", " << e << ")\n";
-
-    if (s == e) return a[s];
-    int mid = (s + e) / 2;
-    return go(s, mid) + go(mid+1, e);
-}
 int main()
 {
-    cin >> n;
+    ios::sync_with_stdio(0); cin.tie(0);
 
-    for (int i=1; i<=n; i++){
-        a[i-1] = i;
-    }
+    vector<int> v = {0, 1, 2, 3, 4};
 
-    int sum = go(0, n-1);
-    cout << sum << '\n';
+    auto it = v.insert(v.begin() + 1, 100);
+
+    for(auto& ele : v)cout << ele << " ";
+
     return 0;
 }

@@ -1,45 +1,16 @@
 #include <iostream>
 #include <string>
 #include <stack>
-
+#include <vector>
 using namespace std;
 
-int len;
-int res;
+int main(void) {
 
-bool notMatch(char ele, char ch) {
-    if (ele == '(' && ch == ')') return false;
-    if (ele == '[' && ch == ']') return false;
-    if (ele == '{' && ch == '}') return false;
-    return true;
-}
+    vector<int> a = {1,2,3,4,5,6};
 
-void solve(string &newS) {
-    stack<char> stk;
-    
-    for (int j = 0; j < len; j++) {
-        char newCh = newS[j];
-        if (newCh == '(' || newCh == '[' || newCh == '{') {
-            stk.push(newCh);
-        } else if (stk.empty() || notMatch(stk.top(), newCh)) {
-            return;
-        } else {
-            stk.pop();
-        }
+    for (auto it = a.rbegin(); it != a.rend(); it++) {
+        cout << *it << " ";
     }
 
-    if (stk.size() == 0) {
-        res++;
-    }
-}
-
-int solution(string s) {
-    len = s.length();
-    
-    for (int i = 0; i < len; i++) {
-        s = s.substr(1) + s[0];
-        solve(s);
-    }
-
-    return res;
+    return 0;
 }

@@ -5,6 +5,7 @@
 
 using namespace std;
 
+// 순열의 시간복잡도 O(N * N!)
 int main(){
     vector<int> a = {1, 2, 3, 100, 200}; 
     sort(a.begin(), a.end());
