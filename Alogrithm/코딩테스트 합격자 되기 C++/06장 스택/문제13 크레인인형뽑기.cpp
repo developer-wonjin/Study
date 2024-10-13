@@ -17,28 +17,28 @@ using namespace std;
 */
 #include <iostream>
 int cnt;
-stack<int> sections[31];
 stack<int> basket;
 int solution(vector<vector<int>> board, vector<int> moves) {
     
+    stack<int> sections[board[0].size()];
 
-    for (auto it = board.rbegin(); it != board.rend(); it++){
-        vector<int>& boardPart = *it;
-        for (int col = 0; col < boardPart.size(); col++){
-            if (boardPart[col] > 0)sections[col].push(boardPart[col]);
+//    for (auto it = board.rbegin(); it != board.rend(); it++){
+    for (int i = board.size() - 1; i >= 0; i--){
+        for (int j = 0; j < board[0].size(); j++){
+            if (board[i][j])sections[j].push(board[i][j]);
         }
     }
 
-    for (int i = 0; i < board.size(); i++) cout << sections[i].size() << " ";
-    cout << "\n";
-
-    for (int& move : moves){
+    for (int move : moves){
         int col = move - 1;
         stack<int>& section = sections[col];
         
+        // 굉장히 좋은 습관
         if (section.empty()) continue;
         
-        if ( !basket.empty() && basket.top() == section.top()) {
+        // 위에서 section이 채워있음을 보장했으니 section.top()을 사용할 수 있음
+        // basket이 채워져 있음을 선조건으로 달아놨으니 basket.top()을 사용할 수 있음
+        if (basket.size() && basket.top() == section.top()) {
                 basket.pop();
                 cnt += 2;
         } else {
