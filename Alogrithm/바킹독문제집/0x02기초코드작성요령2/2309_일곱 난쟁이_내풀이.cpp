@@ -16,30 +16,31 @@ void solution(){
     20, 7, 23, 19, 10, 15, 25, 8, 13
     */
     
-    for (int i = 0; i < 9; i++) {
-        cin >> heights[i];
-        sum += heights[i];
+    for (int height : heights) {
+        cin >> height;
+        sum += height;
+        check[height] = 1;
     }
 
     int delta = sum - 100;
 
     pair<int, int> p;
-
-    for (int hIdx = 0; hIdx < 9; hIdx++) {
-        int height = heights[hIdx];
-
-        if (delta - height > 0 && check[delta - height]){
-            p = {height, delta - height};
+    vector<int> v;
+    
+    for (int height : heights) {
+        int otherHeight = delta - height;
+        if (otherHeight <= 0) continue;
+        if (check[otherHeight]){
+            p = {height, otherHeight};
             break;
         }
-        check[height] = 1;
     }
 
-    vector<int> v;
     for (auto ele : heights){
         if (ele == p.first || ele == p.second) continue;
         v.push_back(ele);
     }
+
     sort(v.begin(), v.end());
 
     for (auto ele : v)cout << ele << "\n";
