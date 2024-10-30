@@ -18,15 +18,21 @@ bool cmp(const pair<int, int> &a, const pair<int, int> &b){
 
 vector<int> solution2(vector<int> answers) {
     vector<int> answer;
-    vector<int> scores(3);
+    vector<int> scores(3);// {0, 0, 0}
     
+    // O(N)
     for (int stuNum = 0; stuNum < stuAnswers.size(); stuNum++){
         vector<int>& stuAnswer = stuAnswers[stuNum];
         int t = stuAnswer.size();
         for (int i = 0; i < answers.size(); i++){
+
+            //i   0 1 2 3 4 5 6 7 8
+            //i%t 0 1 2 3 4 0 1 2 3             
             if (answers[i] == stuAnswer[i%t])scores[stuNum]++; 
         }
     }
+
+    // O(N)
     int maxScore = *max_element(scores.begin(), scores.end());
     for (int i = 0; i < 3; i++){
         if (scores[i] == maxScore) answer.push_back(i+1);

@@ -18,6 +18,13 @@ vector<int> solution(int N, vector<int> stages) {
 
     for (int stage : stages){
         for (int i = 1; i <= stage; i++) trying[i]++;
+
+        // 5 
+        // [2, 1, 2, 6, 2, 4, 3, 3]
+
+        // [0, 1, 2, 3, 4, 5]
+        //  X  4  3  1  1  1       
+
         notClear[stage]++;
     }
 

@@ -18,6 +18,20 @@ bool cmp (pair<int, double>& a, pair<int, double>& b){
     return a.second > b.second;
 }
 
+/*
+N     : 5
+stages: [2, 1, 2, 6, 2, 4, 3, 3] 
+
+
+
+스테이지NO 0   1   2   3   4   5   6   7
+remain   [X   1   3   2   1   0   1           : 스테이지에 도달했으나 클리어하지 못한 플레이어수 집계
+reached  [X   8   7   4   2   1   1   0]      : 스테이지에 도달한 플레이어수 집계
+
+
+*/
+
+
 vector<int> solution(int N, vector<int> stages) {
     vector<int> answer;
 
@@ -26,7 +40,7 @@ vector<int> solution(int N, vector<int> stages) {
     }
 
     for (int i = N + 1; i > 0; i--){
-        passStages[i] = passStages[i + 1] + onStages[i];
+        passStages[i] = passStages[i + 1] + onStages[i]; // O(1)
     }
 
     vector<pair<int, double>> v;

@@ -1,9 +1,15 @@
 #include<bits/stdc++.h>
 
 using namespace std;
-
+// 
 vector<int> solution(vector<int> lst) {
-    sort(lst.rbegin(), lst.rend());
+    
+    //2 1 1 3 2 5 4
+    sort(lst.rbegin(), lst.rend());// NlogN
+
+    //1 1 2 2 3 4 5
+
+    //1 2 3 4 5
     lst.erase(unique(lst.begin(), lst.end()), lst.end());
     return lst;
 }
