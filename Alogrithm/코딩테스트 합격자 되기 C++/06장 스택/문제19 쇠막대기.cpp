@@ -1,4 +1,5 @@
 //https://www.acmicpc.net/problem/2493
+//https://www.youtube.com/watch?v=m_EtZVDHbbE
 
 #include<bits/stdc++.h>
 
