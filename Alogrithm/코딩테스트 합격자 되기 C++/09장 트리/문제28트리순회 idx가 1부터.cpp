@@ -4,31 +4,31 @@
 
 using namespace std;
 
-string preOrder(const vector<int>& nodes, int idx) {
+string preOrder(const vector<string>& nodes, int idx) {
     if (idx > nodes.size()) {
         return "";
     }
 
     string ret = "";
-    ret += to_string(nodes[idx-1]) + " ";
+    ret += nodes[idx-1] + " ";
     ret += preOrder(nodes, idx * 2);
     ret += preOrder(nodes, idx * 2 + 1);
     return ret;
 }
 
-string inOrder(const vector<int>& nodes, int idx) {
+string inOrder(const vector<string>& nodes, int idx) {
     if (idx > nodes.size()) {
         return "";
     }
     cout << idx << " ";
     string ret = "";
     ret += inOrder(nodes, idx * 2);
-    ret += to_string(nodes[idx-1]) + " ";
+    ret += nodes[idx-1] + " ";
     ret += inOrder(nodes, idx * 2 + 1);
     return ret;
 }
 
-string postOrder(const vector<int>& nodes, int idx) {
+string postOrder(const vector<string>& nodes, int idx) {
     if (idx > nodes.size()) {
         return "";
     }
@@ -36,11 +36,11 @@ string postOrder(const vector<int>& nodes, int idx) {
     string ret = "";
     ret += postOrder(nodes, idx * 2);
     ret += postOrder(nodes, idx * 2 + 1);
-    ret += to_string(nodes[idx-1]) + " ";
+    ret += nodes[idx-1] + " ";
     return ret;
 }
 
-vector<string> solution(vector<int> nodes) {
+vector<string> solution(vector<string> nodes) {
     vector<string> ret;
     ret.push_back(preOrder(nodes, 1));
     ret.push_back(inOrder(nodes, 1));
@@ -49,7 +49,9 @@ vector<string> solution(vector<int> nodes) {
 }
 
 int main() {
-    const vector<string>& ret = solution({1,2,3,4,5,6,7});
+    const vector<string>& ret = solution(
+        {"A","B","C","D","E","F","G"}
+    );
     for (auto& ele : ret) {
         cout << "\n" << ele;
     }
