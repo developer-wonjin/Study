@@ -41,10 +41,35 @@ A, B, C가 주어지고, 상근이의 트럭이 주차장에 주차된 시간이
 
 480
 */
+
+int cnts[101];
+int a,b,c;
+
 int main() {
     ios::sync_with_stdio(0); cin.tie(0);
 
+    cin >> a >> b >> c;
 
+    for (int i = 0; i < 3; i++) {
+        int x, y;
+        cin >> x >> y;
+        for (int j = x; j < y; j++){
+            cnts[j]++;
+        }
+    }
+
+    int tot = 0;
+    for (auto& ele : cnts) {
+        if (ele == 1) {
+            tot += ele * a;
+        } else if (ele == 2) {
+            tot += ele * b;
+        } else {
+            tot += ele * c;
+        }
+    }
+
+    cout << tot;
 
     return 0;
 }
