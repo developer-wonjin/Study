@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int n = 4, r = 3, a[4] = {1,2,3,4};
+int n = 4, r = 3, a[4] = {100,200,300,400};
 vector<int> bucket;
 
 void printV() {
@@ -18,6 +18,8 @@ void combi(int start) {
         return;
     }
 
+    // 0123       0
+    // 0123       0
     for (int i = start + 1; i < n; i++) {
         bucket.push_back(i);
         combi(i);

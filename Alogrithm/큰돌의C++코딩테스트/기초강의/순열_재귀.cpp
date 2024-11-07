@@ -6,7 +6,7 @@ using namespace std;
 
 vector<int> v = {0, 1, 2, 3};
 int n = 4;
-int r = 1;
+int r = 2;
 
 void printV(vector<int> &v) {
     for (int i = 0; i < r; i++) {
@@ -26,7 +26,7 @@ void makePermutation(int depth){
     for (int i = depth; i < n; i++) {
         swap(v[depth], v[i]);
         makePermutation(depth+1);
-        swap(v[depth], v[i]);
+        swap(v[depth], v[i]);//제자리로 돌려놓기
     }
 }
 

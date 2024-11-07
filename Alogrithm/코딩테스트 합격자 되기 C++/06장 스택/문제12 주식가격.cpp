@@ -1,3 +1,4 @@
+//
 #include <string>
 #include <vector>
 #include <stack>
@@ -15,7 +16,7 @@ vector<int> solution(vector<int> prices) {
     int priceNum = prices.size();
     
     for(int i=0;i<priceNum;i++){
-        while(!s.empty()&&prices[s.top()]>prices[i]){
+        while(s.size()&&prices[s.top()]>prices[i]){
            //❷ 가격이 떨어졌으므로 이전 가격의 기간 계산 
             answer[s.top()] = i-s.top();
             s.pop();

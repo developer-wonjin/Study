@@ -39,8 +39,8 @@ int solution(vector<vector<int>> board, vector<int> moves) {
         // 위에서 section이 채워있음을 보장했으니 section.top()을 사용할 수 있음
         // basket이 채워져 있음을 선조건으로 달아놨으니 basket.top()을 사용할 수 있음
         if (basket.size() && basket.top() == section.top()) {
-                basket.pop();
-                cnt += 2;
+            basket.pop();
+            cnt += 2;
         } else {
             basket.push(section.top()); 
         }

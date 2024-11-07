@@ -2,7 +2,6 @@
 //https://www.youtube.com/watch?v=m_EtZVDHbbE
 
 #include<bits/stdc++.h>
-
 using namespace std;
 
 /*
