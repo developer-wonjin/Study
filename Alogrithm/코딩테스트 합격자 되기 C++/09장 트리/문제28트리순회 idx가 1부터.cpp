@@ -5,38 +5,38 @@
 using namespace std;
 
 string preOrder(const vector<string>& nodes, int idx) {
-    if (idx > nodes.size()) {
+    if (idx >= nodes.size()) {
         return "";
     }
 
     string ret = "";
-    ret += nodes[idx-1] + " ";
+    ret += nodes[idx] + " ";
     ret += preOrder(nodes, idx * 2);
     ret += preOrder(nodes, idx * 2 + 1);
     return ret;
 }
 
 string inOrder(const vector<string>& nodes, int idx) {
-    if (idx > nodes.size()) {
+    if (idx >= nodes.size()) {
         return "";
     }
     cout << idx << " ";
     string ret = "";
     ret += inOrder(nodes, idx * 2);
-    ret += nodes[idx-1] + " ";
+    ret += nodes[idx] + " ";
     ret += inOrder(nodes, idx * 2 + 1);
     return ret;
 }
 
 string postOrder(const vector<string>& nodes, int idx) {
-    if (idx > nodes.size()) {
+    if (idx >= nodes.size()) {
         return "";
     }
 
     string ret = "";
     ret += postOrder(nodes, idx * 2);
     ret += postOrder(nodes, idx * 2 + 1);
-    ret += nodes[idx-1] + " ";
+    ret += nodes[idx] + " ";
     return ret;
 }
 
@@ -50,7 +50,7 @@ vector<string> solution(vector<string> nodes) {
 
 int main() {
     const vector<string>& ret = solution(
-        {"A","B","C","D","E","F","G"}
+        {"", "A","B","C","D","E","F","G"}
     );
     for (auto& ele : ret) {
         cout << "\n" << ele;
