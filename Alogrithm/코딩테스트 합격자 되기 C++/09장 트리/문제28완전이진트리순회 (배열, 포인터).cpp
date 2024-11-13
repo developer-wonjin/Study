@@ -27,11 +27,6 @@ struct Node{
 Node nodes[100];
 
 string preOrder(int idx) {
-    // cout << idx << "\n";
-    // if (nodes[idx].left == -1 && nodes[idx].right == -1){
-    //     return "";
-    // }
-
     if (idx <= 0 || idx > N) return "";
 
     string ret = "";

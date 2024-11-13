@@ -6,7 +6,12 @@
 using namespace std;
 
 unordered_map<string, int> wantMap, discountMap;
-
+/*
+want:     ["banana", "apple", "rice", "pork", "pot"]
+number:   [3, 2, 2, 2, 1]
+discount: ["chicken", "apple", "apple", "banana", "rice", "apple", "pork", "banana", "pork", "rice", "pot", "banana", "apple", "banana"]
+discount: ["chicken", "apple", "apple", "banana", "rice", "apple", "pork", "banana", "pork", "rice", "pot", "banana", "apple", "banana"]
+*/
 void printMap(unordered_map<string, int>& map) {
     for (auto& ele : map) {
         cout << ele.first << ": " << ele.second << " ";

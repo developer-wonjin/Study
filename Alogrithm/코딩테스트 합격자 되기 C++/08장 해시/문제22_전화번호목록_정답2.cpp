@@ -12,7 +12,7 @@ bool isPrefix (string& phoneNumber) {
     string prefix = "";
     for (char digit : phoneNumber) {
         prefix += digit;
-        if (phoneBook.find(prefix) != phoneBook.end() && prefix != phoneNumber) {
+        if (prefix != phoneNumber && phoneBook.find(prefix) != phoneBook.end()) {
             return true;
         }
     }

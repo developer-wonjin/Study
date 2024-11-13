@@ -16,6 +16,7 @@ int main(){
 
     cin >> n;
 
+    // 사전에 check배열 미리 채워넣기
     for (int i = 0; i < n; i++){
         int temp;
         cin >> temp;
@@ -23,15 +24,15 @@ int main(){
         check[temp] = 1;
     }
     cin >> x;
+//x: 8
+//       1 2 3 4
+//target 7 6 5 4
 
-    /*[정답패턴]
-    다음 두 줄은 반드시 선후관계를 뒤집으면 안된다.
-    ex. 두 수의 합 x = 8 일 때 ele = 4 이면 res에 카운트가 되면 안된다.*/
-    for (int i = 0; i <n ; i++) {
+
+    for (int i = 0; i < n; i++) {
         int ele = v[i];
         int target = x - ele;
         if (target <= 0)continue;
-        if (target == ele)continue;        
         if (check[target]) res++;
     }
 
