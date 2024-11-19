@@ -16,6 +16,7 @@ struct Node {
 
 //❷ 이진트리 정의
 class BinaryTree {
+
 private:
   Node* root = nullptr;
   //❸ 노드 좌표를 기준으로 정렬할 때 기준이 되는 함수
@@ -70,8 +71,8 @@ public:
     }
   }
 
-// 전위순회 후 경로를 반환하는 함수  
-vector<int> getPreOrderTraversal() {
+  // 전위순회 후 경로를 반환하는 함수  
+  vector<int> getPreOrderTraversal() {
     vector<int> traversal;
     preOrder(root, traversal);
     

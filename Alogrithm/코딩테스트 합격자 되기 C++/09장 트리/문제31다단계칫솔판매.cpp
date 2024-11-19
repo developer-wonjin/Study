@@ -29,11 +29,7 @@ vector<int> solution(vector<string> enroll, vector<string> referral, vector<stri
       int to_distribute = money / 10;
       total[cur_name] += money - to_distribute;
       //❺ 현재 이름의 추천인이있으면, 현재이름은 추천인으로 변경, 그렇지 않으면 종료 
-      if (parent.find(cur_name) != parent.end()) {
-        cur_name = parent[cur_name];
-      } else {
-        break;
-      }
+      cur_name = parent[cur_name];
       //❻  현재 판매원이 추천인으로 변경되었으므로, 수익금도 이에 맞춰서 업데이트
       money = to_distribute;
     }
