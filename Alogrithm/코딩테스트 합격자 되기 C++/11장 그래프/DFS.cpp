@@ -6,7 +6,7 @@ int visited[10];
 vector<int> myGraph[10];
 
 // 재귀방식 : 방문했던 안했던간에 일단 DFS부터 진행해
-void DFS_RECURSIVE (int curr) {
+void DFS1 (int curr) {
     // 방문했던 안했던간에 DFS로 진입한다는 전제가 깔린 구현
     
     //방문한 노드라면
@@ -20,12 +20,12 @@ void DFS_RECURSIVE (int curr) {
 
     for (int i = 0; i < myGraph[curr].size(); i++) {
         int next = myGraph[curr][i];
-        DFS_RECURSIVE(next);
+        DFS1(next);
     }
 }
 
 // 완전탐색방식(추천)
-void DFS1 (int curr) {
+void DFS2 (int curr) {
     // 방문 안했던 new노드만 DFS로 진입한다는 전제가 깔린 구현
     visited[curr] = 1;
     cout << curr << " -> ";
@@ -33,20 +33,20 @@ void DFS1 (int curr) {
     for (int i = 0; i < myGraph[curr].size(); i++) {
         int next = myGraph[curr][i];
         if (visited[next])continue;
-        DFS1(next);
+        DFS2(next);
     }
 }
 
 // 완전탐색방식(가끔)
-// visited[curr] = 1;
-void DFS2 (int curr) {
+// visited[curr] = 1; 메소드호출전 필요함
+void DFS3 (int curr) {
     // 방문 안했던 new노드만 DFS로 진입한다는 전제가 깔린 구현
     cout << curr << " -> ";
     for (int i = 0; i < myGraph[curr].size(); i++) {
         int next = myGraph[curr][i];
         if (visited[next])continue;
-        visited[curr] = 1;
-        DFS1(next);
+        visited[next] = 1;
+        DFS3(next);
     }
 }
 
@@ -70,13 +70,14 @@ int main() {
         myGraph[b].push_back(a);
     }
 
-    DFS_RECURSIVE(1);cout << "\n";
-    fill(visited, visited+10, 0);
-    
     DFS1(1);cout << "\n";
     fill(visited, visited+10, 0);
     
     DFS2(1);cout << "\n";
+    fill(visited, visited+10, 0);
+    
+    visited[1] = 1;
+    DFS3(1);cout << "\n";
     return 0;
 }
 /*
