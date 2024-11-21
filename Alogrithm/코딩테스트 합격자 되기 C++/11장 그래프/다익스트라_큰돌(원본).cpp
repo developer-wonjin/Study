@@ -8,12 +8,12 @@ vector<int> weights[20004];
 
 int n, m, start;
 
-vector<int> dist(20004, INF); // 최단 거리 배열
+vector<int> distance(20004, INF); // 최단 거리 배열
 
 void dijkstra() {
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
     
-    dist[start] = 0;
+    distance[start] = 0;
     pq.push({0, start});
     
     while (!pq.empty()) {
@@ -22,16 +22,16 @@ void dijkstra() {
         pq.pop();
         
         // 느긋한 삭제
-        if (curr_distance != dist[curr]) continue;
+        if (curr_distance != distance[curr]) continue;
         
         for (int i = 0; i < graph[curr].size(); i++) {
             int next   =   graph[curr][i];
             int weight = weights[curr][i];
             int next_distance = curr_distance + weight;
             
-            if (next_distance >= dist[next]) continue;
+            if (next_distance >= distance[next]) continue;
 
-            dist[next] = next_distance;
+            distance[next] = next_distance;
             pq.push({next_distance, next});
         }
     }
@@ -49,7 +49,7 @@ int main() {
     dijkstra();
     for (int i = 1; i <= n; i++) {
         if (dist[i] == INF) cout << "INF\n";
-        else cout << dist[i] << "\n";
+        else cout << distance[i] << "\n";
     }
     return 0;
 }
