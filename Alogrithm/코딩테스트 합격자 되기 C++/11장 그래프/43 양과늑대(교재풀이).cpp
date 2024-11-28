@@ -1,3 +1,4 @@
+//
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -56,6 +57,7 @@ void dfs(vector<int> cur) {
             printV2(tree[node]);
             cout << "중에서 ";
             cout << g << " 추가(방문한적 없어서) \n";
+
             //❻ 현재 노드를 방문한 경우, 하지 않은 경우 모두 확인
             visited[g] = true;
             cur.push_back(g);

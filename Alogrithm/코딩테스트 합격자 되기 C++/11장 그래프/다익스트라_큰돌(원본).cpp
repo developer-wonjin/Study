@@ -18,16 +18,16 @@ void dijkstra() {
     
     while (!pq.empty()) {
         int curr          = pq.top().second;
-        int curr_distance = pq.top().first;
+        int distance = pq.top().first;
         pq.pop();
         
         // 느긋한 삭제
-        if (curr_distance != distance[curr]) continue;
+        if (distance != distance[curr]) continue;
         
         for (int i = 0; i < graph[curr].size(); i++) {
             int next   =   graph[curr][i];
             int weight = weights[curr][i];
-            int next_distance = curr_distance + weight;
+            int next_distance = distance + weight;
             
             if (next_distance >= distance[next]) continue;
 

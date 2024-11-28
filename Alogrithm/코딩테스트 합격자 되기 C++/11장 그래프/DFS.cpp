@@ -5,6 +5,7 @@ const int MAX = 100;
 int visited[MAX];
 vector<int> myGraph[MAX];
 vector<int> ans;
+
 // 재귀방식 : 방문했던 안했던간에 일단 DFS부터 진행해
 void DFS1 (int curr) {
     // 방문했던 안했던간에 DFS로 진입한다는 전제가 깔린 구현
@@ -20,6 +21,7 @@ void DFS1 (int curr) {
 
     for (int i = 0; i < myGraph[curr].size(); i++) {
         int next = myGraph[curr][i];
+
         DFS1(next);
     }
 }
@@ -35,6 +37,7 @@ void DFS2 (int curr) {
     for (int i = 0; i < myGraph[curr].size(); i++) {
         int next = myGraph[curr][i];
         if (visited[next])continue;
+
         DFS2(next);
     }
 }
@@ -44,10 +47,12 @@ void DFS2 (int curr) {
 void DFS3 (int curr) {
     // 방문 안했던 new노드만 DFS로 진입한다는 전제가 깔린 구현
     cout << curr << " -> ";
+
     for (int i = 0; i < myGraph[curr].size(); i++) {
         int next = myGraph[curr][i];
         if (visited[next])continue;
-        visited[next] = 1;
+
+        visited[next] = 1;//visited[curr] + 1;
         DFS3(next);
     }
 }
