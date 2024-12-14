@@ -37,7 +37,7 @@ int dx[4] = {0, 1, 0, -1};
 // int dy[4] = {0, -1, 0, 1};
 // int dx[4] = {1, 0, -1, 0};
 
-void dfs (int y, int x) {
+bool dfs (int y, int x) {
 
     for (int i = 0; i < NMAX; i++) {
         for (int j = 0; j < NMAX; j++) {
@@ -52,7 +52,7 @@ void dfs (int y, int x) {
 
     if (myMap[y][x] == 'E') {
         cout << "도달함\n";
-        return;
+        return true;
     }
 
     for (int dir = 0; dir < 4; dir++) {
@@ -64,11 +64,11 @@ void dfs (int y, int x) {
         if (myMap[ny][nx] == 'X') continue;
 
         visited[ny][nx] = visited[y][x] + 1;
-        dfs (ny, nx);
-        visited[ny][nx] = 0;
+        if (dfs (ny, nx)) return true;
     }
 
     cout << "도달 못함\n";
+    return false;
 }
 
 int main() {

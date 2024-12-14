@@ -13,6 +13,9 @@ void printV() {
   cout << "\n";
 }
 
+// S 
+// 0 1 2 3 4
+
 void DFS(int start, int sum) {
   cout << "start: " << start << ", sum: " << sum << " | ";
   printV();

@@ -63,6 +63,7 @@ bool solve_sudoku(int depth) {
 
     for (int num = 1; num <= 9; num++) {
         if (duplicate(next_row, next_col, num)) continue;
+        
         board[next_row][next_col] = num;
         if (solve_sudoku(nextdepth)) return true;   // 백트래킹
         board[next_row][next_col] = 0;
