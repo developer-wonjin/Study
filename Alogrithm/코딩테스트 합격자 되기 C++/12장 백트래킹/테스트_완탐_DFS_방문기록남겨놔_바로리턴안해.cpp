@@ -21,15 +21,15 @@ vector <vector<int>> visited(NMAX, vector<int>(NMAX, 0));
 
 vector<vector <vector<int>>> ans;
 
-//           U   R D  L
+//            U  R  D  L
 int dy[4] = {-1, 0, 1, 0};
-int dx[4] = {0, 1, 0, -1};
+int dx[4] = { 0, 1, 0,-1};
 
 // up R L down
 // int dy[4] = {-1, 0, 0, 1};
 // int dx[4] = {0, 1, -1, 0};
 
-//           R  D   L  U
+//              R  D   L  U
 // int dy[4] = {0, 1, 0, -1};
 // int dx[4] = {1, 0, -1, 0};
 
@@ -37,8 +37,7 @@ int dx[4] = {0, 1, 0, -1};
 // int dy[4] = {0, -1, 0, 1};
 // int dx[4] = {1, 0, -1, 0};
 
-void dfs (int y, int x) {
-
+void printMap() {
     for (int i = 0; i < NMAX; i++) {
         for (int j = 0; j < NMAX; j++) {
             if (myMap[i][j] == 'X') cout << " X ";
@@ -48,7 +47,12 @@ void dfs (int y, int x) {
         }
         cout << "\n";
     }
-    cout << "\n";
+    cout << "\n";    
+}
+
+// Start => End 가라 가기만해라(모든 노드를 방문를 방문해)
+void dfs (int y, int x) {
+    printMap();
 
     if (myMap[y][x] == 'E') {
         cout << "도달함\n";
@@ -65,10 +69,10 @@ void dfs (int y, int x) {
 
         visited[ny][nx] = visited[y][x] + 1;
         dfs (ny, nx);
-        visited[ny][nx] = 0;
     }
 
     cout << "도달 못함\n";
+    return;
 }
 
 int main() {

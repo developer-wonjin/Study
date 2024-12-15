@@ -46,6 +46,10 @@ int main() {
     //     cout << str << "\n";
     // }
 
+    int n;
+    while (cin >> n) {
+        cout << 1 << '\n';
+    }
         
 
     return 0;

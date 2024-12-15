@@ -37,8 +37,7 @@ int dx[4] = {0, 1, 0, -1};
 // int dy[4] = {0, -1, 0, 1};
 // int dx[4] = {1, 0, -1, 0};
 
-bool dfs (int y, int x) {
-
+void printMap() {
     for (int i = 0; i < NMAX; i++) {
         for (int j = 0; j < NMAX; j++) {
             if (myMap[i][j] == 'X') cout << " X ";
@@ -48,11 +47,16 @@ bool dfs (int y, int x) {
         }
         cout << "\n";
     }
-    cout << "\n";
+    cout << "\n";    
+}
+
+// Start => End 갈 수 있는 모든 경우의 수 구해라! (단, 이동거리의 비효율은 허용한다)
+void dfs (int y, int x) {
+    printMap();
 
     if (myMap[y][x] == 'E') {
         cout << "도달함\n";
-        return true;
+        return;
     }
 
     for (int dir = 0; dir < 4; dir++) {
@@ -64,11 +68,11 @@ bool dfs (int y, int x) {
         if (myMap[ny][nx] == 'X') continue;
 
         visited[ny][nx] = visited[y][x] + 1;
-        if (dfs (ny, nx)) return true;
+        dfs (ny, nx);
+        visited[ny][nx] = 0;
     }
 
     cout << "도달 못함\n";
-    return false;
 }
 
 int main() {
