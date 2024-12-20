@@ -40,6 +40,15 @@
 예제 출력 1 
 3
 5
+
+4 4
+0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0
+예제 출력 2
+0
+0
 */
 # include<bits/stdc++.h>
 using namespace std;
