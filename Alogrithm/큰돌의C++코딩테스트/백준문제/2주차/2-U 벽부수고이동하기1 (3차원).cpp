@@ -73,8 +73,8 @@ int bfs() {
         int cBreakCnt, cy, cx;
         tie(cBreakCnt, cy, cx) = curr;
 
-        // cout << "(" << cy << ", " << cx << ")\n";
-        // printV(cBreakCnt);
+        cout << "(" << cy << ", " << cx << ")\n";
+        printV(cBreakCnt);
 
         if (cy == n-1 && cx == m-1) {
             return visited[cBreakCnt][cy][cx];

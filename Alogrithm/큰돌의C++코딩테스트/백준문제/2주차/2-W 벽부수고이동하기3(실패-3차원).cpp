@@ -64,21 +64,13 @@ int bfs() {
         
         if (y == N - 1 && x == M - 1) return visited[k][y][x];
 
-        for (int dir = 0; dir < 5; dir++) {
+        for (int dir = 0; dir < 4; dir++) {
             int ny = y + dy[dir];
             int nx = x + dx[dir];
 
-            //이동하지 않고 같은 칸에 머물러있는 경우
-            if (ny == y && nx == x) {
-                visited[k][y][x]++;//이 경우도 방문한 칸의 개수가 하나 늘어나는 것으로 생각해야 한다.
-                q.push({k, !day, y, x}); //이동하지 않고 같은 칸에 머무르는 경우에도 낮과 밤이 바뀌게 된다.
-                continue;
-            }
-
             // 영역 검사
             if (ny < 0 || ny >= N || nx < 0 || nx >= M) continue;
-            
-            
+                        
             /*
             만약에 이동하는 도중에 벽을 부수고 이동하는 것이 좀 더 경로가 짧아진다면, 
             벽을 K개 까지 부수고 이동하여도 된다. 
@@ -102,6 +94,10 @@ int bfs() {
             visited[k][ny][nx] = visited[k][y][x] + 1;
             q.push({k, !day, ny, nx});
         }
+
+        
+        visited[k][y][x]++;//이 경우도 방문한 칸의 개수가 하나 늘어나는 것으로 생각해야 한다.
+        q.push({k, !day, y, x}); //이동하지 않고 같은 칸에 머무르는 경우에도 낮과 밤이 바뀌게 된다.
     }
 }
 
