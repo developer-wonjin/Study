@@ -67,15 +67,15 @@ int bfs() {
         char subj = curr.subj;
         int dis = curr.dis;
 
-        // for (int y = 0; y < R; y++) {
-        //     for (int x = 0; x < C; x++){
-        //         cout << myMap[y][x] << " ";
-        //     }
-        //     cout << "\n";
-        // }
-        // cout << "\n";
+        for (int y = 0; y < R; y++) {
+            for (int x = 0; x < C; x++){
+                cout << myMap[y][x] << " ";
+            }
+            cout << "\n";
+        }
+        cout << "\n";
 
-        // 불이 가장자리에 도착했을 때 리턴하는 불상사가 생김
+        // [오류코드] 불이 가장자리에 도착했을 때 리턴하는 불상사가 생김
         if (y == 0 || y == R - 1 || x == 0 || x == C - 1) return dis;
 
         for (int dir = 0; dir < 4; dir++){
@@ -83,12 +83,10 @@ int bfs() {
             int nx = x + dx[dir];
 
             if (ny < 0 || ny >= R || nx < 0 || nx >= C) continue;
-            if (myMap[ny][nx] == '#')continue;
-            if (subj == 'J') {
-                if (myMap[ny][nx] == 'J' || myMap[ny][nx] == 'F') continue;
-            } else {
-                if (myMap[ny][nx] == 'F') continue;    
-            }
+            if (myMap[ny][nx] == 'F' || myMap[ny][nx] == '#')continue;
+            
+            if (subj == 'J' && myMap[ny][nx] == 'J') continue;
+            
             myMap[ny][nx] = subj;
             q.push({ny, nx, subj, dis + 1});
         }

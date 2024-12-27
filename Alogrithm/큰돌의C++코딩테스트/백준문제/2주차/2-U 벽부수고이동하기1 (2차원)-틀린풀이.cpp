@@ -40,7 +40,7 @@ using namespace std;
 int n, m;
 
 char myMap[1000][1000];
-int visited[2][1000][1000]; // 첫번째 차원 벽을 뿌시기 횟수
+int visited[1000][1000]; // 첫번째 차원 벽을 뿌시기 횟수
 
 int ans = 987654321;
 
@@ -52,7 +52,7 @@ void printV(int cnt) {
     cout << "기회 " << cnt << "회 남음\n";
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            cout << visited[cnt][i][j] << " ";
+            cout << visited[i][j] << " ";
         }
         cout << "\n";
     }    
@@ -63,45 +63,43 @@ void printV(int cnt) {
 int bfs() {
     
     queue<tuple<int, int, int>> q;
-    visited[1][0][0] = 1;
+    visited[0][0] = 1;
     q.push(make_tuple(1, 0, 0));
 
     while(q.size()) {
 
         tuple<int ,int, int> curr = q.front(); q.pop();
 
-        int cBreakCnt, cy, cx;
-        tie(cBreakCnt, cy, cx) = curr;
+        int cChance, cy, cx;
+        tie(cChance, cy, cx) = curr;
 
-        // cout << "(" << cy << ", " << cx << ")\n";
-        // printV(cBreakCnt);
+        cout << "(" << cy << ", " << cx << ")\n";
+        printV(cChance);
 
         if (cy == n-1 && cx == m-1) {
-            return visited[cBreakCnt][cy][cx];
+            return visited[cy][cx];
         }
 
         for (int dir = 0; dir < 4; dir++) {
             int ny = cy + dy[dir];
             int nx = cx + dx[dir];
-            
+
             if (ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
-            
-            // BFS의 핵심
-            if (visited[cBreakCnt][ny][nx]) continue;
+            if (visited[ny][nx]) continue;
 
             // 벽일 때
             if (myMap[ny][nx] == '1') {
-                //if (cBreakCnt == 0) continue;
-                if (cBreakCnt == 0)continue;
-                if (visited[cBreakCnt - 1][ny][nx]) continue;
-                visited[cBreakCnt - 1][ny][nx] = visited[cBreakCnt][cy][cx] + 1;
-                q.push(make_tuple(cBreakCnt - 1, ny, nx));        
+                if (cChance == 0 || visited[ny][nx]) continue;
+                visited[ny][nx] = visited[cy][cx] + 1;
+                q.push(make_tuple(cChance - 1, ny, nx));        
                 continue;    
             } 
 
+
+
             // 지나갈 수 있으면
-            visited[cBreakCnt][ny][nx] = visited[cBreakCnt][cy][cx] + 1;
-            q.push(make_tuple(cBreakCnt, ny, nx));
+            visited[ny][nx] = visited[cy][cx] + 1;
+            q.push(make_tuple(cChance, ny, nx));
         }
     }
     return -1;
@@ -115,12 +113,7 @@ int main() {
             cin >> myMap[i][j];
         }
     }
-
     cout << bfs() << "\n";
-
-
-
-
     return 0;
 }
 
@@ -151,8 +144,30 @@ ver.3 벽을 뿌시는 기회가 K번 & 밤/낮
 예제 출력 2 
 -1
 
-3 3
-011
-000
-110
+6 4
+0010
+1110
+1000
+0000
+0111
+0000
+
+11
+
+5 5
+01000
+11110
+00010
+01110
+00000
+
+
+5 5
+01111
+00000
+11110
+00001
+00010
+
+
 */

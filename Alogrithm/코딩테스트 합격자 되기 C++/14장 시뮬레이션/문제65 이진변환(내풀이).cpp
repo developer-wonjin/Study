@@ -22,6 +22,7 @@ s에는 '1'이 최소 하나 이상 포함되어 있습니다.
 
 using namespace std;
 
+// 왜 시간초과가 안나는가...?
 string makeBinary(int x) {
     string ret;
     while (x > 0) {
@@ -38,14 +39,14 @@ vector<int> solution(string s) {
     int zeroCnt = 0;
     int t = 0;
     //s가 "1"이 될 때까지 계속해서 s에 이진 변환
-    while (s != "1") {
+    while (s != "1") { // O(log(n))
         t++;
         string tmp;
 
-        int zeroSize = count(s.begin(), s.end(), '0');
+        int zeroSize = count(s.begin(), s.end(), '0');// O(n)
         zeroCnt += zeroSize;
 
-        s = makeBinary(s.size() - zeroSize);
+        s = makeBinary(s.size() - zeroSize); // O(logk)
     }
 
     return {t, zeroCnt};

@@ -50,13 +50,13 @@ int dy[4] = {-1, 0, 1, 0};
 int dx[4] = {0, 1, 0, -1};
 
 void dfs(int y, int x, int chance) {
-    // cout << "\n";cout << "\n";
-    // for (int i = 0; i < n; i++) {
-    //     for (int j = 0; j < m; j++) {
-    //         cout << visited[i][j] << " ";
-    //     }
-    //     cout << "\n";
-    // }
+    cout << "\n";cout << "\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            cout << visited[i][j] << " ";
+        }
+        cout << "\n";
+    }
 
 
     if (y == n - 1 && x == m - 1) {
@@ -142,7 +142,7 @@ int main() {
 0111
 0000
 예제 출력 3 
-
+11
 
 
 */

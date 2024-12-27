@@ -62,10 +62,9 @@ int bfs() {
             
             // 벽 검사
             if (myMap[ny][nx] == '1') {
-                if (curr.k && visited[curr.k - 1][ny][nx] == 0) {
-                    visited[curr.k - 1][ny][nx] = visited[curr.k][curr.y][curr.x] + 1;
-                    q.push({curr.k - 1, ny, nx});
-                }
+                if (curr.k == 0 || visited[curr.k - 1][ny][nx]) continue;
+                visited[curr.k - 1][ny][nx] = visited[curr.k][curr.y][curr.x] + 1;
+                q.push({curr.k - 1, ny, nx});
                 continue;
             }
             

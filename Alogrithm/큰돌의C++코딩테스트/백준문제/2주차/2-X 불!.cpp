@@ -50,11 +50,13 @@ using namespace std;
 
 int R, C;
 char myMap[1000][1000];
-struct Node{
+
+struct Node {
     int y,x;
     char subj;
     int dis;
 };
+
 queue<Node> q;
 int dy[] = {-1, 1, 0, 0};
 int dx[] = {0, 0, -1, 1};
@@ -79,19 +81,19 @@ int bfs() {
 
         // printV();
 
-        if (subj == 'J' &&  (y == 0 || y == R - 1 || x == 0 || x == C - 1))
-            return dis;
+        if (subj == 'J' &&  (y == 0 || y == R - 1 || x == 0 || x == C - 1)) return dis;
 
         for (int dir = 0; dir < 4; dir++){
             int ny = y + dy[dir];
             int nx = x + dx[dir];
 
             if (ny < 0 || ny >= R || nx < 0 || nx >= C) continue;
-            if (subj == 'F') {
-                if (myMap[ny][nx] == 'F' || myMap[ny][nx] == '#') continue;
-            }else if (subj == 'J') {
-                if (myMap[ny][nx] == 'J' || myMap[ny][nx] == 'F' || myMap[ny][nx] == '#') continue;
-            } 
+            if (myMap[ny][nx] == 'F' || myMap[ny][nx] == '#')continue;
+            
+            if (subj == 'J' && myMap[ny][nx] == 'J') continue;
+
+            // F --> . or J
+            // J --> .
             myMap[ny][nx] = subj;
             q.push({ny, nx, subj, dis + 1});
         }
@@ -122,7 +124,7 @@ int main () {
     q.push(human);
 
     int res = bfs();
-    if(res == -1) cout << -1 << "\n";
+    if(res == -1) cout << "IMPOSSIBLE" << "\n";
     else cout << res << "\n";
 
     return 0;
@@ -138,4 +140,10 @@ int main () {
 #..#
 예제 출력 1 
 3
+
+4 4
+####
+#J.#
+#.F#
+#..#
 */
