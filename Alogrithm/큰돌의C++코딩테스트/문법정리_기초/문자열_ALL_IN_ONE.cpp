@@ -22,13 +22,21 @@ int main() {
     
     // +=
     str += "AA";
-    cout << "str: " << str << " , size: " << str.size() << "\n";//str: 01234AAA , size: 8
+    cout << "str: " << str << " , size: " << str.size() << "\n";//str: 01234AA , size: 7
 
     // insert
     int pos = str.size() - 1;
-    int target
+    string target = "BBB";
     str.insert(pos, target);
     cout << "str: " << str << " , size: " << str.size() << "\n\n";//str: 01234ABBBA , size: 10  
+
+    // remove
+    string str2 = "ABC D E  F";
+    cout << str2 << "\n";// ABC D E  F
+    auto it = remove(str2.begin(), str2.end(), ' ');
+    cout << str2 << "\n";// ABCDEFE  F
+    str2.erase(it, str2.end());
+    cout << str2 << "\n";// ABCDEFE
 
     // erase
     int sIdx = 5;
@@ -37,7 +45,7 @@ int main() {
     cout << "str: " << str << " , size: " << str.size() << "\n\n";//str: 01234 , size: 5        
 
     // find
-    str += "AAA";
+    str = "01234AAA";
     cout << "str: " << str << " , size: " << str.size() << "\n\n";//str: 01234AAA , size: 8     
     size_t it1 = str.find("AA");
     cout << it1 << "\n";       //5
@@ -97,7 +105,7 @@ int main() {
 
     // replace
     string origin = "01234567890";
-    string target = "AAAA";
+    target = "AAAA";
     origin.replace(2, target.size(), target);
     cout << "origin: " << origin << "\n\n";
 
