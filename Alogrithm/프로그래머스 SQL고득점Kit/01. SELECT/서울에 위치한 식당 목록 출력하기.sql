@@ -1,4 +1,4 @@
--- 통과함
+-- 통과함 무지성 조인방식
 SELECT
       A.REST_ID
     , A.REST_NAME
@@ -17,16 +17,20 @@ GROUP BY
     , A.ADDRESS
 ORDER BY 6 DESC, 4 DESC
 
-
-SELECT  I.REST_ID, I.REST_NAME, I.FOOD_TYPE, I.FAVORITES, I.ADDRESS, ROUND(AVG(R.REVIEW_SCORE),2) AS SCORE
-FROM    REST_INFO I, REST_REVIEW R
-WHERE   1=1
-AND     I.REST_ID=R.REST_ID -- 리뷰가 존재하는 식당만 조인에 성공해서 결과집합에 포함됨
-AND     I.ADDRESS LIKE '서울%'
-GROUP BY I.REST_ID, I.REST_NAME, I.FOOD_TYPE, I.FAVORITES, I.ADDRESS
-ORDER BY SCORE DESC, I.FAVORITES DESC 
-;
-
+-- 통과함 1: N 집합에서 N집합을 먼저 REST_ID 그룹핑을 진행하여 1집합으로 축소시킨다.
+-- 단, 조인에 성공하는 
+SELECT 
+      A.REST_ID
+    , A.REST_NAME
+    , A.FOOD_TYPE
+    , A.FAVORITES
+    , A.ADDRESS
+    , NVL(B.SCORE, 0) SCORE -- 리뷰를 받아본적 없는 식당의 경우 null 이 나오는데... ==> NVL 혹은 
+FROM REST_INFO  A, 
+    (SELECT REST_ID, ROUND(AVG(REVIEW_SCORE), 2) SCORE FROM REST_REVIEW GROUP BY REST_ID)  B
+WHERE A.REST_ID = B.REST_ID(+)
+AND A.ADDRESS LIKE '서울%'
+ORDER BY 6 DESC, 4 DESC
 
 
 -- 통과못함
